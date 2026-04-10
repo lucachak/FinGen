@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{layout/layout :: layout(
+          pageTitle='Cadastro de Morador',
+          content=~{::main},
+          pageStyles=~{::style},
+          pageScripts=~{::script}
+      )}" lang="pt-BR">
+
+<head>
+  <style th:fragment="style"></style>
+</head>
+
+<body>
+  <main>
+    <div class="max-w-[540px] mx-auto animate-[fade-up_.35s_ease_both]">
+      
+      <div class="mb-6 flex items-center justify-between">
+        <div>
+          <h1 class="font-serif text-[28px] font-medium text-zen-t1 tracking-tight" th:text="${morador.id == null ? 'Novo Morador' : 'Editar Morador'}">Morador</h1>
+        </div>
+        <a th:href="@{/app/settings/moradores}" class="text-[13px] font-medium text-zen-t3 hover:text-brand transition-colors flex items-center gap-1.5"><svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg> Voltar</a>
+      </div>
+
+      <div class="bg-zen-surface border border-zen-border rounded-[24px] overflow-hidden shadow-sm">
+        <div class="px-8 py-6 border-b border-zen-border bg-zen-surface2 flex items-start gap-4">
+          <div class="w-10 h-10 rounded-xl bg-zen-surface border border-zen-border flex items-center justify-center shrink-0 text-zen-t2 shadow-sm">
+            <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          </div>
+          <div>
+            <div class="text-[17px] font-semibold text-zen-t1" th:text="${morador.id == null ? 'Morador Pessoal' : 'Atualizar Morador'}">Morador</div>
+            <div class="text-[13.5px] text-zen-t3 mt-1 leading-relaxed">
+              Adicione detalhes e personalize o acesso deste morador na plataforma Zen Serenity.
+            </div>
+          </div>
+        </div>
+        
+        <form th:action="@{/app/settings/moradores/salvar}" th:object="${morador}" method="post" enctype="multipart/form-data">
+          <input type="hidden" th:field="*{id}" />
+
+          <div class="p-8 flex flex-col gap-6">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+              <div class="flex flex-col gap-2">
+                <label class="text-[12px] font-semibold text-zen-t2 uppercase tracking-widest ml-1">Nome Completo</label>
+                <input type="text" th:field="*{nomeCompleto}" class="w-full px-4 py-3 border border-zen-border rounded-xl bg-zen-surface2 text-[14.5px] text-zen-t1 focus:bg-zen-surface focus:border-brand focus:ring-2 focus:ring-brand/20 transition-all outline-none" placeholder="Ex: João da Silva" required>
+              </div>
+              <div class="flex flex-col gap-2">
+                <label class="text-[12px] font-semibold text-zen-t2 uppercase tracking-widest ml-1">E-mail</label>
+                <input type="email" th:field="*{email}" class="w-full px-4 py-3 border border-zen-border rounded-xl bg-zen-surface2 text-[14.5px] text-zen-t1 focus:bg-zen-surface focus:border-brand focus:ring-2 focus:ring-brand/20 transition-all outline-none" placeholder="joao@email.com" required>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+              <div class="flex flex-col gap-2">
+                <label class="text-[12px] font-semibold text-zen-t2 uppercase tracking-widest ml-1">Nome de Utilizador</label>
+                <input type="text" th:field="*{username}" class="w-full px-4 py-3 border border-zen-border rounded-xl bg-zen-surface2 text-[14.5px] text-zen-t1 focus:bg-zen-surface focus:border-brand focus:ring-2 focus:ring-brand/20 transition-all outline-none" placeholder="Ex: joao" required>
+                <div class="text-[11.5px] text-zen-t3 ml-1 mt-0.5">Sem espaços. Usado no login.</div>
+              </div>
+              <div class="flex flex-col gap-2">
+                <label class="text-[12px] font-semibold text-zen-t2 uppercase tracking-widest ml-1">Telefone</label>
+                <input type="text" th:field="*{telefone}" class="w-full px-4 py-3 border border-zen-border rounded-xl bg-zen-surface2 text-[14.5px] text-zen-t1 focus:bg-zen-surface focus:border-brand focus:ring-2 focus:ring-brand/20 transition-all outline-none" placeholder="Ex: 912 345 678">
+              </div>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+              <div class="flex flex-col gap-2">
+                <label class="text-[12px] font-semibold text-zen-t2 uppercase tracking-widest ml-1">Orçamento Mensal (R$)</label>
+                <input type="number" step="0.01" th:field="*{orcamentoMensal}" class="w-full px-4 py-3 border border-zen-border rounded-xl bg-zen-surface2 text-[14.5px] text-zen-t1 focus:bg-zen-surface focus:border-brand focus:ring-2 focus:ring-brand/20 transition-all outline-none" placeholder="3500.00">
+              </div>
+              <div class="flex flex-col justify-center gap-2">
+                <label class="text-[12px] font-semibold text-zen-t2 uppercase tracking-widest ml-1">Acesso ao Sistema</label>
+                <label class="flex items-center gap-3 px-1 mt-2 cursor-pointer group">
+                  <div class="relative flex items-center justify-center">
+                    <input type="checkbox" th:field="*{ativo}" class="peer appearance-none w-5 h-5 border border-zen-border rounded bg-zen-surface2 checked:bg-brand checked:border-brand focus:outline-none focus:ring-2 focus:ring-brand/20 transition-all cursor-pointer">
+                    <svg class="absolute w-3.5 h-3.5 text-white opacity-0 peer-checked:opacity-100 pointer-events-none" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                  </div>
+                  <span class="text-[14px] font-medium text-zen-t1 group-hover:text-brand transition-colors">Permitir Login (Ativo)</span>
+                </label>
+              </div>
+            </div>
+
+            <div class="flex flex-col gap-2 mt-2 pt-6 border-t border-zen-border">
+              <label class="text-[12px] font-semibold text-zen-t2 uppercase tracking-widest ml-1">Foto de Perfil</label>
+              <input type="file" name="fileFoto" accept="image/*" class="w-full px-4 py-3 border border-zen-border border-dashed rounded-xl bg-zen-surface text-[14px] text-zen-t1 file:mr-4 file:py-2.5 file:px-4 file:rounded-lg file:border-0 file:text-[13px] file:font-semibold file:bg-brand/10 file:text-brand hover:file:bg-brand/20 cursor-pointer transition-all">
+              <div class="text-[11.5px] text-zen-t3 ml-1 mt-1">A foto será atualizada ao gravar as alterações.</div>
+            </div>
+
+            <div class="flex flex-col gap-2 border-t border-zen-border pt-6 mt-2">
+              <label class="text-[12px] font-semibold text-zen-t2 uppercase tracking-widest ml-1" th:text="${morador.id == null ? 'Senha Autenticação' : 'Nova Senha'}">Senha</label>
+              <input type="password" th:field="*{password}" class="w-full px-4 py-3 border border-zen-border rounded-xl bg-zen-surface2 text-[14.5px] text-zen-t1 focus:bg-zen-surface focus:border-brand focus:ring-2 focus:ring-brand/20 transition-all outline-none font-mono" placeholder="••••••••" th:required="${morador.id == null}">
+              <div class="text-[11.5px] text-zen-t3 ml-1 mt-0.5" th:if="${morador.id != null}">Deixe em branco para manter a senha atual inalterada.</div>
+            </div>
+
+          </div>
+
+          <div class="px-8 py-6 border-t border-zen-border bg-zen-surface2 flex gap-3 justify-end items-center">
+            <a th:href="@{/app/settings/moradores}" class="px-5 py-2.5 text-[14px] font-medium text-zen-t3 hover:text-zen-t1 transition-colors">Cancelar</a>
+            <button type="submit" class="px-7 py-2.5 bg-brand hover:bg-brand-h text-white rounded-lg font-medium transition-all shadow-sm hover:shadow text-[14.5px]">Guardar Morador</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </main>
+  <script th:fragment="script"></script>
+</body>
+
+</html>

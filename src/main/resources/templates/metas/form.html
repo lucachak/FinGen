@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{layout/layout :: layout(
+          pageTitle='Nova Meta',
+          content=~{::main},
+          pageStyles=~{::style},
+          pageScripts=~{::script}
+      )}" lang="pt-BR">
+
+<head>
+  <style th:fragment="style">
+    .zen-input:focus {
+      background-color: white !important;
+      border-color: var(--brand) !important;
+      box-shadow: 0 0 0 4px rgba(20, 184, 166, 0.1) !important;
+    }
+  </style>
+</head>
+
+<body>
+  <main>
+    <div class="max-w-[1000px] mx-auto animate-[fade-up_.35s_ease_both]">
+      <div class="mb-8 flex items-center justify-between">
+        <div class="flex items-center gap-4">
+          <a th:href="@{/app/financeiro/metas}" class="group w-10 h-10 rounded-full border border-zen-border flex items-center justify-center hover:bg-zen-surface2 transition-all">
+            <i data-lucide="arrow-left" class="w-5 h-5 text-zen-t3 group-hover:text-brand transition-colors"></i>
+          </a>
+          <div>
+            <h1 class="font-serif text-[32px] font-medium text-zen-t1 tracking-tight" th:text="${meta.id == null ? 'Nova Meta' : 'Editar Meta'}">Meta</h1>
+            <p class="text-[14px] text-zen-t3 font-light">Transforme seus sonhos em planos tangíveis.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+        
+        <!-- Form Column -->
+        <div class="lg:col-span-7 bg-zen-surface border border-zen-border rounded-[32px] overflow-hidden shadow-sm p-8">
+          <form th:action="@{/app/financeiro/metas/salvar}" th:object="${meta}" method="post" class="flex flex-col gap-8">
+            <input type="hidden" th:field="*{id}" />
+            <input type="hidden" th:field="*{responsavel.id}" th:if="${meta.responsavel != null}" />
+            <input type="hidden" th:field="*{icone}" id="iconeInput" />
+
+            <div class="space-y-6">
+              <!-- Título e Natureza -->
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                <div class="flex flex-col gap-2">
+                  <label class="text-[12px] font-semibold text-zen-t2 uppercase tracking-widest ml-1" for="tituloInput">O que você quer conquistar?</label>
+                  <input type="text" th:field="*{titulo}" id="tituloInput" class="w-full px-5 py-3.5 border border-zen-border rounded-2xl bg-zen-surface2 text-[15px] text-zen-t1 transition-all outline-none zen-input" placeholder="Ex: Viagem para o Japão" required>
+                </div>
+                <div class="flex flex-col gap-2">
+                  <label class="text-[12px] font-semibold text-zen-t2 uppercase tracking-widest ml-1" for="naturezaSelect">Natureza do Objetivo</label>
+                  <select th:field="*{natureza}" id="naturezaSelect" class="w-full px-5 py-3.5 border border-zen-border rounded-2xl bg-zen-surface2 text-[15px] text-zen-t1 transition-all outline-none zen-input form-select appearance-none">
+                    <option th:each="n : ${naturezas}" th:value="${n}" th:text="${n.descricao}"></option>
+                  </select>
+                </div>
+              </div>
+
+              <!-- Valores -->
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                <div class="flex flex-col gap-2">
+                  <label class="text-[12px] font-semibold text-zen-t2 uppercase tracking-widest ml-1" for="valorAlvoInput">Valor Alvo (R$)</label>
+                  <div class="relative">
+                    <span class="absolute left-5 top-1/2 -translate-y-1/2 text-zen-t3 font-mono">R$</span>
+                    <input type="number" step="0.01" th:field="*{valorAlvo}" id="valorAlvoInput" class="w-full pl-12 pr-5 py-3.5 border border-zen-border rounded-2xl bg-zen-surface2 text-[15px] text-zen-t1 transition-all outline-none zen-input font-mono" placeholder="0.00" required>
+                  </div>
+                </div>
+                <div class="flex flex-col gap-2">
+                  <label class="text-[12px] font-semibold text-zen-t2 uppercase tracking-widest ml-1" for="valorAtualInput">Já Tenho (R$)</label>
+                  <div class="relative">
+                    <span class="absolute left-5 top-1/2 -translate-y-1/2 text-zen-t3 font-mono">R$</span>
+                    <input type="number" step="0.01" th:field="*{valorAtual}" id="valorAtualInput" class="w-full pl-12 pr-5 py-3.5 border border-zen-border rounded-2xl bg-zen-surface2 text-[15px] text-zen-t1 transition-all outline-none zen-input font-mono" placeholder="0.00" required>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Prazo e Status -->
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                <div class="flex flex-col gap-2">
+                  <label class="text-[12px] font-semibold text-zen-t2 uppercase tracking-widest ml-1" for="prazoInput">Data Limite</label>
+                  <input type="date" th:field="*{prazo}" id="prazoInput" class="w-full px-5 py-3.5 border border-zen-border rounded-2xl bg-zen-surface2 text-[15px] text-zen-t1 transition-all outline-none zen-input">
+                </div>
+                <div class="flex flex-col gap-2">
+                  <label class="text-[12px] font-semibold text-zen-t2 uppercase tracking-widest ml-1" for="statusSelect">Status Atual</label>
+                  <select th:field="*{status}" id="statusSelect" class="w-full px-5 py-3.5 border border-zen-border rounded-2xl bg-zen-surface2 text-[15px] text-zen-t1 transition-all outline-none zen-input form-select appearance-none">
+                    <option value="EM_ANDAMENTO">⚡ Em Andamento</option>
+                    <option value="CONCLUIDO">✅ Concluída</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            <div class="flex gap-4 pt-8 border-t border-zen-border justify-end">
+              <a th:href="@{/app/financeiro/metas}" class="px-6 py-3 text-[14.5px] font-medium text-zen-t3 hover:text-zen-t1 transition-colors">Descartar</a>
+              <button type="submit" class="px-8 py-3 bg-brand hover:bg-brand-h text-white rounded-2xl font-semibold transition-all shadow-lg shadow-brand/20 hover:shadow-brand/30 text-[15px]">Confirmar Meta</button>
+            </div>
+          </form>
+          
+          <form th:if="${meta.id != null}" th:action="@{/app/financeiro/metas/excluir/{id}(id=${meta.id})}" method="post" class="mt-8 text-center border-t border-dashed border-rose-100 pt-6">
+            <button type="submit" class="text-[13px] font-medium text-rose-400 hover:text-rose-500 transition-colors uppercase tracking-widest flex items-center justify-center gap-2 mx-auto">
+              <i data-lucide="trash-2" class="w-4 h-4"></i> Abandonar Objetivo
+            </button>
+          </form>
+        </div>
+
+        <!-- Preview Column -->
+        <div class="lg:col-span-5 sticky top-8">
+          <div class="bg-slate-600 rounded-[32px] p-8 text-white relative overflow-hidden shadow-2xl">
+            <!-- Background Shape -->
+            <div class="absolute -right-10 -bottom-10 w-40 h-40 bg-zen-surface/10 rounded-full blur-3xl"></div>
+            
+            <div class="relative z-10">
+              <div class="flex items-center gap-4 mb-8">
+                <div id="previewIconContainer" class="w-14 h-14 rounded-2xl bg-zen-surface/10 backdrop-blur-md flex items-center justify-center border border-white/20">
+                  <i data-lucide="target" id="previewIcon" class="w-7 h-7"></i>
+                </div>
+                <div>
+                  <h3 id="previewTitle" class="text-[20px] font-bold leading-tight line-clamp-1">Sua Meta Aqui</h3>
+                  <p id="previewNature" class="text-white/60 text-[13px] font-light">Categoria do objetivo</p>
+                </div>
+              </div>
+
+              <div class="mb-8">
+                <div class="flex justify-between items-end mb-3">
+                  <div class="text-white/70 text-[12px] uppercase tracking-widest font-semibold">Progresso</div>
+                  <div id="previewPercent" class="text-[28px] font-bold">0%</div>
+                </div>
+                <div class="h-3 bg-zen-surface/10 rounded-full overflow-hidden border border-white/5">
+                  <div id="previewProgressBar" class="h-full bg-zen-surface rounded-full transition-all duration-700 shadow-[0_0_15px_rgba(255,255,255,0.4)]" style="width: 0%"></div>
+                </div>
+              </div>
+
+              <div class="grid grid-cols-2 gap-4">
+                <div class="p-4 rounded-2xl bg-zen-surface/10 border border-white/5">
+                  <div class="text-white/50 text-[11px] uppercase mb-1">Valor Alvo</div>
+                  <div id="previewAlvo" class="text-[16px] font-bold font-mono">R$ 0,00</div>
+                </div>
+                <div class="p-4 rounded-2xl bg-zen-surface/10 border border-white/5">
+                  <div class="text-white/50 text-[11px] uppercase mb-1">Data Limite</div>
+                  <div id="previewPrazo" class="text-[16px] font-bold">--/--/----</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="mt-6 p-6 bg-brand/5 border border-brand/10 rounded-[24px]">
+             <div class="flex items-start gap-3">
+                <i data-lucide="sparkles" class="w-5 h-5 text-brand mt-0.5"></i>
+                <div>
+                  <h4 class="text-[15px] font-semibold text-brand">Insight Zen</h4>
+                  <p class="text-[13.5px] text-brand/70 leading-relaxed mt-1">Ao definir metas claras, seu cérebro começa a filtrar oportunidades alinhadas com seu sucesso.</p>
+                </div>
+             </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </main>
+  
+  <script th:fragment="script">
+    document.addEventListener('DOMContentLoaded', function() {
+      const inputs = {
+        titulo: document.getElementById('tituloInput'),
+        natureza: document.getElementById('naturezaSelect'),
+        alvo: document.getElementById('valorAlvoInput'),
+        atual: document.getElementById('valorAtualInput'),
+        prazo: document.getElementById('prazoInput')
+      };
+
+      const previews = {
+        titulo: document.getElementById('previewTitle'),
+        natureza: document.getElementById('previewNature'),
+        percent: document.getElementById('previewPercent'),
+        progress: document.getElementById('previewProgressBar'),
+        alvo: document.getElementById('previewAlvo'),
+        prazo: document.getElementById('previewPrazo'),
+        icon: document.getElementById('previewIcon')
+      };
+
+      const natureIcons = {
+        'VIAGEM': 'palmtree',
+        'CARRO': 'car',
+        'CASA': 'home',
+        'APOSENTADORIA': 'trending-up',
+        'RESERVA_EMERGENCIA': 'shield-check',
+        'EDUCACAO': 'graduation-cap',
+        'OUTROS': 'target'
+      };
+
+      function updatePreview() {
+        previews.titulo.textContent = inputs.titulo.value || 'Sua Meta Aqui';
+        previews.natureza.textContent = inputs.natureza.options[inputs.natureza.selectedIndex].text;
+        
+        const alvo = parseFloat(inputs.alvo.value) || 0;
+        const atual = parseFloat(inputs.atual.value) || 0;
+        const percent = alvo > 0 ? Math.min((atual * 100 / alvo), 100).toFixed(0) : 0;
+
+        previews.percent.textContent = percent + '%';
+        previews.progress.style.width = percent + '%';
+        previews.alvo.textContent = 'R$ ' + alvo.toLocaleString('pt-BR', { minimumFractionDigits: 2 });
+        
+        if (inputs.prazo.value) {
+          const date = new Date(inputs.prazo.value);
+          previews.prazo.textContent = date.toLocaleDateString('pt-BR');
+        } else {
+          previews.prazo.textContent = '--/--/----';
+        }
+
+        // Update Icon
+        const nature = inputs.natureza.value;
+        const iconName = natureIcons[nature] || 'target';
+        previews.icon.setAttribute('data-lucide', iconName);
+        lucide.createIcons();
+      }
+
+      Object.values(inputs).forEach(el => el.addEventListener('input', updatePreview));
+      updatePreview();
+    });
+  </script>
+</body>
+
+</html>

@@ -1,0 +1,10 @@
+<footer th:fragment="footer" style="padding: 24px; text-align: center; color: var(--text-muted); font-size: 13px; border-top: 1px solid var(--border); background: transparent; margin-top: auto;">
+    <div style="display: flex; flex-direction: column; gap: 6px; align-items: center;">
+        <p style="margin: 0; font-weight: 500;">
+            Desenvolvido com ❤️ usando <strong>Spring Boot</strong> & <strong>Thymeleaf</strong>
+        </p>
+        <p style="margin: 0; font-size: 12px; opacity: 0.7;">
+            FinGen v1.0.0 &copy; <span th:text="${#dates.year(#dates.createNow())}">2024</span>. Todos os direitos reservados.
+        </p>
+    </div>
+</footer>

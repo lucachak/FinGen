@@ -1,0 +1,36 @@
+<!-- ================================================================
+  LAYOUT MINIMAL (layout-mininal.html)
+  Used for pages without sidebar (e.g. login)
+================================================================ -->
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:fragment="layout(pageTitle, content, pageStyles, pageScripts)" lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title th:text="${pageTitle}">FinGen</title>
+  <meta name="description" content="FinGen Auth Minimal">
+  <meta property="og:title" th:content="${pageTitle}">
+  <meta property="og:description" content="FinGen Auth Minimal">
+  <meta property="og:type" content="website">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --brand: #09090b; --brand-h: #18181b; --border: #e4e4e7;
+      --text: #09090b; --text-muted: #71717a; --bg: #fdfdfd; --surface: #ffffff;
+      --blue: #09090b; --blue-light: #f4f4f5;
+    }
+    body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); font-size: 14px; min-height: 100vh; -webkit-font-smoothing: antialiased; letter-spacing: -0.01em; }
+  </style>
+  <th:block th:replace="${pageStyles}"/>
+</head>
+<body>
+<main style="padding: 32px;">
+  <th:block th:replace="${content}"/>
+</main>
+<th:block th:replace="${pageScripts}"/>
+</body>
+</html>

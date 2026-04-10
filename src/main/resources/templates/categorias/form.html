@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+    th:replace="~{layout/layout :: layout('Categorias',~{::main},~{::style},~{::script})}" lang="pt-BR">
+
+<head>
+    <style th:fragment="style"></style>
+</head>
+
+<body>
+    <main>
+        <div class="max-w-[500px] mx-auto animate-[fade-up_.35s_ease_both]">
+
+            <div class="mb-6 flex items-center justify-between">
+                <div>
+                    <h1 class="font-serif text-[28px] font-medium text-zen-t1 tracking-tight" th:text="${categoria.id == null ? 'Nova Categoria' : 'Editar Categoria'}">
+                        Categoria</h1>
+                </div>
+                <a th:href="@{/app/financeiro/categorias}" class="text-[13px] font-medium text-zen-t3 hover:text-brand transition-colors flex items-center gap-1.5"><svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg> Voltar</a>
+            </div>
+
+            <div class="bg-zen-surface border border-zen-border rounded-[24px] overflow-hidden shadow-sm">
+                <div class="px-8 py-6 border-b border-zen-border bg-zen-surface2">
+                    <div class="text-[17px] font-semibold text-zen-t1">Opções da Categoria</div>
+                    <div class="text-[13.5px] text-zen-t3 mt-1">A natureza é vital para a IA classificar as despesas no Oráculo.</div>
+                </div>
+
+                <form th:action="@{/app/financeiro/categorias/salvar}" th:object="${categoria}" method="post">
+                    <input type="hidden" th:field="*{id}" />
+
+                    <div class="p-8 flex flex-col gap-6">
+                        <div class="flex flex-col gap-2">
+                            <label class="text-[12px] font-semibold text-zen-t2 uppercase tracking-widest ml-1">Nome da Categoria</label>
+                            <input type="text" th:field="*{nome}" class="w-full px-4 py-3 border border-zen-border rounded-xl bg-zen-surface2 text-[14.5px] text-zen-t1 focus:bg-zen-surface focus:border-brand focus:ring-2 focus:ring-brand/20 transition-all outline-none"
+                                placeholder="Ex: Saúde, Lazer, Educação…" required>
+                        </div>
+
+                        <div class="flex flex-col gap-2">
+                            <label class="text-[12px] font-semibold text-zen-t2 uppercase tracking-widest ml-1">Natureza</label>
+                            <select th:field="*{natureza}" class="w-full px-4 py-3 border border-zen-border rounded-xl bg-zen-surface2 text-[14.5px] text-zen-t1 focus:bg-zen-surface focus:border-brand focus:ring-2 focus:ring-brand/20 transition-all outline-none form-select" required>
+                                <option th:each="nat : ${naturezas}" th:value="${nat}" th:text="${nat.descricao}">
+                                </option>
+                            </select>
+                        </div>
+
+                        <div class="flex flex-col gap-2">
+                            <label class="text-[12px] font-semibold text-zen-t2 uppercase tracking-widest ml-1">Cor nos Gráficos</label>
+                            <div class="flex items-center gap-3">
+                                <div class="w-12 h-12 rounded-xl border border-black/10 shadow-inner shrink-0 transition-colors" id="colorSwatch"></div>
+                                <input type="color" th:field="*{corHexadecimal}" class="h-12 w-full p-1 border border-zen-border rounded-xl bg-zen-surface2 cursor-pointer"
+                                    oninput="sync(this.value)" required>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="px-8 py-6 border-t border-zen-border bg-zen-surface2 flex gap-3 justify-end items-center">
+                        <a th:href="@{/app/financeiro/categorias}" class="px-5 py-2.5 text-[14px] font-medium text-zen-t3 hover:text-zen-t1 transition-colors">Cancelar</a>
+                        <button type="submit" class="px-6 py-2.5 bg-brand hover:bg-brand-h text-white rounded-lg font-medium transition-all shadow-sm hover:shadow text-[14px]">Guardar Categoria</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </main>
+    <script th:fragment="script">
+        function sync(v) {
+            document.getElementById('colorSwatch').style.background = v;
+        }
+        // init on load
+        document.addEventListener('DOMContentLoaded', () => {
+             const inp = document.querySelector('input[type="color"]');
+             if (inp) sync(inp.value);
+        });
+    </script>
+</body>
+
+</html>

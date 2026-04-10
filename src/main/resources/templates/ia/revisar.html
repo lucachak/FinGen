@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{layout/layout :: layout(
+          pageTitle='Revisar Importação IA',
+          content=~{::main},
+          pageStyles=~{::style},
+          pageScripts=~{::script}
+      )}" lang="pt-BR">
+
+<head>
+    <style th:fragment="style">
+        .revisar-container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .transaction-row {
+            transition: all 0.2s ease;
+        }
+
+        .transaction-row:hover {
+            background-color: var(--surface-hover);
+        }
+
+        .category-select {
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23a1a1aa' stroke-width='2' stroke-linecap='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 8px center;
+            padding-right: 28px;
+        }
+
+        .btn-confirm {
+            background: var(--brand);
+            color: white;
+            box-shadow: 0 4px 12px rgba(15,118,110,0.25);
+        }
+
+        .btn-confirm:hover {
+            background: var(--brand-h);
+            transform: translateY(-1px);
+        }
+    </style>
+</head>
+
+<body>
+    <main class="revisar-container">
+        <div class="page-header mb-8">
+            <div>
+                <h1 class="page-title">Revisar Importação</h1>
+                <p class="page-subtitle">A IA detectou <span class="font-bold text-brand" th:text="${#lists.size(stagingTransactions)}">0</span> transações no seu extrato. Verifique os dados antes de confirmar.</p>
+            </div>
+            <div class="flex gap-3">
+                <a th:href="@{/app/ia}" class="btn-ghost">Descartar</a>
+                <button form="form-revisao" type="submit" class="btn-primary btn-confirm">
+                    <i data-lucide="check-circle" class="w-4 h-4"></i>
+                    Confirmar e Salvar
+                </button>
+            </div>
+        </div>
+
+        <div class="bg-zen-surface border border-zen-border rounded-[24px] overflow-hidden shadow-sm-zen">
+            <form id="form-revisao" th:action="@{/api/ia/confirmar}" method="POST">
+                <table class="w-full text-left border-collapse">
+                    <thead>
+                        <tr class="bg-zen-surface2/50 border-b border-zen-border">
+                            <th class="px-6 py-4 text-[11px] font-bold uppercase tracking-widest text-zen-t3 w-12">
+                                <label for="selectAll" class="sr-only">Selecionar todas</label>
+                                <input type="checkbox" id="selectAll" checked onclick="toggleAll(this)" class="rounded border-zen-border text-brand focus:ring-brand" aria-label="Selecionar todas">
+                            </th>
+                            <th class="px-6 py-4 text-[11px] font-bold uppercase tracking-widest text-zen-t3">Data</th>
+                            <th class="px-6 py-4 text-[11px] font-bold uppercase tracking-widest text-zen-t3">Descrição</th>
+                            <th class="px-6 py-4 text-[11px] font-bold uppercase tracking-widest text-zen-t3">Categoria Sugerida</th>
+                            <th class="px-6 py-4 text-[11px] font-bold uppercase tracking-widest text-zen-t3 text-right">Valor</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-zen-border">
+                        <tr th:each="t, iter : ${stagingTransactions}" class="transaction-row">
+                            <td class="px-6 py-4">
+                                <input type="checkbox" th:name="'selected[' + ${iter.index} + ']'" value="true" checked class="transaction-check rounded border-zen-border text-brand focus:ring-brand" th:aria-label="'Selecionar transação ' + ${iter.index}">
+                                <input type="hidden" th:name="'id[' + ${iter.index} + ']'" th:value="${iter.index}">
+                            </td>
+                            <td class="px-6 py-4">
+                                <label th:for="'data-' + ${iter.index}" class="sr-only">Data</label>
+                                <input type="date" th:id="'data-' + ${iter.index}" th:name="'data[' + ${iter.index} + ']'" th:value="${t.dataPagamento}" class="bg-transparent border-none p-0 text-[13.5px] text-zen-t1 focus:ring-0 w-32">
+                            </td>
+                            <td class="px-6 py-4">
+                                <label th:for="'desc-' + ${iter.index}" class="sr-only">Descrição</label>
+                                <input type="text" th:id="'desc-' + ${iter.index}" th:name="'descricao[' + ${iter.index} + ']'" th:value="${t.descricao}" class="bg-transparent border-none p-0 text-[13.5px] text-zen-t1 focus:ring-0 w-full font-medium">
+                            </td>
+                            <td class="px-6 py-4">
+                                <label th:for="'cat-' + ${iter.index}" class="sr-only">Categoria</label>
+                                <select th:id="'cat-' + ${iter.index}" th:name="'categoria[' + ${iter.index} + ']'" class="category-select bg-zen-surface2/50 border border-zen-border rounded-lg px-3 py-1.5 text-[12px] text-zen-t2 focus:border-brand focus:ring-brand transition-all outline-none">
+                                    <option th:each="cat : ${categorias}" 
+                                            th:value="${cat.nome}" 
+                                            th:text="${cat.nome}"
+                                            th:selected="${t.categoria != null and t.categoria.nome == cat.nome}"></option>
+                                </select>
+                            </td>
+                            <td class="px-6 py-4 text-right">
+                                <span class="font-mono font-medium text-[14px]" 
+                                      th:classappend="${t.tipo == T(lucas.basemodel.modules.financeiro.enums.TipoTransacao).RECEITA ? 'text-emerald-600' : 'text-zen-t1'}"
+                                      th:text="${(t.tipo == T(lucas.basemodel.modules.financeiro.enums.TipoTransacao).RECEITA ? '+ ' : '- ') + 'R$ ' + #numbers.formatDecimal(t.valor, 1, 'POINT', 2, 'COMMA')}">R$ 0,00</span>
+                                <input type="hidden" th:name="'valor[' + ${iter.index} + ']'" th:value="${t.valor}">
+                                <input type="hidden" th:name="'tipo[' + ${iter.index} + ']'" th:value="${t.tipo}">
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </form>
+        </div>
+
+        <div th:if="${#lists.isEmpty(stagingTransactions)}" class="py-20 text-center bg-zen-surface border border-zen-border rounded-[32px] mt-8">
+            <div class="w-16 h-16 bg-zen-surface2 rounded-full flex items-center justify-center mx-auto mb-4">
+                <i data-lucide="file-warning" class="w-8 h-8 text-zen-t3"></i>
+            </div>
+            <h3 class="text-lg font-serif font-medium text-zen-t1">Nenhuma transação encontrada</h3>
+            <p class="text-sm text-zen-t3 mt-2">Tente fazer o upload de outro arquivo ou verifique se o PDF é compatível.</p>
+            <a th:href="@{/app/ia}" class="mt-6 inline-block btn-primary">Voltar para o AI Hub</a>
+        </div>
+    </main>
+
+    <script th:fragment="script">
+        function toggleAll(master) {
+            const checks = document.querySelectorAll('.transaction-check');
+            checks.forEach(c => c.checked = master.checked);
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            lucide.createIcons();
+        });
+    </script>
+</body>
+
+</html>

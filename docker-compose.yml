@@ -1,0 +1,62 @@
+services:
+  db:
+    image: postgres:15-alpine
+    container_name: fingen-db
+    environment:
+      POSTGRES_USER: sa
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: fin_db
+
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U sa -d fin_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  python-ia:
+    build:
+      context: .
+      dockerfile: Dockerfile.python
+    container_name: fingen-python
+    dns:
+      - 8.8.8.8
+      - 8.8.4.4
+    ports:
+      - "8000:8000"
+    environment:
+      - GEMINI_TOKEN=${GEMINI_TOKEN} # Passa o seu token do ambiente para o Docker
+    volumes:
+      - ./main.py:/app/main.py # Mantém o live-reload local
+
+  app:
+    build: .
+    container_name: fingen-java
+    dns:
+      - 8.8.8.8
+      - 8.8.4.4
+    ports:
+      - "8080:8080"
+    environment:
+      - DB_URL=jdbc:postgresql://db:5432/fin_db
+      - DB_USER=sa
+      - DB_PASS=password
+      - DB_DRIVER=org.postgresql.Driver
+      # Em vez de localhost, o Java chama o serviço "python-ia" pela rede interna do Docker!
+      - PYTHON_API_URL=http://python-ia:8000
+      - SPRING_SERVLET_MULTIPART_MAX_FILE_SIZE=15MB
+      - SPRING_SERVLET_MULTIPART_MAX_REQUEST_SIZE=15MB
+    volumes:
+      - app_uploads:/app/uploads
+    depends_on:
+      db:
+        condition: service_healthy
+      python-ia:
+        condition: service_started
+
+volumes:
+  postgres_data:
+  app_uploads:

@@ -1,0 +1,51 @@
+INFO:     Will watch for changes in these directories: ['/home/lucas/Documents/Java/FinGen']
+INFO:     Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
+INFO:     Started reloader process [6531] using StatReload
+19:00:20 [DEBUG] asyncio — Using selector: EpollSelector
+INFO:     Started server process [6978]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     127.0.0.1:56052 - "GET / HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:56062 - "GET /favicon.ico HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:56748 - "GET / HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:56758 - "GET /favicon.ico HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:52730 - "GET / HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:52730 - "GET / HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:53814 - "GET / HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:53814 - "GET / HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:41276 - "GET / HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:41276 - "GET / HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:41276 - "GET / HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:41276 - "GET / HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:41276 - "GET / HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:41276 - "GET / HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:52910 - "GET / HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:52910 - "GET / HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:34470 - "GET / HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:34470 - "GET / HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:58808 - "GET / HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:58808 - "GET / HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:49086 - "GET / HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:49086 - "GET / HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:35330 - "GET / HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:35330 - "GET / HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:37486 - "GET / HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:37486 - "GET / HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:58770 - "GET / HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:58770 - "GET / HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:58770 - "GET / HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:33038 - "GET / HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:33038 - "GET / HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:33050 - "GET / HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:33050 - "GET / HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:48578 - "GET / HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:34190 - "GET / HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:34190 - "GET / HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:51448 - "GET / HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:51448 - "GET / HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:51448 - "GET / HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:54710 - "GET / HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:54710 - "GET / HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:60312 - "GET / HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:39058 - "GET / HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:39058 - "GET / HTTP/1.1" 404 Not Found

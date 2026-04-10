@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout/layout :: layout(
+          pageTitle='Nova Conta',
+          content=~{::main},
+          pageStyles=~{::style},
+          pageScripts=~{::script}
+      )}"
+      lang="pt-BR">
+<head>
+    <style th:fragment="pageStyles">
+        .glass-card {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+        }
+        .form-input {
+            @apply w-full h-[58px] px-6 bg-zen-surface border border-zen-border rounded-[18px] text-zen-t1 text-[15px] focus:outline-none focus:ring-4 focus:ring-brand/5 focus:border-brand transition-all font-medium;
+        }
+        .form-label {
+            @apply block text-[11px] font-bold text-zen-t3 uppercase tracking-[0.1em] mb-2.5 ml-1;
+        }
+    </style>
+</head>
+
+<body>
+    <main th:fragment="content">
+        <div class="max-w-[1000px] mx-auto py-8">
+            
+            <div class="flex items-center justify-between mb-10 animate-[fade-up_.5s_ease_both]">
+                <div>
+                    <a th:href="@{/app/financeiro/contas}" class="inline-flex items-center gap-2 text-[14px] text-zen-t3 hover:text-zen-t1 transition-colors mb-4 group">
+                        <i data-lucide="arrow-left" class="w-4 h-4 group-hover:-translate-x-1 transition-transform"></i>
+                        Voltar ao Hub
+                    </a>
+                    <h1 class="font-serif text-[36px] font-medium text-zen-t1 tracking-tight" th:text="${conta.id == null ? 'Novo Lançamento' : 'Editar Lançamento'}">Novo Lançamento</h1>
+                </div>
+                <div class="hidden md:flex items-center gap-3 p-2 bg-zen-surface2 rounded-2xl border border-zen-border">
+                    <div class="w-10 h-10 rounded-xl bg-zen-surface shadow-sm flex items-center justify-center text-brand">
+                        <i data-lucide="shield-check"></i>
+                    </div>
+                    <div class="pr-4">
+                        <div class="text-[10px] uppercase font-bold text-zen-t3 tracking-wider">Segurança</div>
+                        <div class="text-[12px] font-medium text-zen-t1">Encriptação Avançada</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">
+                
+                <!-- ✍️ Form Column -->
+                <div class="lg:col-span-7 space-y-8 animate-[fade-up_.5s_ease_both_150ms]">
+                    <form th:action="@{/app/financeiro/contas/salvar}" th:object="${conta}" method="post" enctype="multipart/form-data" class="space-y-8" aria-label="Formulário de Lançamento">
+                        <input type="hidden" th:field="*{id}" />
+
+                        <!-- Error Banner -->
+                        <div th:if="${erroValidacao}" class="flex items-start gap-4 p-5 bg-rose-50 border border-rose-200 rounded-2xl animate-[fade-up_.3s_ease_both]">
+                            <div class="w-8 h-8 rounded-full bg-rose-100 flex items-center justify-center flex-shrink-0 mt-0.5">
+                                <i data-lucide="alert-triangle" class="w-4 h-4 text-rose-600"></i>
+                            </div>
+                            <div>
+                                <div class="text-[13px] font-bold text-rose-700 mb-0.5">Ação necessária</div>
+                                <p class="text-[12px] text-rose-600" th:text="${erroValidacao}"></p>
+                            </div>
+                        </div>
+                        
+                        <!-- Basic Info -->
+                        <div class="bg-zen-surface border border-zen-border p-8 rounded-[32px] shadow-sm space-y-6">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div class="md:col-span-2">
+                                    <label class="form-label" for="inputDesc">Descrição do Lançamento</label>
+                                    <input type="text" th:field="*{descricao}" id="inputDesc" class="form-input" placeholder="O que você está pagando ou recebendo?" required>
+                                </div>
+                                <div>
+                                    <label class="form-label" for="inputValor">Valor (BRL)</label>
+                                    <div class="relative">
+                                        <span class="absolute left-6 top-1/2 -translate-y-1/2 text-zen-t3 font-medium">R$</span>
+                                        <input type="number" step="0.01" th:field="*{valor}" id="inputValor" class="form-input pl-14" placeholder="0,00" required>
+                                    </div>
+                                </div>
+                                <div>
+                                    <label class="form-label" for="inputData">Data de Vencimento</label>
+                                    <input type="date" th:field="*{dataVencimento}" id="inputData" class="form-input" required>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Details -->
+                        <div class="bg-zen-surface border border-zen-border p-8 rounded-[32px] shadow-sm space-y-6">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div>
+                                    <label class="form-label" for="inputTipo">Tipo de Movimento</label>
+                                    <select th:field="*{tipo}" id="inputTipo" class="form-input appearance-none">
+                                        <option th:each="t : ${tipos}" th:value="${t}" th:text="${t}"></option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="form-label" for="inputCat">Categoria</label>
+                                    <select th:field="*{categoria}" id="inputCat" class="form-input appearance-none">
+                                        <option value="">Sem Categoria</option>
+                                        <option th:each="cat : ${categorias}" th:value="${cat.id}" th:text="${cat.nome}"></option>
+                                    </select>
+                                </div>
+                                <div class="md:col-span-2">
+                                    <label class="form-label" for="inputAsset">Conta Bancária / Carteira (Destino/Origem)</label>
+                                    <select th:field="*{asset}" id="inputAsset" class="form-input appearance-none">
+                                        <option value="">Nenhuma (Não afeta Patrimônio)</option>
+                                        <option th:each="a : ${assets}" th:value="${a.id}" th:text="${a.name}"></option>
+                                    </select>
+                                    <p class="text-[10px] text-zen-t3 mt-2 ml-1 italic">* Transações pagas vinculadas a uma conta bancária atualizarão o saldo automaticamente.</p>
+                                </div>
+                                <div class="md:col-span-2">
+                                    <label class="form-label">Prioridade & Escopo</label>
+                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                        <select th:field="*{prioridade}" class="form-input" aria-label="Selecionar Prioridade">
+                                            <option th:each="p : ${prioridades}" th:value="${p}" th:text="${p.descricao}"></option>
+                                        </select>
+                                        <select th:field="*{escopo}" class="form-input" aria-label="Selecionar Escopo">
+                                            <option value="CASA">Despesa Partilhada (Casa)</option>
+                                            <option value="PESSOAL">Finanças Pessoais (Privado)</option>
+                                            <option value="NEGOCIO">Business</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Settings & Attachment -->
+                        <div class="bg-zen-surface border border-zen-border p-8 rounded-[32px] shadow-sm space-y-6">
+                            <div class="space-y-4">
+                                <label class="flex items-center gap-4 p-4 rounded-2xl border border-zen-border hover:bg-zen-surface2 transition-all cursor-pointer group">
+                                    <div class="w-10 h-10 rounded-full bg-zen-surface2 group-hover:bg-brand/10 text-zen-t3 group-hover:text-brand flex items-center justify-center transition-colors">
+                                        <i data-lucide="check"></i>
+                                    </div>
+                                    <div class="flex-1">
+                                        <div class="text-[14px] font-bold text-zen-t1">Já foi processado</div>
+                                        <div class="text-[12px] text-zen-t3">Marcar como pago ou recebido agora</div>
+                                    </div>
+                                    <input type="checkbox" th:field="*{paga}" id="inputPaga" class="w-6 h-6 border-2 border-zen-border rounded-lg text-brand focus:ring-brand transition-all cursor-pointer">
+                                </label>
+
+                                <label class="flex items-center gap-4 p-4 rounded-2xl border border-zen-border hover:bg-zen-surface2 transition-all cursor-pointer group" onclick="document.getElementById('divRecorrencia').classList.toggle('hidden')">
+                                    <div class="w-10 h-10 rounded-full bg-zen-surface2 group-hover:bg-brand/10 text-zen-t3 group-hover:text-brand flex items-center justify-center transition-colors">
+                                        <i data-lucide="repeat"></i>
+                                    </div>
+                                    <div class="flex-1">
+                                        <div class="text-[14px] font-bold text-zen-t1">Lançamento Recorrente</div>
+                                        <div class="text-[12px] text-zen-t3">Repetir automaticamente este valor nos próximos meses</div>
+                                    </div>
+                                    <input type="checkbox" id="checkRecorrente" class="w-6 h-6 border-2 border-zen-border rounded-lg text-brand focus:ring-brand transition-all cursor-pointer">
+                                </label>
+
+                                <div id="divRecorrencia" class="hidden animate-[fade-up_.3s_ease_both] p-6 bg-zen-surface2 rounded-2xl border border-zen-border mt-2">
+                                    <label class="form-label text-brand" for="inputMeses">Duração do Ciclo (Meses)</label>
+                                    <input type="number" id="inputMeses" name="mesesRecorrencia" class="form-input" placeholder="Ex: 12 meses">
+                                </div>
+                            </div>
+
+                            <div class="pt-4">
+                                <label class="form-label" for="archivoInput">Comprovante Digital (Opcional)</label>
+                                <label class="w-full flex flex-col items-center justify-center p-10 border-2 border-dashed border-brand/20 rounded-[24px] bg-brand/5 hover:bg-brand/10 transition-all cursor-pointer group">
+                                    <input type="file" id="archivoInput" name="arquivo" class="hidden" onchange="document.getElementById('fileInfo').textContent = this.files[0].name">
+                                    <div class="w-14 h-14 rounded-full bg-brand flex items-center justify-center text-white shadow-xl shadow-brand/20 mb-4 group-hover:scale-110 transition-transform">
+                                        <i data-lucide="upload-cloud"></i>
+                                    </div>
+                                    <div class="text-[15px] font-bold text-zen-t1" id="fileInfo">Escolher arquivo ou arrastar</div>
+                                    <div class="text-[12px] text-zen-t3 mt-1">PDF, PNG ou JPG até 5MB</div>
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="flex items-center gap-4 pt-4">
+                            <button type="submit" class="flex-1 h-[64px] bg-brand hover:bg-brand-h text-white rounded-[24px] font-bold text-[16px] shadow-xl shadow-brand/20 transition-all active:scale-95 flex items-center justify-center gap-3 group">
+                                Salvar Transação
+                                <i data-lucide="arrow-right" class="w-5 h-5 group-hover:translate-x-1 transition-transform"></i>
+                            </button>
+                            <a th:href="@{/app/financeiro/contas}" class="px-8 h-[64px] bg-zen-surface border border-zen-border text-zen-t2 rounded-[24px] font-bold text-[16px] hover:bg-zen-surface2 transition-all flex items-center justify-center">Cancelar</a>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- 👁️ Preview Column -->
+                <div class="lg:col-span-5 sticky top-8 animate-[fade-up_.5s_ease_both_300ms]">
+                    <div class="bg-zen-t1 text-white p-10 rounded-[40px] shadow-2xl relative overflow-hidden group">
+                        <div class="relative z-10">
+                            <div class="flex items-center justify-between mb-12">
+                                <div class="w-14 h-14 rounded-2xl bg-zen-surface/10 backdrop-blur-md flex items-center justify-center text-brand">
+                                    <i data-lucide="dollar-sign" class="w-8 h-8"></i>
+                                </div>
+                                <div class="text-right">
+                                    <div class="text-[10px] uppercase font-bold tracking-[.2em] text-white/40 mb-1">Status do Lançamento</div>
+                                    <div id="prevStatus" class="text-[12px] font-bold px-3 py-1 rounded-full bg-zen-surface/10 text-brand inline-block">PENDENTE</div>
+                                </div>
+                            </div>
+
+                            <div class="space-y-1">
+                                <div id="prevDesc" class="font-serif text-[28px] font-medium leading-tight mb-2">Descrição da Conta</div>
+                                <div class="flex items-center gap-3 text-white/50 text-[14px]">
+                                    <span id="prevData">Hoje</span>
+                                    <span class="w-1.5 h-1.5 rounded-full bg-zen-surface/20"></span>
+                                    <span id="prevCat" class="text-brand font-bold uppercase tracking-widest text-[11px]">GERAL</span>
+                                </div>
+                            </div>
+
+                            <div class="mt-12 pt-10 border-t border-white/10 flex items-end justify-between">
+                                <div>
+                                    <div class="text-[11px] uppercase font-bold tracking-widest text-white/40 mb-1">Valor Total</div>
+                                    <div id="prevValor" class="font-serif text-[40px] font-semibold">R$ 0,00</div>
+                                </div>
+                                <div id="prevTipoLabel" class="text-[12px] font-bold text-rose-400 uppercase tracking-widest bg-rose-400/10 px-4 py-2 rounded-xl">SAÍDA</div>
+                            </div>
+                        </div>
+                        
+                        <div class="absolute -bottom-20 -right-20 w-60 h-60 bg-brand/20 blur-[100px] rounded-full group-hover:scale-125 transition-transform duration-1000"></div>
+                    </div>
+
+                    <div class="mt-8 p-8 bg-brand/5 border border-brand/10 rounded-[32px]">
+                        <div class="flex items-center gap-4 mb-4">
+                            <div class="w-10 h-10 rounded-full bg-brand text-white flex items-center justify-center">
+                                <i data-lucide="brain-circuit" class="w-5 h-5"></i>
+                            </div>
+                            <h4 class="text-[16px] font-serif font-medium text-zen-t1">Oráculo FinGen</h4>
+                        </div>
+                        <p class="text-[14px] text-zen-t2 leading-relaxed">
+                            "Mantenha este registro atualizado para que seu fluxo de caixa preditivo reflita sua realidade financeira com precisão."
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script th:fragment="script">
+        document.addEventListener('DOMContentLoaded', () => {
+            const up = () => {
+                const desc = document.getElementById('inputDesc').value || 'Descrição da Conta';
+                const valor = document.getElementById('inputValor').value || '0,00';
+                const data = document.getElementById('inputData').value;
+                const tipo = document.getElementById('inputTipo').value;
+                const paga = document.getElementById('inputPaga').checked;
+                const catElement = document.getElementById('inputCat');
+                const cat = catElement.selectedIndex >= 0 ? catElement.options[catElement.selectedIndex].text : 'Sem Categoria';
+
+                document.getElementById('prevDesc').innerText = desc;
+                document.getElementById('prevValor').innerText = 'R$ ' + parseFloat(valor || 0).toLocaleString('pt-BR', {minimumFractionDigits: 2});
+                document.getElementById('prevCat').innerText = cat === 'Sem Categoria' ? 'GERAL' : cat.toUpperCase();
+                
+                if(data) {
+                    const d = new Date(data + 'T12:00:00');
+                    document.getElementById('prevData').innerText = d.toLocaleDateString('pt-BR', {day:'numeric', month:'short'});
+                }
+
+                const s = document.getElementById('prevStatus');
+                s.innerText = paga ? 'PROCESSADO' : 'PENDENTE';
+                s.className = paga ? 'text-[12px] font-bold px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-400 inline-block' 
+                                   : 'text-[12px] font-bold px-3 py-1 rounded-full bg-zen-surface/10 text-brand inline-block';
+
+                const tl = document.getElementById('prevTipoLabel');
+                tl.innerText = tipo === 'RECEITA' ? 'RECEITA' : 'DESPESA';
+                tl.className = (tipo === 'RECEITA') 
+                    ? 'text-[12px] font-bold text-emerald-400 uppercase tracking-widest bg-emerald-400/10 px-4 py-2 rounded-xl'
+                    : 'text-[12px] font-bold text-rose-400 uppercase tracking-widest bg-rose-400/10 px-4 py-2 rounded-xl';
+            };
+
+            ['inputDesc', 'inputValor', 'inputData', 'inputTipo', 'inputCat', 'inputPaga'].forEach(id => {
+                const el = document.getElementById(id);
+                if(el) el.addEventListener('input', up);
+                if(el) el.addEventListener('change', up);
+            });
+            up();
+
+            lucide.createIcons();
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FinGen | Serenity Finance</title>
+    <meta name="description" content="FinGen - Alcance a sua serenidade financeira com algoritmos de IA.">
+    <meta property="og:title" content="FinGen | Serenity Finance">
+    <meta property="og:description" content="FinGen - Gestão de património online.">
+    <meta property="og:type" content="website">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        :root {
+            --brand: #0F766E;
+            --brand-h: #0d9488;
+            --font-serif: 'Outfit', sans-serif;
+            --font-sans: 'DM Sans', sans-serif;
+        }
+        body {
+            font-family: var(--font-sans);
+            background-color: #fcfdfd;
+            color: #1e293b;
+        }
+        .font-serif { font-family: var(--font-serif); }
+        .glass {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+        .hero-gradient {
+            background: radial-gradient(circle at 70% 30%, rgba(20, 184, 166, 0.15) 0%, transparent 50%),
+                        radial-gradient(circle at 10% 80%, rgba(15, 118, 110, 0.1) 0%, transparent 40%);
+        }
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+        .float { animation: float 6s ease-in-out infinite; }
+    </style>
+</head>
+<body class="hero-gradient min-h-screen">
+    <!-- Navigation -->
+    <nav class="fixed top-0 w-full z-50 glass border-b border-slate-200/50">
+        <div class="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
+            <div class="flex items-center gap-2">
+                <div class="w-10 h-10 bg-teal-700 rounded-xl flex items-center justify-center text-white shadow-lg shadow-teal-700/20">
+                    <i data-lucide="sprout" class="w-6 h-6"></i>
+                </div>
+                <span class="font-serif text-2xl font-semibold tracking-tight text-teal-900 border-none">FinGen</span>
+            </div>
+            
+            <div class="flex items-center gap-6">
+                <a th:href="@{/auth/login}" class="text-sm font-medium text-slate-600 hover:text-teal-700 transition-colors">Entrar</a>
+                <a th:href="@{/auth/registar}" class="bg-teal-700 text-white px-6 py-2.5 rounded-full text-sm font-medium hover:bg-teal-800 transition-all shadow-md shadow-teal-700/10 hover:shadow-lg active:scale-95">Começar Agora</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="pt-40 pb-24 px-6">
+        <div class="max-w-7xl mx-auto grid lg:grid-cols-2 gap-16 items-center">
+            <div class="space-y-8 animate-[fade-in-up_0.8s_ease-out]">
+                <div class="inline-flex items-center gap-2 px-3 py-1 bg-teal-50 text-teal-700 rounded-full text-xs font-semibold border border-teal-100">
+                    <span class="relative flex h-2 w-2">
+                      <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-teal-400 opacity-75"></span>
+                      <span class="relative inline-flex rounded-full h-2 w-2 bg-teal-500"></span>
+                    </span>
+                    AI-Powered Wealth Management
+                </div>
+                
+                <h1 class="font-serif text-5xl md:text-7xl font-semibold text-slate-900 leading-[1.1] tracking-tight border-none">
+                    Alcance a sua <span class="text-teal-700 italic">Serenidade</span> Financeira.
+                </h1>
+                
+                <p class="text-lg text-slate-600 leading-relaxed max-w-xl">
+                    FinGen utiliza inteligência artificial de ponta para analisar os seus gastos, otimizar investimentos e traçar o caminho mais curto para a sua independência financeira.
+                </p>
+                
+                <div class="flex flex-wrap gap-4 pt-4">
+                    <a th:href="@{/auth/registar}" class="bg-teal-700 text-white px-8 py-4 rounded-2xl text-base font-semibold hover:bg-teal-800 transition-all shadow-xl shadow-teal-700/20 flex items-center gap-2 group">
+                        Criar conta gratuita
+                        <i data-lucide="arrow-right" class="w-5 h-5 group-hover:translate-x-1 transition-transform"></i>
+                    </a>
+                    <div class="flex items-center gap-4 px-6">
+                        <div class="flex -space-x-3">
+                            <div class="w-10 h-10 rounded-full border-2 border-white bg-slate-200"></div>
+                            <div class="w-10 h-10 rounded-full border-2 border-white bg-slate-300"></div>
+                            <div class="w-10 h-10 rounded-full border-2 border-white bg-slate-400"></div>
+                        </div>
+                        <span class="text-sm text-slate-500 font-medium">+500 utilizadores ativos</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Visual Asset -->
+            <div class="relative hidden lg:block float">
+                <div class="absolute -inset-4 bg-teal-500/5 blur-3xl rounded-full"></div>
+                <div class="relative glass rounded-[40px] p-8 shadow-2xl border-white/50">
+                    <div class="space-y-6">
+                        <div class="flex justify-between items-center">
+                            <div class="space-y-1">
+                                <div class="text-[10px] uppercase tracking-widest text-slate-400 font-bold">Património Líquido</div>
+                                <div class="text-3xl font-serif font-semibold text-slate-900 border-none">R$ 142.580,00</div>
+                            </div>
+                            <div class="w-12 h-12 bg-emerald-50 text-emerald-600 rounded-full flex items-center justify-center border border-emerald-100">
+                                <i data-lucide="trending-up" class="w-6 h-6"></i>
+                            </div>
+                        </div>
+                        
+                        <div class="h-48 bg-slate-50/50 rounded-2xl border border-slate-100 flex items-end justify-between p-4 gap-2">
+                            <div class="w-full bg-teal-200/50 rounded-t-lg" style="height: 40%"></div>
+                            <div class="w-full bg-teal-300/50 rounded-t-lg" style="height: 60%"></div>
+                            <div class="w-full bg-teal-400/50 rounded-t-lg" style="height: 50%"></div>
+                            <div class="w-full bg-teal-500/50 rounded-t-lg" style="height: 80%"></div>
+                            <div class="w-full bg-teal-600 rounded-t-lg" style="height: 95%"></div>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-4">
+                            <div class="p-4 bg-zen-surface rounded-2xl border border-slate-100 shadow-sm">
+                                <div class="text-[9px] uppercase tracking-widest text-slate-400 font-bold mb-1">Taxa de Poupança</div>
+                                <div class="text-xl font-serif font-semibold text-teal-700 border-none">32%</div>
+                            </div>
+                            <div class="p-4 bg-zen-surface rounded-2xl border border-slate-100 shadow-sm">
+                                <div class="text-[9px] uppercase tracking-widest text-slate-400 font-bold mb-1">Sugestões IA</div>
+                                <div class="text-xl font-serif font-semibold text-amber-600 border-none">12 Ativas</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="max-w-7xl mx-auto px-6 py-24 border-t border-slate-200/50">
+        <div class="grid md:grid-cols-3 gap-12">
+            <div class="space-y-4">
+                <div class="w-12 h-12 bg-teal-50 text-teal-700 rounded-2xl flex items-center justify-center border border-teal-100">
+                    <i data-lucide="shield-check" class="w-6 h-6"></i>
+                </div>
+                <h3 class="font-serif text-xl font-semibold text-slate-900 border-none">Segurança Bancária</h3>
+                <p class="text-slate-600">Dados encriptados de ponta a ponta e alojamento privado para total tranquilidade.</p>
+            </div>
+            <div class="space-y-4">
+                <div class="w-12 h-12 bg-amber-50 text-amber-600 rounded-2xl flex items-center justify-center border border-amber-100">
+                    <i data-lucide="zap" class="w-6 h-6"></i>
+                </div>
+                <h3 class="font-serif text-xl font-semibold text-slate-900 border-none">Análise Instantânea</h3>
+                <p class="text-slate-600">Importe os seus extratos e deixe que a nossa IA categorize tudo em segundos.</p>
+            </div>
+            <div class="space-y-4">
+                <div class="w-12 h-12 bg-sky-50 text-sky-600 rounded-2xl flex items-center justify-center border border-sky-100">
+                    <i data-lucide="layout-dashboard" class="w-6 h-6"></i>
+                </div>
+                <h3 class="font-serif text-xl font-semibold text-slate-900 border-none">Visão Holística</h3>
+                <p class="text-slate-600">Património, contas, orçamentos e objetivos num único lugar com design premium.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="max-w-7xl mx-auto px-6 py-12 border-t border-slate-200/50 flex flex-col md:flex-row justify-between items-center gap-6">
+        <div class="flex items-center gap-2">
+            <i data-lucide="sprout" class="w-5 h-5 text-teal-700"></i>
+            <span class="font-serif font-semibold text-slate-900 border-none">FinGen</span>
+        </div>
+        <div class="text-sm text-slate-400">© 2026 FinGen Pro Max. Todos os direitos reservados.</div>
+        <div class="flex gap-6">
+            <a href="#" class="text-slate-400 hover:text-teal-700 transition-colors"><i data-lucide="twitter" class="w-5 h-5"></i></a>
+            <a href="#" class="text-slate-400 hover:text-teal-700 transition-colors"><i data-lucide="github" class="w-5 h-5"></i></a>
+        </div>
+    </footer>
+
+    <script>
+        lucide.createIcons();
+    </script>
+</body>
+</html>

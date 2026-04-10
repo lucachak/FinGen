@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{layout/layout :: layout(
+          pageTitle='Nova Automação',
+          content=~{::main},
+          pageStyles=~{::style},
+          pageScripts=~{::script}
+      )}" lang="pt-BR">
+<head>
+  <style th:fragment="style"></style>
+</head>
+
+<body>
+  <main>
+    <div class="max-w-[600px] mx-auto animate-[fade-up_.35s_ease_both]">
+      <div class="mb-6 flex items-center justify-between">
+        <div>
+          <h1 class="font-serif text-[28px] font-medium text-zen-t1 tracking-tight" th:text="${recorrente.id == null ? 'Nova Automação' : 'Editar Automação'}">Automação</h1>
+        </div>
+        <a th:href="@{/app/financeiro/recorrentes}" class="text-[13px] font-medium text-zen-t3 hover:text-brand transition-colors flex items-center gap-1.5"><svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg> Voltar</a>
+      </div>
+
+      <div class="bg-zen-surface border border-zen-border rounded-[24px] overflow-hidden shadow-sm">
+        <div class="px-8 py-6 border-b border-zen-border bg-zen-surface2 flex items-center gap-4">
+          <div class="w-12 h-12 rounded-xl bg-slate-50 border border-slate-100 flex items-center justify-center shrink-0 text-slate-500 shadow-sm">
+            <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+          </div>
+          <div>
+            <h4 class="text-[17px] font-semibold text-zen-t1">Configurar Regra Base</h4>
+            <div class="text-[13.5px] text-zen-t3 mt-1 leading-relaxed">
+              O Cron gerará as faturas mensalmente. A IA adaptará o preço para contas variáveis.
+            </div>
+          </div>
+        </div>
+        
+        <form th:action="@{/app/financeiro/recorrentes/salvar}" th:object="${recorrente}" method="post" class="p-8 flex flex-col gap-6">
+          <input type="hidden" th:field="*{id}" />
+
+          <div class="flex flex-col gap-2">
+            <label class="text-[12px] font-semibold text-zen-t2 uppercase tracking-widest ml-1">Título/Serviço</label>
+            <input type="text" th:field="*{titulo}" class="w-full px-4 py-3 border border-zen-border rounded-xl bg-zen-surface2 text-[14.5px] text-zen-t1 focus:bg-zen-surface focus:border-brand focus:ring-2 focus:ring-brand/20 transition-all outline-none" placeholder="Ex: Conta de Luz, Aluguel, Netflix..." required>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+            <div class="flex flex-col gap-2">
+              <label class="text-[12px] font-semibold text-zen-t2 uppercase tracking-widest ml-1">Grupo (IA vs Fixo)</label>
+              <select th:field="*{grupo}" class="w-full px-4 py-3 border border-zen-border rounded-xl bg-zen-surface2 text-[14.5px] text-zen-t1 focus:bg-zen-surface focus:border-brand focus:ring-2 focus:ring-brand/20 transition-all outline-none form-select" required>
+                <option value="FIXA">Fixo (Aluguel, Streaming)</option>
+                <option value="VARIAVEL">Variável (Luz, Água, Mercado)</option>
+              </select>
+            </div>
+            <div class="flex flex-col gap-2">
+              <label class="text-[12px] font-semibold text-zen-t2 uppercase tracking-widest ml-1">Frequência</label>
+              <select th:field="*{frequencia}" class="w-full px-4 py-3 border border-zen-border rounded-xl bg-zen-surface2 text-[14.5px] text-zen-t1 focus:bg-zen-surface focus:border-brand focus:ring-2 focus:ring-brand/20 transition-all outline-none form-select" required>
+                <option th:each="f : ${frequencias}" th:value="${f}" th:text="${f.name()}"></option>
+              </select>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+            <div class="flex flex-col gap-2">
+              <label class="text-[12px] font-semibold text-zen-t2 uppercase tracking-widest ml-1">Dia do Vencimento (1 a 31)</label>
+              <input type="number" min="1" max="31" th:field="*{diaVencimento}" class="w-full px-4 py-3 border border-zen-border rounded-xl bg-zen-surface2 text-[14.5px] text-zen-t1 focus:bg-zen-surface focus:border-brand focus:ring-2 focus:ring-brand/20 transition-all outline-none font-mono" placeholder="Ex: 5" required>
+            </div>
+            <div class="flex flex-col gap-2">
+              <label class="text-[12px] font-semibold text-zen-t2 uppercase tracking-widest ml-1">Valor Base (R$)</label>
+              <input type="number" step="0.01" th:field="*{valorBase}" class="w-full px-4 py-3 border border-zen-border rounded-xl bg-zen-surface2 text-[14.5px] text-zen-t1 focus:bg-zen-surface focus:border-brand focus:ring-2 focus:ring-brand/20 transition-all outline-none font-mono" placeholder="Ex: 50.00" required>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+            <div class="flex flex-col gap-2">
+              <label class="text-[12px] font-semibold text-zen-t2 uppercase tracking-widest ml-1">Tipo da Transação</label>
+              <select th:field="*{tipo}" class="w-full px-4 py-3 border border-zen-border rounded-xl bg-zen-surface2 text-[14.5px] text-zen-t1 focus:bg-zen-surface focus:border-brand focus:ring-2 focus:ring-brand/20 transition-all outline-none form-select" required>
+                <option th:each="t : ${tipos}" th:value="${t}" th:text="${t.name()}"></option>
+              </select>
+            </div>
+            <div class="flex flex-col gap-2">
+              <label class="text-[12px] font-semibold text-zen-t2 uppercase tracking-widest ml-1">Categoria</label>
+              <select th:field="*{categoria.id}" class="w-full px-4 py-3 border border-zen-border rounded-xl bg-zen-surface2 text-[14.5px] text-zen-t1 focus:bg-zen-surface focus:border-brand focus:ring-2 focus:ring-brand/20 transition-all outline-none form-select">
+                <option value="">-- Sem Categoria --</option>
+                <option th:each="c : ${categorias}" th:value="${c.id}" th:text="${c.nome}"></option>
+              </select>
+            </div>
+          </div>
+
+          <div class="flex flex-col mt-2">
+            <label class="flex items-center gap-3 px-1 cursor-pointer group w-fit">
+              <div class="relative flex items-center justify-center">
+                <input type="checkbox" th:field="*{automacaoAtiva}" class="peer appearance-none w-5 h-5 border border-zen-border rounded bg-zen-surface2 checked:bg-brand checked:border-brand focus:outline-none focus:ring-2 focus:ring-brand/20 transition-all cursor-pointer">
+                <svg class="absolute w-3.5 h-3.5 text-white opacity-0 peer-checked:opacity-100 pointer-events-none" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+              </div>
+              <span class="text-[14px] font-medium text-zen-t1 group-hover:text-brand transition-colors">Ativar Automação (Cron Job Diário)</span>
+            </label>
+            <div class="text-[11.5px] text-zen-t3 ml-[32px] mt-1 pr-4">Se desativado, nenhuma transação será gerada automaticamente para os próximos meses até que seja reativada.</div>
+          </div>
+
+          <div class="flex gap-3 pt-7 border-t border-zen-border justify-end mt-2">
+            <a th:href="@{/app/financeiro/recorrentes}" class="px-5 py-2.5 text-[14px] font-medium text-zen-t3 hover:text-zen-t1 transition-colors">Cancelar</a>
+            <button type="submit" class="px-7 py-2.5 bg-brand hover:bg-brand-h text-white rounded-lg font-medium transition-all shadow-sm hover:shadow text-[14px]">Guardar Automação</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </main>
+  <script th:fragment="script"></script>
+</body>
+</html>

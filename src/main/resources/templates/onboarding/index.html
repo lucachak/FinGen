@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{layout/layout :: layout('Onboarding FinGen', ~{::section}, ~{::style}, ~{::script})}">
+<head>
+    <style>
+        .step-transition {
+            transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .step-hidden {
+            opacity: 0;
+            transform: translateY(20px);
+            pointer-events: none;
+            position: absolute;
+            visibility: hidden;
+            width: 100%;
+        }
+        .step-active {
+            opacity: 1;
+            transform: translateY(0);
+            position: relative;
+            visibility: visible;
+        }
+        
+        .radio-card-input:checked + .radio-card-label {
+            border-color: var(--brand);
+            background-color: var(--brand-soft);
+        }
+        .checkbox-card-input:checked + .checkbox-card-label {
+            border-color: var(--brand);
+            background-color: var(--brand-soft);
+        }
+    </style>
+</head>
+<body>
+    <section class="relative min-h-[calc(100vh-80px)] flex items-center justify-center py-10 px-5 overflow-hidden">
+        
+        <!-- Background Decor -->
+        <div class="absolute -top-[10%] -left-[10%] w-[500px] h-[500px] bg-brand/10 rounded-full blur-[100px] pointer-events-none z-0"></div>
+        <div class="absolute -bottom-[5%] -right-[5%] w-[400px] h-[400px] bg-emerald-200/20 rounded-full blur-[100px] pointer-events-none z-0"></div>
+
+        <div class="w-full max-w-[720px] relative z-10">
+            <!-- Progress Bar -->
+            <div class="flex justify-between items-center mb-8 px-4" id="progress-container">
+                <!-- JS will inject progress indicators here -->
+            </div>
+
+            <!-- Wizard Container -->
+            <div class="bg-zen-surface/80 backdrop-blur-xl border border-white/90 rounded-[32px] p-8 md:p-12 shadow-xl-zen relative overflow-hidden min-h-[400px]">
+                
+                <form id="onboardingForm" onsubmit="return false;">
+                    
+                    <!-- STEP 1: Renda Principal -->
+                    <div id="step-1" class="step-transition step-active">
+                        <div class="text-center mb-10">
+                            <h2 class="font-serif text-[32px] md:text-[36px] text-zen-t1 tracking-tight mb-3">Sua Renda Principal</h2>
+                            <p class="text-zen-t3 text-[15px] max-w-md mx-auto">Para montarmos seu orçamento ideal, precisamos saber sua renda líquida mensal aproximada.</p>
+                        </div>
+                        <div class="max-w-md mx-auto">
+                            <div class="relative mb-8">
+                                <label for="rendaLiquida" class="sr-only">Renda Líquida Mensal</label>
+                                <div class="absolute inset-y-0 left-0 pl-5 flex items-center pointer-events-none">
+                                    <span class="text-zen-t3 font-medium text-lg">R$</span>
+                                </div>
+                                <input type="number" id="rendaLiquida" name="rendaLiquida" step="100" class="w-full bg-zen-surface2/50 border border-zen-border rounded-2xl pl-12 pr-5 py-4 text-zen-t1 text-xl font-mono focus:outline-none focus:ring-2 focus:ring-brand/30 focus:bg-zen-surface transition-all shadow-sm-zen" placeholder="0,00">
+                            </div>
+                            <button type="button" onclick="nextStep(2)" class="w-full btn-primary justify-center py-3.5 text-[15px] rounded-xl">
+                                Avançar <i data-lucide="arrow-right" class="w-4 h-4 ml-1"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- STEP 2: Moradia -->
+                    <div id="step-2" class="step-transition step-hidden">
+                        <div class="text-center mb-10">
+                            <h2 class="font-serif text-[32px] md:text-[36px] text-zen-t1 tracking-tight mb-3">Como você mora hoje?</h2>
+                            <p class="text-zen-t3 text-[15px]">O custo de moradia costuma ser a maior despesa.</p>
+                        </div>
+                        
+                        <div class="grid grid-cols-2 gap-4 mb-6">
+                            <div class="relative">
+                                <input type="radio" name="situacaoMoradia" value="ALUGUEL" id="moradia-aluguel" class="radio-card-input hidden peer" onchange="toggleValorMoradia()">
+                                <label for="moradia-aluguel" class="radio-card-label cursor-pointer flex flex-col items-center text-center p-5 border border-zen-border rounded-2xl transition hover:border-brand/50 select-none">
+                                    <i data-lucide="key" class="w-8 h-8 text-zen-t2 mb-3"></i>
+                                    <span class="font-medium text-[14px]">Aluguel</span>
+                                </label>
+                            </div>
+                            <div class="relative">
+                                <input type="radio" name="situacaoMoradia" value="FINANCIAMENTO" id="moradia-financiamento" class="radio-card-input hidden peer" onchange="toggleValorMoradia()">
+                                <label for="moradia-financiamento" class="radio-card-label cursor-pointer flex flex-col items-center text-center p-5 border border-zen-border rounded-2xl transition hover:border-brand/50 select-none">
+                                    <i data-lucide="home" class="w-8 h-8 text-zen-t2 mb-3"></i>
+                                    <span class="font-medium text-[14px]">Financiamento</span>
+                                </label>
+                            </div>
+                            <div class="relative">
+                                <input type="radio" name="situacaoMoradia" value="QUITADO" id="moradia-quitado" class="radio-card-input hidden peer" onchange="toggleValorMoradia()">
+                                <label for="moradia-quitado" class="radio-card-label cursor-pointer flex flex-col items-center text-center p-5 border border-zen-border rounded-2xl transition hover:border-brand/50 select-none">
+                                    <i data-lucide="check-circle-2" class="w-8 h-8 text-zen-t2 mb-3"></i>
+                                    <span class="font-medium text-[14px]">Imóvel Quitado</span>
+                                </label>
+                            </div>
+                            <div class="relative">
+                                <input type="radio" name="situacaoMoradia" value="COM_OS_PAIS" id="moradia-pais" class="radio-card-input hidden peer" onchange="toggleValorMoradia()">
+                                <label for="moradia-pais" class="radio-card-label cursor-pointer flex flex-col items-center text-center p-5 border border-zen-border rounded-2xl transition hover:border-brand/50 select-none">
+                                    <i data-lucide="users" class="w-8 h-8 text-zen-t2 mb-3"></i>
+                                    <span class="font-medium text-[14px]">Com os pais/outros</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- Valor input (hidden by default) -->
+                        <div id="valor-moradia-container" class="hidden animate-fade-in mb-8">
+                            <label class="block text-[12px] font-semibold text-zen-t3 uppercase tracking-widest mb-2 ml-1" for="valorMoradia">Valor Mensal (R$)</label>
+                            <input type="number" id="valorMoradia" name="valorMoradia" step="10" class="w-full bg-zen-surface2/50 border border-zen-border rounded-xl px-4 py-3 text-zen-t1 font-mono focus:outline-none focus:ring-2 focus:ring-brand/30" placeholder="0,00">
+                        </div>
+
+                        <div class="flex justify-between items-center mt-8">
+                            <button type="button" onclick="prevStep(1)" class="btn-ghost py-2.5 px-6 rounded-xl text-[14px]">Voltar</button>
+                            <button type="button" onclick="nextStep(3)" class="btn-primary py-2.5 px-8 rounded-xl text-[14px]">Avançar</button>
+                        </div>
+                    </div>
+
+                    <!-- STEP 3: Contas Residenciais -->
+                    <div id="step-3" class="step-transition step-hidden">
+                        <div class="text-center mb-10">
+                            <h2 class="font-serif text-[32px] md:text-[36px] text-zen-t1 tracking-tight mb-3">Despesas da Casa</h2>
+                            <p class="text-zen-t3 text-[15px]">Quais destas contas você costuma pagar todo mês?</p>
+                        </div>
+
+                        <div class="grid grid-cols-2 md:grid-cols-3 gap-4 mb-10">
+                            <!-- Helper template for checkboxes -->
+                            <div class="relative">
+                                <input type="checkbox" name="contasCasa" value="Luz" id="conta-luz" class="checkbox-card-input hidden">
+                                <label for="conta-luz" class="checkbox-card-label cursor-pointer flex items-center gap-3 p-4 border border-zen-border rounded-xl transition hover:bg-zen-surface2">
+                                    <i data-lucide="zap" class="w-5 h-5 text-amber-500"></i>
+                                    <span class="font-medium text-[14px]">Energia</span>
+                                </label>
+                            </div>
+                            <div class="relative">
+                                <input type="checkbox" name="contasCasa" value="Agua" id="conta-agua" class="checkbox-card-input hidden">
+                                <label for="conta-agua" class="checkbox-card-label cursor-pointer flex items-center gap-3 p-4 border border-zen-border rounded-xl transition hover:bg-zen-surface2">
+                                    <i data-lucide="droplet" class="w-5 h-5 text-blue-500"></i>
+                                    <span class="font-medium text-[14px]">Água</span>
+                                </label>
+                            </div>
+                            <div class="relative">
+                                <input type="checkbox" name="contasCasa" value="Internet" id="conta-internet" class="checkbox-card-input hidden">
+                                <label for="conta-internet" class="checkbox-card-label cursor-pointer flex items-center gap-3 p-4 border border-zen-border rounded-xl transition hover:bg-zen-surface2">
+                                    <i data-lucide="wifi" class="w-5 h-5 text-brand"></i>
+                                    <span class="font-medium text-[14px]">Internet</span>
+                                </label>
+                            </div>
+                            <div class="relative">
+                                <input type="checkbox" name="contasCasa" value="Gas" id="conta-gas" class="checkbox-card-input hidden">
+                                <label for="conta-gas" class="checkbox-card-label cursor-pointer flex items-center gap-3 p-4 border border-zen-border rounded-xl transition hover:bg-zen-surface2">
+                                    <i data-lucide="flame" class="w-5 h-5 text-orange-500"></i>
+                                    <span class="font-medium text-[14px]">Gás</span>
+                                </label>
+                            </div>
+                            <div class="relative">
+                                <input type="checkbox" name="contasCasa" value="Condominio" id="conta-condo" class="checkbox-card-input hidden">
+                                <label for="conta-condo" class="checkbox-card-label cursor-pointer flex items-center gap-3 p-4 border border-zen-border rounded-xl transition hover:bg-zen-surface2">
+                                    <i data-lucide="building" class="w-5 h-5 text-emerald-600"></i>
+                                    <span class="font-medium text-[14px]">Condomínio</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="flex justify-between items-center mt-8">
+                            <button type="button" onclick="prevStep(2)" class="btn-ghost py-2.5 px-6 rounded-xl text-[14px]">Voltar</button>
+                            <button type="button" onclick="nextStep(4)" class="btn-primary py-2.5 px-8 rounded-xl text-[14px]">Avançar</button>
+                        </div>
+                    </div>
+
+                    <!-- STEP 4: Transporte e Estilo de Vida -->
+                    <div id="step-4" class="step-transition step-hidden">
+                        <div class="text-center mb-8">
+                            <h2 class="font-serif text-[32px] md:text-[36px] text-zen-t1 tracking-tight mb-3">Transporte & Assinaturas</h2>
+                            <p class="text-zen-t3 text-[15px]">Só faltam os gastos do dia a dia e streaming.</p>
+                        </div>
+
+                        <div class="mb-8">
+                            <label class="block text-[12px] font-semibold text-zen-t3 uppercase tracking-widest mb-3">Transporte Principal</label>
+                            <div class="grid grid-cols-3 gap-3">
+                                <div class="relative">
+                                    <input type="radio" name="transportePrincipal" value="CARRO_MOTO" id="transp-carro" class="radio-card-input hidden">
+                                    <label for="transp-carro" class="radio-card-label cursor-pointer flex flex-col items-center p-3 border border-zen-border rounded-xl hover:border-brand/50">
+                                        <i data-lucide="car" class="w-5 h-5 mb-2"></i><span class="text-[12px] font-medium">Carro/Moto</span>
+                                    </label>
+                                </div>
+                                <div class="relative">
+                                    <input type="radio" name="transportePrincipal" value="TRANSPORTE_PUBLICO" id="transp-pub" class="radio-card-input hidden">
+                                    <label for="transp-pub" class="radio-card-label cursor-pointer flex flex-col items-center p-3 border border-zen-border rounded-xl hover:border-brand/50">
+                                        <i data-lucide="bus" class="w-5 h-5 mb-2"></i><span class="text-[12px] font-medium">Público/App</span>
+                                    </label>
+                                </div>
+                                <div class="relative">
+                                    <input type="radio" name="transportePrincipal" value="BICICLETA_A_PE" id="transp-pe" class="radio-card-input hidden">
+                                    <label for="transp-pe" class="radio-card-label cursor-pointer flex flex-col items-center p-3 border border-zen-border rounded-xl hover:border-brand/50">
+                                        <i data-lucide="bike" class="w-5 h-5 mb-2"></i><span class="text-[12px] font-medium">Ativo (Pé/Bike)</span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="block text-[12px] font-semibold text-zen-t3 uppercase tracking-widest mb-3">Serviços que você assina</label>
+                            <div class="flex flex-wrap gap-2">
+                                <label class="relative">
+                                    <input type="checkbox" name="assinaturas" value="Netflix" class="checkbox-card-input hidden">
+                                    <span class="checkbox-card-label cursor-pointer inline-flex px-4 py-2 border border-zen-border rounded-full text-[13px] font-medium transition hover:bg-zen-surface2">Netflix</span>
+                                </label>
+                                <label class="relative">
+                                    <input type="checkbox" name="assinaturas" value="Spotify" class="checkbox-card-input hidden">
+                                    <span class="checkbox-card-label cursor-pointer inline-flex px-4 py-2 border border-zen-border rounded-full text-[13px] font-medium transition hover:bg-zen-surface2">Spotify</span>
+                                </label>
+                                <label class="relative">
+                                    <input type="checkbox" name="assinaturas" value="Academia" class="checkbox-card-input hidden">
+                                    <span class="checkbox-card-label cursor-pointer inline-flex px-4 py-2 border border-zen-border rounded-full text-[13px] font-medium transition hover:bg-zen-surface2">Academia</span>
+                                </label>
+                                <label class="relative">
+                                    <input type="checkbox" name="assinaturas" value="Amazon Prime" class="checkbox-card-input hidden">
+                                    <span class="checkbox-card-label cursor-pointer inline-flex px-4 py-2 border border-zen-border rounded-full text-[13px] font-medium transition hover:bg-zen-surface2">Prime Video</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="flex justify-between items-center mt-8">
+                            <button type="button" onclick="prevStep(3)" class="btn-ghost py-2.5 px-6 rounded-xl text-[14px]">Voltar</button>
+                            <button type="button" onclick="submitOnboarding()" class="bg-brand text-white font-medium py-3 px-8 rounded-xl text-[14px] shadow-md hover:bg-brand-h transition">Concluir Setup</button>
+                        </div>
+                    </div>
+
+                    <!-- STEP 5: Loading state -->
+                    <div id="step-5" class="step-transition step-hidden flex-col items-center justify-center min-h-[300px]">
+                        <div class="w-16 h-16 border-4 border-zen-surface2 border-t-brand rounded-full animate-spin mb-6"></div>
+                        <h2 class="font-serif text-[28px] text-zen-t1 mb-2">Preparando sua Base...</h2>
+                        <p class="text-zen-t3" id="loading-text">Analisando padrão financeiro</p>
+                    </div>
+
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <script>
+        const totalSteps = 4;
+        let currentStep = 1;
+
+        // Init progress dots
+        function initProgress() {
+            const container = document.getElementById('progress-container');
+            let html = '';
+            for(let i=1; i<=totalSteps; i++) {
+                html += `<div id="dot-${i}" class="w-3.5 h-3.5 rounded-full border-2 transition-all duration-300 ${i===1 ? 'bg-brand border-brand ring-4 ring-brand/15' : 'bg-zen-surface2 border-zen-border'}"></div>`;
+                if(i < totalSteps) {
+                    html += `<div class="flex-1 h-px bg-zen-border mx-2"></div>`;
+                }
+            }
+            container.innerHTML = html;
+        }
+
+        function updateProgress(step) {
+            for(let i=1; i<=totalSteps; i++) {
+                const dot = document.getElementById(`dot-${i}`);
+                if (i <= step) {
+                    dot.className = "w-3.5 h-3.5 rounded-full border-2 transition-all duration-300 bg-brand border-brand ring-4 ring-brand/15";
+                } else {
+                    dot.className = "w-3.5 h-3.5 rounded-full border-2 transition-all duration-300 bg-zen-surface2 border-zen-border";
+                }
+            }
+        }
+
+        let ctx;
+        document.addEventListener('DOMContentLoaded', () => {
+            ctx = gsap.context(() => {});
+            initProgress();
+            
+            // Cleanup for HTMX
+            document.addEventListener('htmx:beforeSwap', () => ctx && ctx.revert());
+        });
+
+        function toggleValorMoradia() {
+            const radios = document.getElementsByName('situacaoMoradia');
+            const container = document.getElementById('valor-moradia-container');
+            let selected = '';
+            for(let i=0; i<radios.length; i++){
+                if(radios[i].checked) selected = radios[i].value;
+            }
+            if(selected === 'ALUGUEL' || selected === 'FINANCIAMENTO') {
+                container.classList.remove('hidden');
+                if (ctx) {
+                    ctx.add(() => {
+                        gsap.fromTo(container, {opacity: 0, y: -10}, {opacity: 1, y: 0, duration: 0.3});
+                    });
+                }
+            } else {
+                container.classList.add('hidden');
+            }
+        }
+
+        function nextStep(step) {
+            document.getElementById(`step-${currentStep}`).classList.remove('step-active');
+            document.getElementById(`step-${currentStep}`).classList.add('step-hidden');
+            
+            currentStep = step;
+            
+            document.getElementById(`step-${currentStep}`).classList.remove('step-hidden');
+            document.getElementById(`step-${currentStep}`).classList.add('step-active');
+            updateProgress(currentStep);
+        }
+
+        function prevStep(step) {
+            nextStep(step);
+        }
+
+        async function submitOnboarding() {
+            document.getElementById('progress-container').style.display = 'none';
+            document.getElementById(`step-${currentStep}`).classList.remove('step-active');
+            document.getElementById(`step-${currentStep}`).classList.add('step-hidden');
+            
+            currentStep = 5;
+            document.getElementById('step-5').classList.remove('step-hidden');
+            document.getElementById('step-5').classList.add('step-active');
+            document.getElementById('step-5').style.display = 'flex';
+
+            const texts = ["Analisando padrão...", "Montando Orçamentos...", "Ajustando Metas...", "Quase lá..."];
+            let i = 0;
+            const textInterval = setInterval(() => {
+                document.getElementById('loading-text').innerText = texts[i];
+                i = (i + 1) % texts.length;
+            }, 800);
+
+            const form = document.getElementById('onboardingForm');
+            const formData = new FormData(form);
+            
+            const payload = {
+                rendaLiquida: formData.get('rendaLiquida') ? parseFloat(formData.get('rendaLiquida')) : 0,
+                situacaoMoradia: formData.get('situacaoMoradia'),
+                valorMoradia: formData.get('valorMoradia') ? parseFloat(formData.get('valorMoradia')) : 0,
+                transportePrincipal: formData.get('transportePrincipal'),
+                contasCasa: formData.getAll('contasCasa'),
+                assinaturas: formData.getAll('assinaturas'),
+                possuiDividasAtivas: false,
+                possuiDependentes: false,
+                numeroDependentes: 0
+            };
+
+            try {
+                const csrfElem = document.querySelector('meta[name="_csrf"]');
+                const csrfHeaderElem = document.querySelector('meta[name="_csrf_header"]');
+                const headers = { 'Content-Type': 'application/json' };
+                if (csrfElem && csrfHeaderElem) headers[csrfHeaderElem.content] = csrfElem.content;
+
+                const response = await fetch('/app/onboarding/submit', {
+                    method: 'POST',
+                    headers: headers,
+                    body: JSON.stringify(payload)
+                });
+                
+                if (!response.ok) throw new Error(`Erro ${response.status}`);
+                const data = await response.json();
+                clearInterval(textInterval);
+                if (data.status === 'success') window.location.href = data.redirect;
+                else throw new Error(data.message);
+            } catch (error) {
+                clearInterval(textInterval);
+                document.getElementById('step-5').classList.add('hidden');
+                document.getElementById(`step-${currentStep}`).classList.remove('step-hidden');
+                document.getElementById(`step-${currentStep}`).classList.add('step-active');
+                document.getElementById('progress-container').style.display = 'flex';
+                alert("Falha: " + error.message);
+            }
+        }
+    </script>
+</body>
+</html>

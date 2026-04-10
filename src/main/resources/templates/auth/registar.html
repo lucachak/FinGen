@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Criar Conta — FinGen</title>
+  <meta name="description" content="Crie a sua conta FinGen e comece a gerir o seu património com clareza e inteligência.">
+  <meta property="og:title" content="Criar Conta - FinGen">
+  <meta property="og:description" content="Crie a sua conta FinGen e comece a gerir o seu património.">
+  <meta property="og:type" content="website">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
+
+  <script type="importmap">
+    {
+      "imports": {
+        "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+        "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+      }
+    }
+  </script>
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #F4F7F4;
+      --surface: #FFFFFF;
+      --surface-2: #EDF2ED;
+      --border: rgba(15, 118, 110, 0.12);
+      --brand: #0F766E;
+      --brand-h: #0d9488;
+      --brand-soft: rgba(15, 118, 110, 0.08);
+      --t1: #0F2721;
+      --t2: #2D4A3E;
+      --t3: #475569;
+      --t-inv: #F4F7F4;
+      --green: #16a34a;
+      --green-bg: #f0fdf4;
+      --green-b: #bbf7d0;
+      --red: #dc2626;
+      --red-bg: #fef2f2;
+      --red-b: #fecaca;
+      --font: system-ui, -apple-system, sans-serif;
+      --font-serif: serif;
+      --mono: monospace;
+      --r-sm: 8px; --r-md: 12px; --r-lg: 16px; --r-xl: 20px; --r-full: 9999px;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      min-height: 100vh;
+      font-family: var(--font);
+      background: var(--bg);
+      color: var(--t1);
+      font-size: 15px;
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    *:focus-visible { outline: 2px solid var(--brand); outline-offset: 2px; }
+
+    /* ── Shell ── */
+    .auth-shell {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    /* ── Left Brand Panel ── */
+    .auth-panel {
+      background: linear-gradient(160deg, #0a4a44 0%, #0F766E 50%, #0d9488 100%);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 52px;
+      position: relative;
+      overflow: hidden;
+      height: 100%;
+    }
+
+    .auth-panel::before {
+      content: '';
+      position: absolute; inset: 0;
+      background:
+        radial-gradient(ellipse 80% 60% at 50% 0%, rgba(10, 74, 68, 0.55) 0%, transparent 70%),
+        radial-gradient(ellipse 80% 50% at 50% 100%, rgba(10, 74, 68, 0.65) 0%, transparent 70%);
+      pointer-events: none;
+      z-index: 2;
+    }
+
+    #coin-canvas {
+      position: absolute; inset: 0;
+      width: 100%; height: 100%;
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    .panel-logo, .panel-body, .panel-stats { position: relative; z-index: 3; }
+
+    .panel-logo { display: flex; align-items: center; gap: 12px; }
+
+    .panel-logo-mark {
+      width: 38px; height: 38px;
+      background: rgba(255,255,255,0.15);
+      border: 1px solid rgba(255,255,255,0.25);
+      border-radius: var(--r-md);
+      display: flex; align-items: center; justify-content: center;
+      backdrop-filter: blur(8px);
+    }
+
+    .panel-logo-name { font-size: 18px; font-weight: 600; color: rgba(255,255,255,0.95); letter-spacing: -0.3px; }
+
+    .panel-headline {
+      font-family: var(--font-serif);
+      font-size: 38px; font-weight: 500;
+      color: rgba(255,255,255,0.95);
+      letter-spacing: -0.03em;
+      line-height: 1.2;
+      margin-bottom: 20px;
+    }
+
+    .panel-desc { font-size: 15px; color: rgba(255,255,255,0.8); line-height: 1.7; max-width: 340px; }
+
+    .panel-stats { display: flex; gap: 32px; flex-wrap: wrap; }
+    .panel-stat-val { font-family: var(--mono); font-size: 22px; font-weight: 500; color: rgba(255,255,255,0.95); }
+    .panel-stat-lbl { font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em; color: rgba(255,255,255,0.6); margin-top: 3px; }
+
+    /* ── Right Form Panel ── */
+    .auth-form-side {
+      display: flex; align-items: center; justify-content: center;
+      padding: 52px 40px;
+      background: var(--bg);
+      height: 100%;
+      overflow-y: auto;
+    }
+
+    .card-wrap {
+      width: 100%; max-width: 420px;
+      animation: rise 0.7s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+    }
+
+    @keyframes rise {
+      from { opacity: 0; transform: translateY(16px) scale(0.98); }
+      to   { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    .card-heading {
+      font-family: var(--font-serif);
+      font-size: 32px; font-weight: 500;
+      color: var(--t1); letter-spacing: -0.02em; margin-bottom: 8px;
+    }
+
+    .card-sub { font-size: 14px; color: var(--t3); margin-bottom: 40px; }
+
+    /* Alerts */
+    .alert {
+      padding: 12px 16px; border-radius: var(--r-md); font-size: 13px;
+      display: flex; align-items: center; gap: 10px; margin-bottom: 24px;
+    }
+    .alert svg { width: 16px; height: 16px; flex-shrink: 0; }
+    .alert-err { color: var(--red); background: var(--red-bg); border: 1px solid var(--red-b); }
+    .alert-ok  { color: var(--green); background: var(--green-bg); border: 1px solid var(--green-b); }
+
+    /* Fields */
+    .fields { display: flex; flex-direction: column; gap: 20px; }
+
+    .field { display: flex; flex-direction: column; gap: 7px; }
+
+    .field-label {
+      font-size: 12px; font-weight: 600;
+      color: var(--t3); text-transform: uppercase; letter-spacing: 0.07em;
+    }
+
+    .field-wrap { position: relative; }
+
+    .field-input {
+      width: 100%; padding: 11px 14px;
+      background: var(--surface);
+      border: 1.5px solid var(--border);
+      border-radius: var(--r-md);
+      font-family: var(--font); font-size: 14.5px; color: var(--t1);
+      transition: border-color .2s, box-shadow .2s;
+      outline: none;
+    }
+    .field-input::placeholder { color: var(--t3); opacity: 0.6; }
+    .field-input:focus { border-color: var(--brand); box-shadow: 0 0 0 3px var(--brand-soft); }
+    .field-input:focus-visible { outline: none; }
+
+    #password, #confirm { padding-right: 42px; }
+
+    .field-eye {
+      position: absolute; right: 12px; top: 50%; transform: translateY(-50%);
+      background: none; border: none; cursor: pointer; color: var(--t3);
+      display: flex; padding: 4px;
+      transition: color .2s; border-radius: 4px;
+    }
+    .field-eye:hover { color: var(--brand); }
+    .field-eye svg { width: 15px; height: 15px; }
+
+    /* Password strength */
+    .strength-bar {
+      display: flex; gap: 4px; margin-top: 8px;
+    }
+    .strength-seg {
+      flex: 1; height: 3px; border-radius: 99px;
+      background: var(--border);
+      transition: background .3s;
+    }
+    .strength-seg.weak   { background: #ef4444; }
+    .strength-seg.fair   { background: #f97316; }
+    .strength-seg.good   { background: #eab308; }
+    .strength-seg.strong { background: var(--brand); }
+
+    .strength-label {
+      font-size: 11px; color: var(--t3); margin-top: 4px;
+      min-height: 16px; transition: color .3s;
+    }
+
+    /* Submit */
+    .btn-login {
+      width: 100%; padding: 14px;
+      background: var(--brand); color: var(--t-inv);
+      border: none; border-radius: var(--r-md);
+      font-family: var(--font); font-size: 14px; font-weight: 500;
+      cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px;
+      transition: background-color .2s, box-shadow .2s, transform .2s;
+      margin-top: 8px;
+      box-shadow: 0 2px 8px rgba(15, 118, 110, 0.25);
+    }
+    .btn-login:hover { background-color: var(--brand-h); box-shadow: 0 6px 18px rgba(15, 118, 110, 0.32); transform: translateY(-1px); }
+    .btn-login:active { transform: translateY(0); }
+
+    .card-footer {
+      margin-top: 32px; font-size: 13px; color: var(--t3);
+      display: flex; justify-content: center; align-items: center; gap: 6px;
+    }
+    .card-footer a { color: var(--brand); text-decoration: none; font-weight: 500; transition: color .2s; }
+    .card-footer a:hover { color: var(--brand-h); }
+
+    .trust-row {
+      display: flex; align-items: center; justify-content: center; gap: 6px;
+      margin-top: 24px; font-size: 11.5px; color: var(--t3);
+    }
+    .trust-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--green); }
+
+    @media (max-width: 768px) {
+      .auth-shell { grid-template-columns: 1fr; height: auto; }
+      .auth-panel  { display: none; }
+      .auth-form-side { padding: 40px 24px; height: 100vh; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, ::before, ::after {
+        animation-duration: 1ms !important;
+        transition-duration: 0s !important;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="auth-shell">
+
+    <!-- ── Left Brand Panel ── -->
+    <div class="auth-panel" aria-hidden="true">
+      <canvas id="coin-canvas"></canvas>
+
+      <div class="panel-logo">
+        <div class="panel-logo-mark">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+            <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"
+              stroke="white" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <span class="panel-logo-name">FinGen</span>
+      </div>
+
+      <div class="panel-body">
+        <h2 class="panel-headline">Comece a sua<br>jornada financeira.</h2>
+        <p class="panel-desc">Registe-se e tenha o controlo total do seu património, despesas e investimentos num só lugar.</p>
+      </div>
+
+      <div class="panel-stats">
+        <div>
+          <div class="panel-stat-val">100%</div>
+          <div class="panel-stat-lbl">Gratuito</div>
+        </div>
+        <div>
+          <div class="panel-stat-val">256-bit</div>
+          <div class="panel-stat-lbl">Encriptação</div>
+        </div>
+        <div>
+          <div class="panel-stat-val">IA</div>
+          <div class="panel-stat-lbl">Integrada</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Right Form Panel ── -->
+    <div class="auth-form-side">
+      <div class="card-wrap">
+
+        <h1 class="card-heading">Criar Conta</h1>
+        <p class="card-sub">Inicie a sua jornada financeira com clareza.</p>
+
+        <!-- Error -->
+        <div th:if="${erro}" class="alert alert-err">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+          </svg>
+          <span th:text="${erro}"></span>
+        </div>
+
+        <form th:action="@{/auth/registar}" method="post" class="fields" id="register-form">
+
+          <!-- Nome -->
+          <div class="field">
+            <label class="field-label" for="nomeCompleto">Nome Completo</label>
+            <input id="nomeCompleto" class="field-input" type="text" name="nomeCompleto"
+              placeholder="O seu nome completo" required autofocus autocomplete="name">
+          </div>
+
+          <!-- Email -->
+          <div class="field">
+            <label class="field-label" for="email">E-mail</label>
+            <input id="email" class="field-input" type="email" name="email"
+              placeholder="seu@email.com" required autocomplete="email">
+          </div>
+
+          <!-- Password -->
+          <div class="field">
+            <label class="field-label" for="password">Senha</label>
+            <div class="field-wrap">
+              <input id="password" class="field-input" type="password" name="password"
+                placeholder="Mínimo 8 caracteres" required autocomplete="new-password"
+                oninput="checkStrength(this.value)">
+              <button type="button" class="field-eye" onclick="togglePwd('password','eye-pwd')" aria-label="Mostrar senha">
+                <svg id="eye-pwd" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>
+                </svg>
+              </button>
+            </div>
+            <!-- Strength bar -->
+            <div class="strength-bar" aria-hidden="true">
+              <div class="strength-seg" id="seg1"></div>
+              <div class="strength-seg" id="seg2"></div>
+              <div class="strength-seg" id="seg3"></div>
+              <div class="strength-seg" id="seg4"></div>
+            </div>
+            <div class="strength-label" id="strength-lbl"></div>
+          </div>
+
+          <button type="submit" class="btn-login">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
+              <circle cx="9" cy="7" r="4"/>
+              <line x1="19" y1="8" x2="19" y2="14"/>
+              <line x1="22" y1="11" x2="16" y2="11"/>
+            </svg>
+            Criar Conta
+          </button>
+        </form>
+
+        <div class="card-footer">
+          <span>Já tem uma conta?</span>
+          <a th:href="@{/auth/login}">Fazer Login</a>
+        </div>
+
+        <div class="trust-row">
+          <span class="trust-dot"></span>
+          Dados encriptados e seguros · FinGen &copy; 2026
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function togglePwd(inputId, iconId) {
+      var inp = document.getElementById(inputId);
+      var ico = document.getElementById(iconId);
+      var show = inp.type === 'password';
+      inp.type = show ? 'text' : 'password';
+      ico.innerHTML = show
+        ? '<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/><path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/><line x1="1" y1="1" x2="23" y2="23"/>'
+        : '<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>';
+    }
+
+    function checkStrength(val) {
+      var segs = [document.getElementById('seg1'), document.getElementById('seg2'),
+                  document.getElementById('seg3'), document.getElementById('seg4')];
+      var lbl = document.getElementById('strength-lbl');
+      var score = 0;
+      if (val.length >= 8) score++;
+      if (/[A-Z]/.test(val)) score++;
+      if (/[0-9]/.test(val)) score++;
+      if (/[^A-Za-z0-9]/.test(val)) score++;
+
+      var levels = ['', 'weak', 'fair', 'good', 'strong'];
+      var labels = ['', 'Fraca', 'Razoável', 'Boa', 'Forte ✓'];
+      var colors = ['', '#ef4444', '#f97316', '#eab308', 'var(--brand)'];
+
+      segs.forEach(function(s, i) {
+        s.className = 'strength-seg ' + (i < score ? levels[score] : '');
+      });
+      lbl.textContent = val.length ? labels[score] : '';
+      lbl.style.color = val.length ? colors[score] : 'var(--t3)';
+    }
+  </script>
+
+  <!-- 3D Coin Canvas (identical to login) -->
+  <script type="module" th:inline="none">
+    import * as THREE from 'three';
+    import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+
+    const gsap = window.gsap;
+    const pfm = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const canvas = document.getElementById('coin-canvas');
+    const panel = canvas.parentElement;
+    const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    renderer.outputColorSpace = THREE.SRGBColorSpace;
+    renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    renderer.toneMappingExposure = 1.0;
+
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(40, 1, 0.1, 100);
+    camera.position.set(0, 1.5, 14);
+
+    scene.add(new THREE.AmbientLight(0xffffff, 0.8));
+    const sun = new THREE.DirectionalLight(0xffffff, 1.5);
+    sun.position.set(5, 10, 7); scene.add(sun);
+    const fill = new THREE.DirectionalLight(0xdbeafe, 0.8);
+    fill.position.set(-5, -5, -2); scene.add(fill);
+
+    function resize() {
+      const w = panel.clientWidth, h = panel.clientHeight;
+      renderer.setSize(w, h, false);
+      camera.aspect = w / h;
+      camera.updateProjectionMatrix();
+    }
+    resize();
+    new ResizeObserver(resize).observe(panel);
+
+    const PILES_CFG = [
+      { x: 3.2, z: -0.8, count: 14 },
+      { x: 2.3, z: 0.3,  count: 10 },
+      { x: 3.4, z: 1.2,  count: 8  },
+    ];
+    const BASE_Y = -1.5;
+    const COIN_THICKNESS = 0.22;
+    const coins = [];
+    const totalCoins = PILES_CFG.reduce((s, p) => s + p.count, 0);
+
+    new GLTFLoader().load('/golden_coin.glb', function(gltf) {
+      var raw = gltf.scene;
+      var box = new THREE.Box3().setFromObject(raw);
+      var size = new THREE.Vector3(); box.getSize(size);
+      raw.scale.setScalar(1.0 / Math.max(size.x, size.y, size.z) * 1.3);
+      raw.rotation.x = Math.PI / 2;
+
+      const mat = new THREE.MeshStandardMaterial({ color: 0xFBBF24, metalness: 0.75, roughness: 0.35 });
+      raw.traverse(c => { if (c.isMesh) c.material = mat; });
+
+      const proto = new THREE.Group(); proto.add(raw);
+      let idx = 0;
+
+      PILES_CFG.forEach(cfg => {
+        for (let i = 0; i < cfg.count; i++) {
+          const g = proto.clone(true);
+          const finalY = BASE_Y + i * COIN_THICKNESS;
+          g.position.set(cfg.x, pfm ? finalY : 20, cfg.z);
+          g.rotation.y = Math.random() * Math.PI * 2;
+          g.rotation.z = (Math.random() - 0.5) * 0.15;
+          g.userData = { finalY, popped: pfm, triggerPercent: idx / (totalCoins + 1), index: idx, spinSpeed: 0 };
+          scene.add(g); coins.push(g);
+          if (pfm) g.position.y = finalY;
+          idx++;
+        }
+      });
+
+      // Auto-reveal without scroll (registration page has no scroll)
+      if (!pfm) {
+        window.gsapCtx = gsap.context(() => {
+          coins.forEach((coin, i) => {
+            gsap.to(coin.position, { y: coin.userData.finalY, duration: 1.5, delay: i * 0.05, ease: 'bounce.out' });
+          });
+        });
+      }
+
+      (function animate() {
+        requestAnimationFrame(animate);
+        renderer.render(scene, camera);
+      })();
+
+      document.addEventListener('htmx:beforeSwap', () => {
+        if (window.gsapCtx) window.gsapCtx.revert();
+      });
+    }, undefined, () => {});
+  </script>
+
+</body>
+</html>

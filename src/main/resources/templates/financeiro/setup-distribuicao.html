@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{layout/layout :: layout('Distribuição de Renda - FinGen Zen', ~{::section}, ~{::style}, ~{::script})}">
+<head>
+    <style>
+        .strategy-card.selected {
+            border-color: #0f766e;
+            background-color: #f0fdfa;
+            box-shadow: 0 10px 15px -3px rgba(15, 118, 110, 0.1);
+        }
+        .strategy-card.selected .icon-box {
+            background-color: #0f766e;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <section class="relative min-h-[calc(100vh-80px)] flex items-center justify-center py-10 px-5 overflow-hidden">
+        <!-- Background Decorations -->
+        <div class="absolute -top-[10%] -left-[10%] w-[400px] h-[400px] bg-brand-soft rounded-[43%_57%_70%_30%/30%_60%_40%_70%] blur-[80px] opacity-40 pointer-events-none z-0"></div>
+        <div class="absolute -bottom-[5%] -right-[5%] w-[350px] h-[350px] bg-[#EDF2ED] rounded-[53%_47%_40%_60%/60%_40%_60%_40%] blur-[80px] opacity-40 pointer-events-none z-0"></div>
+
+        <div class="w-full max-w-[850px] relative z-10 animate-[fade-up_0.6s_ease-out_both]">
+            <div class="bg-zen-surface/80 backdrop-blur-xl border border-white/90 rounded-2xl p-8 sm:p-12 shadow-[0_32px_72px_rgba(15,118,110,0.12)] relative overflow-hidden">
+                <!-- Bamboo Texture Noise -->
+                <div class="absolute inset-0 opacity-[0.02] mix-blend-overlay pointer-events-none bg-[url('data:image/svg+xml,%3Csvg viewBox=%220 0 200 200%22 xmlns=%22http://www.w3.org/2000/svg%22%3E%3Cfilter id=%22noiseFilter%22%3E%3CfeTurbulence type=%22fractalNoise%22 baseFrequency=%220.85%22 numOctaves=%223%22 stitchTiles=%22stitch%22/%3E%3C/filter%3E%3Crect width=%22100%25%22 height=%22100%25%22 filter=%22url(%23noiseFilter)%22/%3E%3C/svg%3E')]"></div>
+                
+                <div class="relative z-10 grid grid-cols-1 lg:grid-cols-2 gap-12">
+                    <!-- Left: Form -->
+                    <div>
+                        <h2 class="font-serif text-[32px] font-medium text-zen-t1 mb-2 tracking-tight">Setup de Distribuição</h2>
+                        <p class="text-[15px] text-zen-t3 mb-8 leading-relaxed">Configure como sua renda será distribuída automaticamente entre orçamentos e metas.</p>
+                        
+                        <form th:action="@{/app/financeiro/setup}" method="POST" id="setupForm" class="space-y-6">
+                            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+                            <input type="hidden" name="strategy" id="selectedStrategy" value="REGRA_50_30_20">
+                            
+                            <!-- Income Input -->
+                            <div>
+                                <label class="block text-[11.5px] font-semibold text-zen-t3 uppercase tracking-widest mb-2 ml-1">Sua Renda Mensal Líquida</label>
+                                <div class="relative group">
+                                    <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                                        <span class="text-brand font-semibold">R$</span>
+                                    </div>
+                                    <input type="number" step="0.01" name="income" id="incomeInput" 
+                                           class="w-full bg-zen-surface2 border border-zen-border rounded-xl pl-11 pr-4 py-4 text-zen-t1 text-[18px] font-semibold focus:outline-none focus:ring-2 focus:ring-brand/30 focus:bg-zen-surface transition-all" 
+                                           placeholder="0,00" required>
+                                </div>
+                            </div>
+
+                            <!-- Strategy Selection -->
+                            <div>
+                                <label class="block text-[11.5px] font-semibold text-zen-t3 uppercase tracking-widest mb-3 ml-1">Escolha sua Estratégia</label>
+                                <div class="grid grid-cols-1 gap-3">
+                                    <div class="strategy-card group p-4 cursor-pointer bg-zen-surface2 border border-zen-border rounded-xl transition-all hover:bg-zen-surface hover:border-brand/40 selected" 
+                                         onclick="selectStrategy('REGRA_50_30_20', this)">
+                                        <div class="flex items-center gap-4">
+                                            <div class="icon-box w-10 h-10 rounded-lg bg-zen-surface flex items-center justify-center text-zen-t2 shadow-sm border border-zen-border transition-colors">
+                                                <i data-lucide="pie-chart" class="w-5 h-5"></i>
+                                            </div>
+                                            <div>
+                                                <h5 class="text-[14px] font-bold text-zen-t1">Regra 50/30/20</h5>
+                                                <p class="text-[12px] text-zen-t3">Essencial / Lazer / Poupança</p>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="strategy-card group p-4 cursor-pointer bg-zen-surface2 border border-zen-border rounded-xl transition-all hover:bg-zen-surface hover:border-brand/40" 
+                                         onclick="selectStrategy('FOCO_POUPANCA_40_40_20', this)">
+                                        <div class="flex items-center gap-4">
+                                            <div class="icon-box w-10 h-10 rounded-lg bg-zen-surface flex items-center justify-center text-zen-t2 shadow-sm border border-zen-border transition-colors">
+                                                <i data-lucide="trending-up" class="w-5 h-5"></i>
+                                            </div>
+                                            <div>
+                                                <h5 class="text-[14px] font-bold text-zen-t1">Foco Poupança</h5>
+                                                <p class="text-[12px] text-zen-t3">40% Essencial / 40% Metas</p>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="strategy-card group p-4 cursor-pointer bg-zen-surface2 border border-zen-border rounded-xl transition-all hover:bg-zen-surface hover:border-brand/40" 
+                                         onclick="selectStrategy('MANUAL', this)">
+                                        <div class="flex items-center gap-4">
+                                            <div class="icon-box w-10 h-10 rounded-lg bg-zen-surface flex items-center justify-center text-zen-t2 shadow-sm border border-zen-border transition-colors">
+                                                <i data-lucide="mouse-pointer-2" class="w-5 h-5"></i>
+                                            </div>
+                                            <div>
+                                                <h5 class="text-[14px] font-bold text-zen-t1">Manual</h5>
+                                                <p class="text-[12px] text-zen-t3">Eu defino meus próprios limites</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <button type="submit" class="w-full inline-flex items-center justify-center gap-2 px-8 py-4 bg-brand hover:bg-brand-h text-white rounded-xl font-bold transition-all shadow-lg shadow-brand/20 cursor-pointer">
+                                Aplicar Distribuição <i data-lucide="sparkles" class="w-5 h-5"></i>
+                            </button>
+                        </form>
+                    </div>
+
+                    <!-- Right: Preview -->
+                    <div class="bg-zen-surface2/50 border border-zen-border rounded-2xl p-6 sm:p-8 flex flex-col h-full">
+                        <h3 class="text-[18px] font-serif font-medium text-zen-t1 mb-6 flex items-center gap-2">
+                            <i data-lucide="eye" class="w-5 h-5 text-brand"></i> Prévia da Estratégia
+                        </h3>
+                        
+                        <div id="previewContent" class="space-y-6 flex-grow">
+                            <!-- Needs -->
+                            <div>
+                                <div class="flex justify-between items-end mb-2">
+                                    <span class="text-[13px] font-medium text-zen-t2">Despesas Essenciais</span>
+                                    <span class="text-[15px] font-bold text-zen-t1" id="previewNeeds">R$ 0,00</span>
+                                </div>
+                                <div class="w-full h-2 bg-zen-surface rounded-full overflow-hidden border border-zen-border">
+                                    <div id="barNeeds" class="h-full bg-brand transition-all duration-500" style="width: 0%"></div>
+                                </div>
+                            </div>
+
+                            <!-- Leisure -->
+                            <div>
+                                <div class="flex justify-between items-end mb-2">
+                                    <span class="text-[13px] font-medium text-zen-t2">Lazer e Estilo</span>
+                                    <span class="text-[15px] font-bold text-zen-t1" id="previewLeisure">R$ 0,00</span>
+                                </div>
+                                <div class="w-full h-2 bg-zen-surface rounded-full overflow-hidden border border-zen-border">
+                                    <div id="barLeisure" class="h-full bg-amber-400 transition-all duration-500" style="width: 0%"></div>
+                                </div>
+                            </div>
+
+                            <!-- Savings -->
+                            <div>
+                                <div class="flex justify-between items-end mb-2">
+                                    <span class="text-[13px] font-medium text-zen-t2">Poupança e Metas</span>
+                                    <span class="text-[15px] font-bold text-zen-t1" id="previewSavings">R$ 0,00</span>
+                                </div>
+                                <div class="w-full h-2 bg-zen-surface rounded-full overflow-hidden border border-zen-border">
+                                    <div id="barSavings" class="h-full bg-slate-500 transition-all duration-500" style="width: 0%"></div>
+                                </div>
+                            </div>
+
+                            <div class="mt-auto p-4 bg-zen-surface/60 border border-zen-border rounded-xl text-[12px] text-zen-t3 leading-relaxed">
+                                <i data-lucide="info" class="w-4 h-4 inline-block mr-1 text-brand"></i>
+                                Os valores acima são estimativas mensais baseadas na renda informada. Ao clicar em aplicar, o sistema atualizará seus orçamentos automáticos.
+                            </div>
+                        </div>
+
+                        <!-- Manual Message -->
+                        <div id="manualMessage" class="hidden flex-grow flex items-center justify-center text-center p-8">
+                            <div>
+                                <i data-lucide="settings-2" class="w-12 h-12 mx-auto mb-4 text-zen-border"></i>
+                                <p class="text-zen-t3 text-[14px]">Na estratégia manual, você tem total controle sobre seus orçamentos e metas nas telas específicas.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <script th:inline="javascript">
+        const formatter = new Intl.NumberFormat('pt-BR', {
+            style: 'currency',
+            currency: 'BRL',
+        });
+
+        const strategies = {
+            'REGRA_50_30_20': { needs: 0.5, leisure: 0.3, savings: 0.2 },
+            'FOCO_POUPANCA_40_40_20': { needs: 0.4, leisure: 0.2, savings: 0.4 },
+            'MANUAL': null
+        };
+
+        const incomeInput = document.getElementById('incomeInput');
+        const selectedStrategyInput = document.getElementById('selectedStrategy');
+
+        function updatePreview() {
+            const income = parseFloat(incomeInput.value) || 0;
+            const strategyKey = selectedStrategyInput.value;
+            const strategy = strategies[strategyKey];
+
+            const previewContent = document.getElementById('previewContent');
+            const manualMessage = document.getElementById('manualMessage');
+
+            if (!strategy) {
+                previewContent.classList.add('hidden');
+                manualMessage.classList.remove('hidden');
+                return;
+            }
+
+            previewContent.classList.remove('hidden');
+            manualMessage.classList.add('hidden');
+
+            const valNeeds = income * strategy.needs;
+            const valLeisure = income * strategy.leisure;
+            const valSavings = income * strategy.savings;
+
+            document.getElementById('previewNeeds').textContent = formatter.format(valNeeds);
+            document.getElementById('previewLeisure').textContent = formatter.format(valLeisure);
+            document.getElementById('previewSavings').textContent = formatter.format(valSavings);
+
+            document.getElementById('barNeeds').style.width = (strategy.needs * 100) + '%';
+            document.getElementById('barLeisure').style.width = (strategy.leisure * 100) + '%';
+            document.getElementById('barSavings').style.width = (strategy.savings * 100) + '%';
+        }
+
+        function selectStrategy(strategy, element) {
+            selectedStrategyInput.value = strategy;
+            document.querySelectorAll('.strategy-card').forEach(card => {
+                card.classList.remove('selected');
+            });
+            element.classList.add('selected');
+            updatePreview();
+        }
+
+        incomeInput.addEventListener('input', updatePreview);
+
+        // Initial update
+        document.addEventListener('DOMContentLoaded', () => {
+            updatePreview();
+            lucide.createIcons();
+        });
+    </script>
+</body>
+</html>

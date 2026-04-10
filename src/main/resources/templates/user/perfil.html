@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{layout/layout :: layout('Perfil',~{::content},~{::style},~{})}"
+    lang="pt-BR">
+
+<head>
+    <style>
+        .zen-shell {
+            max-width: 480px;
+        }
+
+        .profile-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--r-lg);
+            overflow: hidden;
+        }
+
+        .profile-top {
+            display: flex;
+            align-items: center;
+            gap: 18px;
+            padding: 24px 26px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .profile-av {
+            width: 64px;
+            height: 64px;
+            border-radius: var(--r-md);
+            background: var(--brand);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            font-weight: 700;
+            color: #fff;
+            flex-shrink: 0;
+            overflow: hidden;
+        }
+
+        .profile-av img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .profile-name {
+            font-size: 15px;
+            font-weight: 700;
+            color: var(--text);
+        }
+
+        .profile-email {
+            font-size: 12.5px;
+            color: var(--text-dim);
+            margin-top: 3px;
+        }
+
+        .profile-role {
+            display: inline-block;
+            margin-top: 6px;
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: .05em;
+            padding: 2px 8px;
+            border-radius: var(--r-full);
+            background: var(--brand);
+            color: #fff;
+        }
+
+        .profile-body {
+            padding: 22px 26px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .field {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .field-label {
+            font-size: 10.5px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: .06em;
+            color: var(--text-dim);
+        }
+
+        .field-input {
+            padding: 10px 13px;
+            border: 1px solid var(--border);
+            border-radius: var(--r-sm);
+            font-family: var(--font);
+            font-size: 13.5px;
+            color: var(--text);
+            background: var(--bg);
+            transition: all .15s;
+            cursor: pointer;
+        }
+
+        .field-input:focus {
+            outline: none;
+            border-color: var(--brand);
+            box-shadow: 0 0 0 3px rgba(15, 23, 42, .06);
+            background: var(--surface);
+        }
+
+        .profile-foot {
+            padding: 18px 26px;
+            border-top: 1px solid var(--border);
+        }
+    </style>
+</head>
+
+<body>
+    <div th:fragment="content">
+        <div class="zen-shell">
+            <div class="page-header anim-1" style="margin-bottom:24px;">
+                <div>
+                    <h1 class="page-title">Perfil</h1>
+                    <p class="page-subtitle">As suas informações e foto de perfil.</p>
+                </div>
+            </div>
+            <div class="profile-card anim-2">
+                <div class="profile-top">
+                    <div class="profile-av">
+                        <img th:if="${user.fotoPerfil!=null}" th:src="@{${user.fotoPerfil}}" alt="Foto de perfil">
+                        <span th:unless="${user.fotoPerfil!=null}"
+                            th:text="${#strings.substring(user.username,0,1).toUpperCase()}">U</span>
+                    </div>
+                    <div>
+                        <div class="profile-name" th:text="${user.username}">Username</div>
+                        <div class="profile-email" th:text="${user.email}">email</div>
+                        <span class="profile-role" th:text="${user.role}">ROLE</span>
+                    </div>
+                </div>
+                <form th:action="@{/app/settings/perfil/foto}" method="post" enctype="multipart/form-data">
+                    <div class="profile-body">
+                        <div class="field">
+                            <label class="field-label">Nova foto de perfil</label>
+                            <input type="file" id="foto" name="foto" accept="image/png,image/jpeg,image/webp"
+                                class="field-input" required>
+                        </div>
+                    </div>
+                    <div class="profile-foot">
+                        <button type="submit" class="btn-primary" style="width:100%; justify-content:center;">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                                <polyline points="17 8 12 3 7 8" />
+                                <line x1="12" y1="3" x2="12" y2="15" />
+                            </svg>
+                            Actualizar foto
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

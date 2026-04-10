@@ -1,0 +1,78 @@
+[INFO] Scanning for projects...
+[INFO] 
+[INFO] --------------------------< lucas:BaseModel >---------------------------
+[INFO] Building BaseModel 0.0.1-SNAPSHOT
+[INFO]   from pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] >>> spring-boot:3.3.0:run (default-cli) > test-compile @ BaseModel >>>
+[INFO] 
+[INFO] --- resources:3.3.1:resources (default-resources) @ BaseModel ---
+[INFO] Copying 1 resource from src/main/resources to target/classes
+[INFO] Copying 28 resources from src/main/resources to target/classes
+[INFO] 
+[INFO] --- compiler:3.13.0:compile (default-compile) @ BaseModel ---
+[INFO] Recompiling the module because of changed source code.
+[INFO] Compiling 49 source files with javac [debug parameters release 21] to target/classes
+[WARNING] /home/lucas/Documents/Java/FinGen/src/main/java/lucas/basemodel/modules/financeiro/models/Conta.java:[39,21] @Builder will ignore the initializing expression entirely. If you want the initializing expression to serve as default, add @Builder.Default. If it is not supposed to be settable during building, make the field final.
+[INFO] /home/lucas/Documents/Java/FinGen/src/main/java/lucas/basemodel/modules/financeiro/services/ContaService.java: Some input files use or override a deprecated API.
+[INFO] /home/lucas/Documents/Java/FinGen/src/main/java/lucas/basemodel/modules/financeiro/services/ContaService.java: Recompile with -Xlint:deprecation for details.
+[INFO] /home/lucas/Documents/Java/FinGen/src/main/java/lucas/basemodel/modules/financeiro/services/GeminiService.java: /home/lucas/Documents/Java/FinGen/src/main/java/lucas/basemodel/modules/financeiro/services/GeminiService.java uses unchecked or unsafe operations.
+[INFO] /home/lucas/Documents/Java/FinGen/src/main/java/lucas/basemodel/modules/financeiro/services/GeminiService.java: Recompile with -Xlint:unchecked for details.
+[INFO] 
+[INFO] --- resources:3.3.1:testResources (default-testResources) @ BaseModel ---
+[INFO] skip non existing resourceDirectory /home/lucas/Documents/Java/FinGen/src/test/resources
+[INFO] 
+[INFO] --- compiler:3.13.0:testCompile (default-testCompile) @ BaseModel ---
+[INFO] Recompiling the module because of changed dependency.
+[INFO] Compiling 1 source file with javac [debug parameters release 21] to target/test-classes
+[INFO] 
+[INFO] <<< spring-boot:3.3.0:run (default-cli) < test-compile @ BaseModel <<<
+[INFO] 
+[INFO] 
+[INFO] --- spring-boot:3.3.0:run (default-cli) @ BaseModel ---
+[INFO] Attaching agents: []
+  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+
+ :: Spring Boot ::                (v3.3.0)
+
+2026-03-23T04:49:19.409Z  INFO 679897 --- [BaseModel] [           main] lucas.basemodel.BaseModelApplication     : Starting BaseModelApplication using Java 21.0.10 with PID 679897 (/home/lucas/Documents/Java/FinGen/target/classes started by lucas in /home/lucas/Documents/Java/FinGen)
+2026-03-23T04:49:19.410Z  INFO 679897 --- [BaseModel] [           main] lucas.basemodel.BaseModelApplication     : No active profile set, falling back to 1 default profile: "default"
+2026-03-23T04:49:19.972Z  INFO 679897 --- [BaseModel] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-03-23T04:49:20.013Z  INFO 679897 --- [BaseModel] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 36 ms. Found 7 JPA repository interfaces.
+2026-03-23T04:49:20.757Z  INFO 679897 --- [BaseModel] [           main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port 8080 (http)
+2026-03-23T04:49:20.766Z  INFO 679897 --- [BaseModel] [           main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2026-03-23T04:49:20.766Z  INFO 679897 --- [BaseModel] [           main] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/10.1.24]
+2026-03-23T04:49:20.810Z  INFO 679897 --- [BaseModel] [           main] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
+2026-03-23T04:49:20.811Z  INFO 679897 --- [BaseModel] [           main] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 1368 ms
+2026-03-23T04:49:20.912Z  INFO 679897 --- [BaseModel] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2026-03-23T04:49:21.043Z  INFO 679897 --- [BaseModel] [           main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection conn0: url=jdbc:h2:file:./data/fingen user=SA
+2026-03-23T04:49:21.044Z  INFO 679897 --- [BaseModel] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2026-03-23T04:49:21.051Z  INFO 679897 --- [BaseModel] [           main] o.s.b.a.h2.H2ConsoleAutoConfiguration    : H2 console available at '/h2-console'. Database available at 'jdbc:h2:file:./data/fingen'
+2026-03-23T04:49:21.144Z  INFO 679897 --- [BaseModel] [           main] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
+2026-03-23T04:49:21.174Z  INFO 679897 --- [BaseModel] [           main] org.hibernate.Version                    : HHH000412: Hibernate ORM core version 6.5.2.Final
+2026-03-23T04:49:21.190Z  INFO 679897 --- [BaseModel] [           main] o.h.c.internal.RegionFactoryInitiator    : HHH000026: Second-level cache disabled
+2026-03-23T04:49:21.331Z  INFO 679897 --- [BaseModel] [           main] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-03-23T04:49:21.351Z  WARN 679897 --- [BaseModel] [           main] org.hibernate.orm.deprecation            : HHH90000025: H2Dialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+2026-03-23T04:49:22.131Z  INFO 679897 --- [BaseModel] [           main] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-03-23T04:49:22.185Z  INFO 679897 --- [BaseModel] [           main] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-03-23T04:49:22.453Z  INFO 679897 --- [BaseModel] [           main] o.s.d.j.r.query.QueryEnhancerFactory     : Hibernate is in classpath; If applicable, HQL parser will be used.
+2026-03-23T04:49:22.947Z  INFO 679897 --- [BaseModel] [           main] r$InitializeUserDetailsManagerConfigurer : Global AuthenticationManager configured with UserDetailsService bean with name customUserDetailsService
+2026-03-23T04:49:23.155Z  WARN 679897 --- [BaseModel] [           main] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2026-03-23T04:49:23.440Z  INFO 679897 --- [BaseModel] [           main] o.s.b.a.e.web.EndpointLinksResolver      : Exposing 1 endpoint beneath base path '/actuator'
+2026-03-23T04:49:23.492Z  INFO 679897 --- [BaseModel] [           main] o.s.s.web.DefaultSecurityFilterChain     : Will secure any request with [org.springframework.security.web.session.DisableEncodeUrlFilter@6626204e, org.springframework.security.web.context.request.async.WebAsyncManagerIntegrationFilter@645db77c, org.springframework.security.web.context.SecurityContextHolderFilter@7c9be48a, org.springframework.security.web.header.HeaderWriterFilter@441fd20d, org.springframework.web.filter.CorsFilter@60514b5, org.springframework.security.web.csrf.CsrfFilter@30df67b8, org.springframework.security.web.authentication.logout.LogoutFilter@52baae51, lucas.basemodel.core.config.JwtAuthenticationFilter@1043c493, org.springframework.security.web.savedrequest.RequestCacheAwareFilter@46710018, org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestFilter@54039b8a, org.springframework.security.web.authentication.AnonymousAuthenticationFilter@41f79561, org.springframework.security.web.session.SessionManagementFilter@6e65fc8b, org.springframework.security.web.access.ExceptionTranslationFilter@7be9e5fb, org.springframework.security.web.access.intercept.AuthorizationFilter@34668a96]
+2026-03-23T04:49:23.798Z  INFO 679897 --- [BaseModel] [           main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port 8080 (http) with context path '/'
+2026-03-23T04:49:23.809Z  INFO 679897 --- [BaseModel] [           main] lucas.basemodel.BaseModelApplication     : Started BaseModelApplication in 4.652 seconds (process running for 4.866)
+2026-03-23T04:49:23.815Z  INFO 679897 --- [BaseModel] [   scheduling-1] l.b.m.f.services.MercadoService          : Iniciando rotina de atualização de cotações (Sincronização em Lote)...
+2026-03-23T04:49:23.853Z  INFO 679897 --- [BaseModel] [   scheduling-1] l.b.m.f.services.MercadoService          : Nenhum ticker com mercado encontrado. Ignorando atualização de API.
+2026-03-23T04:49:51.800Z  INFO 679897 --- [BaseModel] [nio-8080-exec-1] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring DispatcherServlet 'dispatcherServlet'
+2026-03-23T04:49:51.800Z  INFO 679897 --- [BaseModel] [nio-8080-exec-1] o.s.web.servlet.DispatcherServlet        : Initializing Servlet 'dispatcherServlet'
+2026-03-23T04:49:51.801Z  INFO 679897 --- [BaseModel] [nio-8080-exec-1] o.s.web.servlet.DispatcherServlet        : Completed initialization in 1 ms
+2026-03-23T17:12:41.584Z  INFO 679897 --- [BaseModel] [ionShutdownHook] j.LocalContainerEntityManagerFactoryBean : Closing JPA EntityManagerFactory for persistence unit 'default'
+2026-03-23T17:12:41.588Z  INFO 679897 --- [BaseModel] [ionShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown initiated...
+2026-03-23T17:12:41.593Z  INFO 679897 --- [BaseModel] [ionShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown completed.

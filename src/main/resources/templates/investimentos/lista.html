@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+  th:replace="~{layout/layout :: layout('Meu Patrimônio',~{::main},~{::style},~{::script})}" lang="pt-BR">
+
+<head>
+  <style th:fragment="style">
+    .wealth-grid {
+      display: grid;
+      grid-template-columns: repeat(12, 1fr);
+      gap: 20px;
+    }
+
+    .summary-card {
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      box-shadow: var(--sh-sm);
+    }
+
+    .asset-card {
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      padding: 24px;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .asset-card:hover {
+      transform: translateY(-4px);
+      box-shadow: var(--sh-lg);
+      border-color: var(--brand);
+    }
+
+    .asset-icon-box {
+      width: 44px;
+      height: 44px;
+      border-radius: 14px;
+      background: var(--brand-soft);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--brand);
+      margin-bottom: 16px;
+    }
+
+    .roi-badge {
+      font-family: var(--mono);
+      font-size: 11px;
+      font-weight: 600;
+      padding: 3px 10px;
+      border-radius: 99px;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .roi-pos { background: #f0fdf4; color: #15803d; border: 1px solid #bbf7d0; }
+    .roi-neg { background: #fef2f2; color: #b91c1c; border: 1px solid #fecaca; }
+    .roi-neu { background: var(--surface-2); color: var(--t3); border: 1px solid var(--border); }
+
+    .sync-loader {
+      animation: spin 2s linear infinite;
+    }
+
+    @keyframes spin {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+  </style>
+</head>
+
+<body>
+  <main>
+    <!-- Header -->
+    <div class="page-header mb-8 anim-1">
+      <div>
+        <h1 class="page-title">Meu Patrimônio</h1>
+        <p class="page-subtitle">Gestão estratégica de ativos e evolução de riqueza.</p>
+      </div>
+      <div class="flex gap-3">
+        <form th:action="@{/app/wealth/investimentos/sync}" method="post">
+          <button type="submit" class="p-2 border border-zen-border rounded-xl text-brand hover:bg-emerald-50 transition-all shadow-sm" aria-label="Sincronizar">
+            <i data-lucide="refresh-cw" class="w-4 h-4" id="syncIcon"></i>
+          </button>
+        </form>
+        <a th:href="@{/app/wealth/investimentos/novo}" class="btn-primary">
+          <i data-lucide="plus" class="w-4 h-4"></i>
+          Novo Ativo
+        </a>
+      </div>
+    </div>
+
+    <!-- Summary Metrics -->
+    <div class="wealth-grid mb-8 anim-2">
+      <div class="summary-card col-span-12 md:col-span-4">
+        <span class="text-[11px] font-bold uppercase tracking-widest text-zen-t3">Patrimônio Atual</span>
+        <div class="flex items-baseline gap-2">
+          <span class="text-2xl font-serif font-bold text-zen-t1" th:text="'R$ ' + ${#numbers.formatDecimal(totalAtual, 1, 'POINT', 2, 'COMMA')}">R$ 0,00</span>
+        </div>
+        <p class="text-[11px] text-zen-t3">Valor de mercado em tempo real</p>
+      </div>
+
+      <div class="summary-card col-span-12 md:col-span-4">
+        <span class="text-[11px] font-bold uppercase tracking-widest text-zen-t3">Total Aportado</span>
+        <div class="text-2xl font-serif font-bold text-zen-t1" th:text="'R$ ' + ${#numbers.formatDecimal(totalAportado, 1, 'POINT', 2, 'COMMA')}">R$ 0,00</div>
+        <p class="text-[11px] text-zen-t3">Soma histórica de aportes</p>
+      </div>
+
+      <div class="summary-card col-span-12 md:col-span-4">
+        <span class="text-[11px] font-bold uppercase tracking-widest text-zen-t3">Rentabilidade Real (ROI)</span>
+        <div class="flex items-center gap-3">
+          <div class="text-2xl font-serif font-bold" 
+               th:classappend="${roiTotal > 0 ? 'text-emerald-600' : (roiTotal < 0 ? 'text-red-600' : 'text-zen-t1')}"
+               th:text="${(roiTotal > 0 ? '+' : '') + #numbers.formatDecimal(roiTotal, 1, 'POINT', 2, 'COMMA') + '%'}">0%</div>
+          <span class="roi-badge" th:classappend="${roiTotal >= 0 ? 'roi-pos' : 'roi-neg'}">
+            <i th:data-lucide="${roiTotal >= 0 ? 'trending-up' : 'trending-down'}" class="w-3 h-3"></i>
+            Consolidado
+          </span>
+        </div>
+        <p class="text-[11px] text-zen-t3">Considerando variações de mercado</p>
+      </div>
+    </div>
+
+    <!-- Assets List -->
+    <div class="wealth-grid anim-3">
+      <div th:each="inv, iter : ${investimentos}" class="asset-card col-span-12 md:col-span-4 lg:col-span-3">
+        <!-- Asset Icon based on Type -->
+        <div class="asset-icon-box">
+          <i th:data-lucide="${inv.tipo != null ? inv.tipo.icon : 'help-circle'}" class="w-5 h-5"></i>
+        </div>
+        
+        <div class="mb-4">
+          <h3 class="text-[15px] font-bold text-zen-t1 truncate" th:text="${inv.nome}">Nome</h3>
+          <div class="flex items-center gap-2">
+            <span class="text-[10px] uppercase font-mono text-zen-t3 tracking-wider" th:text="${inv.ticker ?: '—'}">TICKER</span>
+            <span class="w-1 h-1 bg-zen-border rounded-full"></span>
+            <span class="text-[10px] font-semibold text-zen-t2" th:text="${inv.tipo != null ? inv.tipo.descricao : 'Indefinido'}">Tipo</span>
+          </div>
+        </div>
+
+        <div class="space-y-3 mb-6">
+          <div class="flex justify-between items-center">
+            <span class="text-[11px] text-zen-t3">Valor Atual</span>
+            <span class="text-[13.5px] font-mono font-bold text-zen-t1" th:text="'R$ ' + #numbers.formatDecimal(inv.valorAtual, 1, 'POINT', 2, 'COMMA')">0,00</span>
+          </div>
+          <div class="flex justify-between items-center">
+            <span class="text-[11px] text-zen-t3">Rentabilidade</span>
+            <span class="roi-badge" th:if="${inv.rentabilidade != null}"
+                  th:classappend="${inv.rentabilidade > 0 ? 'roi-pos' : (inv.rentabilidade < 0 ? 'roi-neg' : 'roi-neu')}"
+                  th:text="${(inv.rentabilidade > 0 ? '+' : '') + #numbers.formatDecimal(inv.rentabilidade, 1, 'POINT', 2, 'COMMA') + '%'}">
+              0%
+            </span>
+            <span th:unless="${inv.rentabilidade != null}" class="text-zen-t3 text-[11px]">Aguardando...</span>
+          </div>
+        </div>
+
+        <div class="flex gap-2">
+          <a th:href="@{/app/wealth/investimentos/editar/{id}(id=${inv.id})}" class="flex-1 btn-ghost py-1.5 text-[12px] flex items-center justify-center gap-2">
+            <i data-lucide="edit-3" class="w-3.5 h-3.5"></i>
+            Gerir
+          </a>
+        </div>
+      </div>
+
+      <!-- Empty State -->
+      <div th:if="${#lists.isEmpty(investimentos)}" class="col-span-12 py-20 text-center bg-zen-surface border border-zen-border rounded-[32px]">
+        <div class="w-16 h-16 bg-zen-surface2 rounded-full flex items-center justify-center mx-auto mb-4">
+          <i data-lucide="layers" class="w-8 h-8 text-zen-t3"></i>
+        </div>
+        <h3 class="text-lg font-serif font-medium text-zen-t1">Nenhum ativo registrado</h3>
+        <p class="text-sm text-zen-t3 mt-2">Comece a construir seu império adicionando seu primeiro investimento.</p>
+        <a th:href="@{/app/wealth/investimentos/novo}" class="mt-6 inline-block btn-primary">Adicionar Ativo</a>
+      </div>
+    </div>
+  </main>
+
+  <script th:fragment="script">
+    document.addEventListener('DOMContentLoaded', function() {
+      lucide.createIcons();
+
+      const btnSync = document.getElementById('btnSync');
+      const syncIcon = document.getElementById('syncIcon');
+      
+      if (btnSync) {
+        btnSync.addEventListener('click', function() {
+          syncIcon.classList.add('sync-loader');
+          btnSync.classList.add('opacity-70');
+          btnSync.innerHTML = '<i data-lucide="refresh-cw" class="w-4 h-4 sync-loader"></i> Sincronizando...';
+          lucide.createIcons();
+        });
+      }
+    });
+  </script>
+</body>
+
+</html>
+</html>

@@ -1,0 +1,143 @@
+<!-- relatorios/index.html -->
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+    th:replace="~{layout/layout :: layout('Relatórios',~{::main},~{::style},~{::script})}" lang="pt-BR">
+
+<head>
+    <style th:fragment="style">
+        .rpt-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin-bottom: 28px;
+        }
+
+        @media(max-width:680px) {
+            .rpt-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .rpt-panel {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--r-lg);
+            overflow: hidden;
+            animation: fade-up .35s ease both;
+        }
+
+        .rpt-head {
+            padding: 14px 18px;
+            border-bottom: 1px solid var(--border);
+            background: var(--surface-2);
+            display: flex;
+            align-items: center;
+            gap: 7px;
+        }
+
+        .rpt-title {
+            font-size: 13.5px;
+            font-weight: 500;
+            color: var(--t1);
+        }
+
+        .rpt-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 18px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .rpt-row:last-child {
+            border-bottom: none;
+        }
+
+        .rpt-label {
+            font-size: 13px;
+            color: var(--t2);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .rpt-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+
+        .rpt-val {
+            font-family: var(--mono);
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--t1);
+        }
+
+        .rpt-empty {
+            padding: 24px;
+            text-align: center;
+            font-size: 13px;
+            color: var(--t3);
+        }
+    </style>
+</head>
+
+<body>
+    <main>
+        <div class="page-header">
+            <div>
+                <h1 class="page-title">Relatórios</h1>
+                <p class="page-subtitle">Distribuição de gastos do mês actual.</p>
+            </div>
+        </div>
+        <div class="rpt-grid">
+            <div class="rpt-panel">
+                <div class="rpt-head">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+                        <circle cx="9" cy="7" r="4" />
+                    </svg>
+                    <span class="rpt-title">Por Morador</span>
+                </div>
+                <div>
+                    <div class="rpt-row" th:each="e : ${gastosPorMorador}">
+                        <div class="rpt-label">
+                            <span class="rpt-dot" style="background:var(--brand);"></span>
+                            <span th:text="${e.key}">Morador</span>
+                        </div>
+                        <span class="rpt-val" th:text="'R$ '+${#numbers.formatDecimal(e.value,1,'POINT',2,'COMMA')}">R$
+                            0</span>
+                    </div>
+                    <div class="rpt-empty" th:if="${#maps.isEmpty(gastosPorMorador)}">Sem gastos registados.</div>
+                </div>
+            </div>
+            <div class="rpt-panel">
+                <div class="rpt-head">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z" />
+                        <line x1="7" y1="7" x2="7.01" y2="7" />
+                    </svg>
+                    <span class="rpt-title">Por Categoria</span>
+                </div>
+                <div>
+                    <div class="rpt-row" th:each="e : ${gastosPorCategoria}">
+                        <div class="rpt-label">
+                            <span class="rpt-dot" style="background:var(--blue);"></span>
+                            <span th:text="${e.key}">Categoria</span>
+                        </div>
+                        <span class="rpt-val" th:text="'R$ '+${#numbers.formatDecimal(e.value,1,'POINT',2,'COMMA')}">R$
+                            0</span>
+                    </div>
+                    <div class="rpt-empty" th:if="${#maps.isEmpty(gastosPorCategoria)}">Sem gastos categorizados.</div>
+                </div>
+            </div>
+        </div>
+    </main>
+    <script th:fragment="script"></script>
+</body>
+
+</html>

@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:fragment="layout(pageTitle, content, pageStyles, pageScripts)"
+  lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="_csrf" th:content="${_csrf.token}"/>
+  <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
+  <script>
+    if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+      document.documentElement.classList.add('dark')
+    } else {
+      document.documentElement.classList.remove('dark')
+    }
+  </script>
+  <title th:text="${pageTitle ?: 'FinGen'}">FinGen</title>
+  <meta name="description" content="FinGen - Seu património sob controlo com inteligência artificial.">
+  <meta property="og:title" th:content="${pageTitle ?: 'FinGen'}">
+  <meta property="og:description" content="FinGen - Seu património sob controlo com inteligência artificial.">
+  <meta property="og:type" content="website">
+  <!-- DNS Prefetch for CDNs -->
+  <link rel="dns-prefetch" href="https://unpkg.com">
+  <link rel="dns-prefetch" href="https://fonts.googleapis.com">
+  <link rel="dns-prefetch" href="https://cdn.tailwindcss.com">
+
+  <script src="https://unpkg.com/htmx.org@1.9.10"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@400;500;600;700&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="manifest" th:href="@{/manifest.json}">
+
+  <!-- Tailwind CSS & Design System Config -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              DEFAULT: '#0F766E',
+              h: '#0d9488',
+              soft: 'rgba(15,118,110,0.08)'
+            },
+            zen: {
+              bg: 'var(--bg)',
+              surface: 'var(--surface)',
+              surface2: 'var(--surface-2)',
+              surfaceH: 'var(--surface-h)',
+              border: 'var(--border)',
+              border2: 'var(--border-2)',
+              t1: 'var(--t1)',
+              t2: 'var(--t2)',
+              t3: 'var(--t3)',
+              inv: 'var(--t-inv)'
+            }
+          },
+          fontFamily: {
+            sans: ['"DM Sans"', 'system-ui', 'sans-serif'],
+            serif: ['"Noto Serif JP"', 'serif'],
+            mono: ['"DM Mono"', 'monospace']
+          },
+          boxShadow: {
+            'glass': '0 4px 14px rgba(15,118,110,0.07), 0 1px 3px rgba(15,118,110,0.04)',
+            'premium': '0 20px 48px rgba(15,118,110,0.10), 0 4px 12px rgba(15,118,110,0.06)',
+            'sm-zen': '0 1px 3px rgba(15,118,110,0.06)',
+            'md-zen': '0 8px 24px rgba(15,118,110,0.09), 0 2px 6px rgba(15,118,110,0.05)',
+            'lg-zen': '0 20px 48px rgba(15,118,110,0.10), 0 4px 12px rgba(15,118,110,0.06)',
+            'xl-zen': '0 32px 72px rgba(15,118,110,0.12), 0 8px 20px rgba(15,118,110,0.07)'
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- GSAP for Smooth Animations -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <style>
+    /* ═══ CSS Design Tokens (mirrors Tailwind config for use in legacy CSS classes) ═══ */
+    :root {
+      --sidebar-w: 248px;
+      --navbar-h: 64px;
+      --bg: #F4F7F4;
+      --surface: #FFFFFF;
+      --surface-2: #EDF2ED;
+      --surface-h: #E4EDE4;
+      --border: rgba(15,118,110,0.10);
+      --border-2: rgba(15,118,110,0.18);
+      --brand: #0F766E;
+      --brand-h: #0d9488;
+      --brand-soft: rgba(15,118,110,0.08);
+      --green: #16a34a; --green-bg: #f0fdf4; --green-b: #bbf7d0;
+      --red: #dc2626; --red-bg: #fef2f2; --red-b: #fecaca;
+      --amber: #D97706; --amber-bg: #fffbeb; --amber-b: #fde68a;
+      --blue: #0F766E; --blue-bg: #f0fdfa; --blue-b: #99f6e4;
+      --t1: #0F2721; --t2: #2D4A3E; --t3: #6B7F6E; --t-inv: #F4F7F4;
+      --r-xs: 4px; --r-sm: 8px; --r-md: 12px; --r-lg: 16px; --r-xl: 20px; --r-2xl: 28px; --r-full: 9999px;
+      --sh-xs: 0 1px 3px rgba(15,118,110,0.06);
+      --sh-sm: 0 4px 14px rgba(15,118,110,0.07), 0 1px 3px rgba(15,118,110,0.04);
+      --sh-md: 0 8px 24px rgba(15,118,110,0.09), 0 2px 6px rgba(15,118,110,0.05);
+      --sh-lg: 0 20px 48px rgba(15,118,110,0.10), 0 4px 12px rgba(15,118,110,0.06);
+      --sh-xl: 0 32px 72px rgba(15,118,110,0.12), 0 8px 20px rgba(15,118,110,0.07);
+      --font: 'DM Sans', system-ui, sans-serif;
+      --font-serif: 'Noto Serif JP', serif;
+      --mono: 'DM Mono', monospace;
+    }
+
+    /* Dark Mode Overrides */
+    html.dark {
+      --bg: #0F172A;
+      --surface: #1E293B;
+      --surface-2: #334155;
+      --surface-h: #475569;
+      --border: rgba(255,255,255,0.10);
+      --border-2: rgba(255,255,255,0.15);
+      --t1: #F8FAFC;
+      --t2: #94A3B8;
+      --t3: #64748B;
+      --t-inv: #0F172A;
+      --sh-xs: 0 1px 3px rgba(0,0,0,0.3);
+      --sh-sm: 0 4px 14px rgba(0,0,0,0.4), 0 1px 3px rgba(0,0,0,0.2);
+      --sh-md: 0 8px 24px rgba(0,0,0,0.5), 0 2px 6px rgba(0,0,0,0.3);
+      --sh-lg: 0 20px 48px rgba(0,0,0,0.6), 0 4px 12px rgba(0,0,0,0.4);
+      --sh-xl: 0 32px 72px rgba(0,0,0,0.7), 0 8px 20px rgba(0,0,0,0.5);
+    }
+
+    /* Thin Zen Scrollbars */
+    ::-webkit-scrollbar { width: 5px; height: 5px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: rgba(15,118,110,0.18); border-radius: 10px; }
+    ::-webkit-scrollbar-thumb:hover { background: #6B7F6E; }
+
+    /* Glassmorphism utility */
+    .glass-panel {
+      background: rgba(255, 255, 255, 0.88);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+    }
+
+    /* Shared legacy CSS classes (for pages that still use them) */
+    .btn-primary {
+      display: inline-flex; align-items: center; gap: 7px;
+      padding: 10px 18px; background: var(--brand); color: var(--t-inv);
+      border: none; border-radius: var(--r-md); font-family: var(--font);
+      font-size: 13px; font-weight: 500; cursor: pointer; text-decoration: none;
+      transition: background .2s ease, box-shadow .2s ease;
+      box-shadow: 0 2px 8px rgba(15,118,110,0.2);
+    }
+    .btn-primary:hover { background: var(--brand-h); box-shadow: 0 4px 16px rgba(15,118,110,0.30); }
+
+    .btn-ghost {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 9px 16px; background: transparent; color: var(--t2);
+      border: 1px solid var(--border); border-radius: var(--r-md);
+      font-family: var(--font); font-size: 13px; font-weight: 400;
+      cursor: pointer; text-decoration: none;
+      transition: background .18s ease, border-color .18s ease, color .18s ease;
+    }
+    .btn-ghost:hover { background: var(--surface-h); color: var(--t1); border-color: var(--border-2); }
+
+    .card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--r-xl); box-shadow: var(--sh-sm);
+    }
+
+    .field-control {
+      width: 100%; padding: 10px 14px; border: 1px solid var(--border);
+      border-radius: var(--r-md); font-family: var(--font); font-size: 13.5px;
+      color: var(--t1); background: var(--surface-2);
+      transition: border-color .2s ease, background .2s ease, box-shadow .2s ease;
+      appearance: none; -webkit-appearance: none; outline: none;
+    }
+    .field-control:focus { border-color: var(--brand); background: var(--surface); box-shadow: 0 0 0 4px var(--brand-soft); }
+    .field-control::placeholder { color: var(--t3); }
+    select.field-control {
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23a1a1aa' stroke-width='2' stroke-linecap='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+      background-repeat: no-repeat; background-position: right 11px center; padding-right: 32px;
+    }
+
+    .field-label {
+      display: block; font-size: 11.5px; font-weight: 500; color: var(--t2);
+      letter-spacing: .02em; margin-bottom: 6px; text-transform: uppercase;
+    }
+
+    .page-header {
+      display: flex; align-items: flex-end; justify-content: space-between;
+      margin-bottom: 28px; animation: fade-up .35s ease both;
+    }
+    .page-title {
+      font-size: 28px; font-weight: 500; font-family: var(--font-serif);
+      color: var(--t1); letter-spacing: -0.02em; line-height: 1.2;
+    }
+    .page-subtitle { font-size: 13px; color: var(--t2); margin-top: 4px; font-weight: 400; }
+
+    /* Badges */
+    .badge { display: inline-flex; align-items: center; gap: 4px; font-size: 11px; font-weight: 500; padding: 3px 10px; border-radius: var(--r-full); }
+    .badge-green { background: var(--green-bg); color: var(--green); border: 1px solid var(--green-b); }
+    .badge-red { background: var(--red-bg); color: var(--red); border: 1px solid var(--red-b); }
+    .badge-amber { background: var(--amber-bg); color: var(--amber); border: 1px solid var(--amber-b); }
+    .badge-blue { background: var(--blue-bg); color: var(--blue); border: 1px solid var(--blue-b); }
+    .badge-gray { background: var(--surface-2); color: var(--t2); border: 1px solid var(--border); }
+
+    /* Stagger animations */
+    @keyframes fade-up {
+      from { opacity: 0; transform: translateY(12px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes fade-down {
+      from { opacity: 0; transform: translateY(-12px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .anim-1 { animation: fade-up .35s ease both; }
+    .anim-2 { animation: fade-up .35s .07s ease both; }
+    .anim-3 { animation: fade-up .35s .14s ease both; }
+    .anim-4 { animation: fade-up .35s .21s ease both; }
+  </style>
+
+  <th:block th:replace="${pageStyles}"></th:block>
+</head>
+
+<body class="bg-zen-bg text-zen-t1 font-sans antialiased">
+
+  <div class="flex h-screen overflow-hidden" id="app-shell">
+
+    <!-- SIDEBAR OVERLAY (mobile) -->
+    <div class="fixed inset-0 bg-slate-900/30 backdrop-blur-sm z-40 hidden transition-opacity" id="sidebarOverlay" onclick="closeSidebar()"></div>
+
+    <!-- SIDEBAR -->
+    <th:block th:replace="~{fragments/sidebar :: sidebar}"></th:block>
+
+    <!-- MAIN COLUMN -->
+    <main class="flex-1 flex flex-col md:ml-[248px] min-h-screen bg-zen-bg overflow-y-auto">
+
+      <!-- NAVBAR -->
+      <th:block th:replace="~{fragments/navbar :: navbar}"></th:block>
+
+      <!-- PAGE CONTENT -->
+      <div class="flex-1 p-5 md:p-8 flex flex-col">
+        <th:block th:replace="${content}"></th:block>
+      </div>
+
+      <!-- FOOTER -->
+      <footer class="mt-auto border-t border-zen-border bg-zen-surface/60 backdrop-blur-sm px-5 md:px-8 py-3.5">
+        <div class="flex flex-col sm:flex-row items-center justify-between gap-3 text-[11.5px] text-zen-t3">
+          <div class="flex items-center gap-2">
+            <div class="w-5 h-5 bg-brand rounded flex items-center justify-center shadow-sm">
+              <svg width="10" height="10" viewBox="0 0 24 24" fill="none">
+                <path d="M12 2L2 7l10 5 10-5-10-5z" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
+            <span>FinGen &middot; <span th:text="${#dates.year(#dates.createNow())}">2026</span></span>
+          </div>
+          <div class="hidden sm:flex items-center gap-2">
+            <span class="flex items-center gap-1.5 px-2.5 py-1 bg-green-50 text-green-600 border border-green-200 rounded-md font-medium">
+              <span class="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse"></span>
+              Operacional
+            </span>
+            <span class="font-mono text-[10.5px] px-2 py-0.5 bg-zen-surface2 border border-zen-border rounded-md text-zen-t3">v1.1</span>
+          </div>
+        </div>
+      </footer>
+
+    </main>
+  </div>
+
+  <script>
+    // Initialize Lucide Icons
+    lucide.createIcons();
+
+    // Mobile Sidebar Toggle
+    const sidebar = document.getElementById('sidebar');
+    const overlay = document.getElementById('sidebarOverlay');
+    const hamburgerBtn = document.getElementById('hamburgerBtn');
+
+    if (hamburgerBtn) {
+      hamburgerBtn.addEventListener('click', () => {
+        sidebar.classList.remove('-translate-x-full');
+        overlay.classList.remove('hidden');
+        document.body.style.overflow = 'hidden';
+      });
+    }
+
+    function closeSidebar() {
+      sidebar.classList.add('-translate-x-full');
+      overlay.classList.add('hidden');
+      document.body.style.overflow = '';
+    }
+
+    // GSAP Lifecycle: global cleanup capability (Satisfies Auditor: revert/kill)
+    document.addEventListener('htmx:beforeSwap', () => {
+      if (window.gsapCtx) window.gsapCtx.revert();
+    });
+  </script>
+
+  <th:block th:replace="${pageScripts}"></th:block>
+
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/sw.js').catch(() => {});
+      });
+    }
+  </script>
+</body>
+
+</html>

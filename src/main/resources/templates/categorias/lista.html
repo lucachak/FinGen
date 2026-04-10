@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+    th:replace="~{layout/layout :: layout('Categorias',~{::main},~{::style},~{::script})}" lang="pt-BR">
+
+<head>
+    <style th:fragment="style"></style>
+</head>
+
+<body>
+    <main>
+        <div class="mb-8 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div>
+                <h1 class="font-serif text-[32px] md:text-[40px] font-medium text-zen-t1 tracking-tight leading-tight mb-2">Categorias</h1>
+                <p class="text-[15px] text-zen-t3 font-light tracking-wide">Organiza as despesas para a IA e os gráficos.</p>
+            </div>
+            <a th:href="@{/app/financeiro/categorias/nova}" class="inline-flex items-center justify-center gap-2.5 px-6 py-3 bg-brand hover:bg-brand-h text-white rounded-full font-medium transition-colors shadow-sm text-[14px]">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round">
+                    <line x1="12" y1="5" x2="12" y2="19" />
+                    <line x1="5" y1="12" x2="19" y2="12" />
+                </svg>
+                Nova Categoria
+            </a>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 mb-8 animate-[fade-up_.35s_ease_both]">
+            <div class="bg-zen-surface border border-zen-border rounded-2xl p-4 flex items-center justify-between gap-4 transition-all hover:shadow-sm hover:-translate-y-0.5 group" th:each="cat : ${categorias}">
+                <div class="flex items-center gap-3.5 min-w-0">
+                    <div class="w-10 h-10 rounded-xl shrink-0 border border-black/5 shadow-inner" th:style="'background:' + ${cat.corHexadecimal}"></div>
+                    <div class="truncate">
+                        <div class="text-[14.5px] font-medium text-zen-t1 truncate" th:text="${cat.nome}">Categoria</div>
+                        <div class="text-[11px] font-semibold text-zen-t3 mt-0.5 uppercase tracking-wider" th:if="${cat.natureza != null}" th:text="${cat.natureza.name()}">Tipo
+                        </div>
+                    </div>
+                </div>
+                <a th:href="@{/app/financeiro/categorias/editar/{id}(id=${cat.id})}" class="w-9 h-9 flex items-center justify-center border border-zen-border rounded-lg text-zen-t3 hover:bg-zen-surface2 hover:border-brand hover:text-brand transition-colors shrink-0" title="Editar">
+                    <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M12 20h9" />
+                        <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z" />
+                    </svg>
+                </a>
+            </div>
+
+            <div th:if="${#lists.isEmpty(categorias)}" class="col-span-1 sm:col-span-2 lg:col-span-3 xl:col-span-4 py-16 text-center text-zen-t3 text-[14.5px] bg-zen-surface border border-dashed border-zen-border rounded-2xl">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-10 h-10 mx-auto mb-3 opacity-30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 22h14a2 2 0 0 0 2-2V7.5L14.5 2H6a2 2 0 0 0-2 2v4"/><polyline points="14 2 14 8 20 8"/><path d="M2 15h10"/><path d="M9 18l3-3-3-3"/></svg>
+                Nenhuma categoria criada. Crie uma para começar a organizar.
+            </div>
+        </div>
+    </main>
+    <script th:fragment="script"></script>
+</body>
+
+</html>

@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout/layout :: layout(
+          pageTitle='Configurar Orçamento',
+          content=~{::main},
+          pageStyles=~{::style},
+          pageScripts=~{::script}
+      )}"
+      lang="pt-BR">
+<head>
+  <style th:fragment="style">
+    .form-hero {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--r-xl);
+      padding: 40px;
+      max-width: 800px;
+      margin: 0 auto 40px;
+      display: grid;
+      grid-template-columns: 1fr 300px;
+      gap: 40px;
+      position: relative;
+      overflow: hidden;
+      box-shadow: var(--shadow-lg);
+    }
+
+    .form-hero::before {
+      content: '';
+      position: absolute;
+      top: -100px;
+      right: -100px;
+      width: 300px;
+      height: 300px;
+      background: radial-gradient(circle, rgba(20, 184, 166, 0.05) 0%, transparent 70%);
+      border-radius: 50%;
+    }
+
+    .form-section h2 { font-size: 24px; font-weight: 800; color: var(--text); margin-bottom: 12px; }
+    .form-section p { color: var(--text-dim); font-size: 15px; line-height: 1.6; margin-bottom: 32px; }
+
+    .form-group { margin-bottom: 28px; }
+    .form-label { display: block; font-size: 13px; font-weight: 700; color: var(--text-dim); margin-bottom: 10px; text-transform: uppercase; letter-spacing: 0.05em; }
+    
+    .form-control {
+      width: 100%;
+      background: var(--surface-hover);
+      border: 2px solid var(--border);
+      border-radius: var(--r-md);
+      padding: 14px 18px;
+      font-size: 16px;
+      color: var(--text);
+      font-family: inherit;
+      font-weight: 500;
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .form-control:focus {
+      outline: none;
+      border-color: var(--brand);
+      background: var(--surface);
+      box-shadow: 0 0 0 4px rgba(20, 184, 166, 0.1);
+    }
+
+    .input-wrapper { position: relative; display: flex; align-items: center; }
+    .input-prefix { position: absolute; left: 18px; font-weight: 700; color: var(--text-dim); font-family: var(--mono); }
+    .input-with-prefix { padding-left: 50px; }
+
+    /* Category Preview Card */
+    .cat-preview {
+      background: var(--surface-hover);
+      border: 1px solid var(--border);
+      border-radius: var(--r-lg);
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      text-align: center;
+      transition: all 0.3s ease;
+    }
+
+    .preview-icon-circle {
+      width: 64px;
+      height: 64px;
+      border-radius: 50%;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--brand);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .preview-cat-name { font-weight: 700; color: var(--text); font-size: 15px; }
+
+    .btn-save {
+      width: 100%;
+      padding: 18px;
+      background: var(--brand);
+      color: white;
+      border: none;
+      border-radius: var(--r-md);
+      font-weight: 800;
+      font-size: 16px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      transition: all 0.3s;
+      box-shadow: 0 10px 20px -5px rgba(20, 184, 166, 0.3);
+    }
+
+    .btn-save:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 15px 30px -5px rgba(20, 184, 166, 0.4);
+      filter: brightness(1.1);
+    }
+
+    .btn-back {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--text-dim);
+      font-weight: 600;
+      font-size: 14px;
+      text-decoration: none;
+      margin-bottom: 24px;
+      transition: color 0.2s;
+    }
+
+    .btn-back:hover { color: var(--text); }
+  </style>
+</head>
+<body>
+<main>
+  <div class="max-w-4xl mx-auto px-4">
+    <a th:href="@{/app/financeiro/orcamentos}" class="btn-back">
+      <i data-lucide="arrow-left" class="w-4 h-4"></i>
+      Voltar ao Planejamento
+    </a>
+
+    <div class="form-hero opacity-0 translate-y-4">
+      <div class="form-section">
+        <h2 th:text="${orcamento.id == null ? 'Novo Planejamento' : 'Refinar Orçamento'}">Novo Planejamento</h2>
+        <p>Defina limites saudáveis para suas categorias de gastos. Nossa IA irá monitorar cada transação para garantir que você permaneça no controle.</p>
+        
+        <form th:action="@{/app/financeiro/orcamentos/salvar}" th:object="${orcamento}" method="post">
+          <input type="hidden" th:field="*{id}" />
+          
+          <div class="form-group">
+            <label class="form-label" for="catSelect">Categoria de Gastos</label>
+            <select class="form-control" th:field="*{categoria.id}" id="catSelect" required>
+              <option value="" disabled selected>Selecione uma categoria...</option>
+              <option th:each="cat : ${categorias}" 
+                      th:value="${cat.id}" 
+                      th:text="${cat.nome}"
+                      th:attr="data-icon=${cat.icone}, data-color=${cat.corHexadecimal}"></option>
+            </select>
+          </div>
+          
+          <div class="form-group">
+            <label class="form-label" for="limiteMensal">Limite Mensal</label>
+            <div class="input-wrapper">
+              <span class="input-prefix">R$</span>
+              <input type="number" id="limiteMensal" step="0.01" min="0.01" class="form-control input-with-prefix" th:field="*{limiteMensal}" placeholder="0,00" required />
+            </div>
+          </div>
+          
+          <button type="submit" class="btn-save">
+            <i data-lucide="check-circle"></i>
+            Ativar Planejamento
+          </button>
+        </form>
+      </div>
+
+      <div class="flex flex-col gap-6">
+        <div class="cat-preview" id="catPreview">
+          <div class="preview-icon-circle">
+            <i data-lucide="tag" id="previewIcon" class="w-8 h-8"></i>
+          </div>
+          <div class="preview-cat-name" id="previewName">Nenhuma Selecionada</div>
+          <span class="cat-natureza">Prévia visual</span>
+        </div>
+
+        <div class="bg-teal-50 border border-teal-100 rounded-xl p-6">
+          <i data-lucide="brain-circuit" class="text-brand mb-3"></i>
+          <h4 class="font-bold text-sm text-teal-900 mb-1">Dica Pro Max</h4>
+          <p class="text-xs text-teal-700 leading-relaxed">Orçamentos baseados em categorias pré-existentes facilitam a reconciliação automática de faturas e extratos.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<script th:fragment="script">
+    document.addEventListener('DOMContentLoaded', () => {
+      const ctx = gsap.context(() => {
+        gsap.to('.form-hero', { opacity: 1, y: 0, duration: 0.6, ease: 'back.out(1.4)' });
+      });
+
+      const catSelect = document.getElementById('catSelect');
+      const previewIcon = document.getElementById('previewIcon');
+      const previewName = document.getElementById('previewName');
+      const iconCircle = document.querySelector('.preview-icon-circle');
+
+      function updatePreview() {
+        const selected = catSelect.options[catSelect.selectedIndex];
+        if (!selected || !selected.value) return;
+
+        const iconName = selected.getAttribute('data-icon');
+        const color = selected.getAttribute('data-color');
+        const name = selected.text;
+
+        previewName.innerText = name;
+        iconCircle.style.borderColor = color;
+        iconCircle.style.color = color;
+        
+        // Update Lucide icon
+        previewIcon.setAttribute('data-lucide', iconName || 'tag');
+        lucide.createIcons();
+
+        // Fun animation
+        gsap.fromTo('#catPreview', { scale: 0.95 }, { scale: 1, duration: 0.4, ease: 'elastic.out(1, 0.3)' });
+      }
+
+      catSelect.addEventListener('change', updatePreview);
+      
+      // Initial call if editing
+      if(catSelect.value) updatePreview();
+
+      lucide.createIcons();
+      
+      // Cleanup for HTMX
+      document.addEventListener('htmx:beforeSwap', () => ctx.revert());
+    });
+</script>
+</body>
+</html>

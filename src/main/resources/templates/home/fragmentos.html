@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+
+<div th:fragment="resultado-distribuicao">
+
+    <div class="dist-toggle">
+        <button class="dist-toggle-btn active" onclick="filterDist('pessoal', this)">🔒 Pessoal</button>
+        <button class="dist-toggle-btn" onclick="filterDist('casa', this)">Casa</button>
+    </div>
+
+    <div th:if="${#lists.isEmpty(itensPessoais)}" class="dist-item" data-tipo="pessoal" style="color: #64748b; justify-content: center; border: none;">
+        <span>Nenhuma conta pessoal pendente este mês.</span>
+    </div>
+    <div class="dist-item" data-tipo="pessoal" th:each="item : ${itensPessoais}">
+        <span th:text="${item.descricao}">Descrição</span>
+        <span th:text="'R$ ' + ${#numbers.formatDecimal(item.valor, 1, 'POINT', 2, 'COMMA')}">R$ 0,00</span>
+    </div>
+
+    <div th:if="${#lists.isEmpty(itensCasa)}" class="dist-item" data-tipo="casa" style="display:none; color: #64748b; justify-content: center; border: none;">
+        <span>Nenhuma conta de casa pendente este mês.</span>
+    </div>
+    <div class="dist-item" data-tipo="casa" th:each="item : ${itensCasa}" style="display:none;">
+        <span th:text="${item.descricao}">Descrição</span>
+        <span th:text="'R$ ' + ${#numbers.formatDecimal(item.valor, 1, 'POINT', 2, 'COMMA')}">R$ 0,00</span>
+    </div>
+
+</div>
+
+<div th:fragment="resultado-ia-premium" style="padding: 32px; animation: fade-in .6s ease both;">
+
+    <div class="ia-growth-advice" th:if="${lastAnalysis != null}" th:utext="${lastAnalysis}">
+        <!-- O conteúdo gerado pela IA no Python já vem formatado em HTML -->
+    </div>
+
+    <div th:if="${lastAnalysis == null}" style="text-align: center; color: var(--t3); padding: 20px;">
+        <p>Não foi possível gerar a análise no momento. Tente novamente mais tarde.</p>
+    </div>
+
+    <div style="margin-top: 32px; border-top: 1px dashed var(--border-2); padding-top: 24px; display: flex; gap: 16px; align-items: center;">
+        <div style="width: 40px; height: 40px; border-radius: 50%; background: var(--amber-bg); display: flex; align-items: center; justify-content: center; color: var(--amber);">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+        </div>
+        <div>
+            <h6 style="font-size: 14px; font-weight: 600; color: var(--t1); margin-bottom: 2px;">Potencial de Crescimento</h6>
+            <p style="font-size: 12px; color: var(--t3); margin-bottom: 0;">Otimizado com base no seu perfil de DNA Financeiro.</p>
+        </div>
+    </div>
+
+</div>
+
+</body>
+</html>
