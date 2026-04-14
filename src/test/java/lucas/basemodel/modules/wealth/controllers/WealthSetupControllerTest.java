@@ -56,36 +56,36 @@ class WealthSetupControllerTest {
     @Test
     @WithMockUser(username = "user@example.com")
     void testShowStep1() throws Exception {
-        mockMvc.perform(post("/wealth/setup/step1")
+        mockMvc.perform(post("/app/wealth/setup/step1")
                 .with(csrf())
                 .param("assetName", "Macbook")
                 .param("assetValue", "2000")
                 .param("assetType", "OTHER"))
                 .andExpect(status().is3xxRedirection())
-                .andExpect(redirectedUrl("/wealth/setup/step2"));
+                .andExpect(redirectedUrl("/app/wealth/setup/step2"));
     }
 
     @Test
     @WithMockUser(username = "user@example.com")
     void testShowStep2() throws Exception {
-        mockMvc.perform(post("/wealth/setup/step2")
+        mockMvc.perform(post("/app/wealth/setup/step2")
                 .with(csrf())
                 .param("incomeSource", "Test")
                 .param("incomeAmount", "0.00")
                 .param("benefitAmount", "0.00")) // empty/zero skips step2 processing
                 .andExpect(status().is3xxRedirection())
-                .andExpect(redirectedUrl("/wealth/setup/step3"));
+                .andExpect(redirectedUrl("/app/wealth/setup/step3"));
     }
 
     @Test
     @WithMockUser(username = "lucas.antunes@example.com")
     void testTypeMismatchException_RedirectsWithError() throws Exception {
-        mockMvc.perform(post("/wealth/setup/step2")
+        mockMvc.perform(post("/app/wealth/setup/step2")
                 .with(csrf())
                 .param("incomeSource", "Salary")
                 .param("incomeAmount", "invalid_number")) // simulate bad input
                 .andExpect(status().is3xxRedirection())
-                .andExpect(redirectedUrl("/wealth/setup/step2?error=format"))
+                .andExpect(redirectedUrl("/app/wealth/setup/step2?error=format"))
                 .andExpect(flash().attributeExists("errorMessage"));
     }
 }

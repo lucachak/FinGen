@@ -1,10 +1,17 @@
 package lucas.basemodel.web;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lucas.basemodel.modules.financeiro.enums.NaturezaMeta;
+import lucas.basemodel.modules.financeiro.models.Investimento;
 import lucas.basemodel.modules.financeiro.models.MetaFinanceira;
+import lucas.basemodel.modules.financeiro.repositories.InvestimentoRepository;
 import lucas.basemodel.modules.financeiro.repositories.MetaFinanceiraRepository;
+import lucas.basemodel.modules.financeiro.services.OpenRouterService;
 import lucas.basemodel.modules.user.User;
 import lucas.basemodel.modules.user.UsuarioRepository;
+import lucas.basemodel.web.dto.MetaSugestaoDTO;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -26,10 +33,19 @@ public class MetaController {
 
     private final MetaFinanceiraRepository metaRepository;
     private final UsuarioRepository usuarioRepository;
+    private final OpenRouterService openRouterService;
+    private final InvestimentoRepository investimentoRepository;
+    private final ObjectMapper objectMapper;
 
-    public MetaController(MetaFinanceiraRepository metaRepository, UsuarioRepository usuarioRepository) {
+    public MetaController(MetaFinanceiraRepository metaRepository,
+                          UsuarioRepository usuarioRepository,
+                          OpenRouterService openRouterService,
+                          InvestimentoRepository investimentoRepository) {
         this.metaRepository = metaRepository;
         this.usuarioRepository = usuarioRepository;
+        this.openRouterService = openRouterService;
+        this.investimentoRepository = investimentoRepository;
+        this.objectMapper = new ObjectMapper();
     }
 
     @GetMapping({"", "/"})
@@ -43,7 +59,6 @@ public class MetaController {
             Map<UUID, Long> mesesRestantes = new HashMap<>();
 
             for (MetaFinanceira meta : metas) {
-                // Cálculo de percentual
                 BigDecimal percentual = BigDecimal.ZERO;
                 if (meta.getValorAlvo().compareTo(BigDecimal.ZERO) > 0) {
                     percentual = meta.getValorAtual().multiply(new BigDecimal("100"))
@@ -51,7 +66,6 @@ public class MetaController {
                 }
                 percentuais.put(meta.getId(), percentual);
 
-                // Cálculo de tempo restante
                 long meses = 0;
                 if (meta.getPrazo() != null) {
                     meses = ChronoUnit.MONTHS.between(LocalDate.now(), meta.getPrazo());
@@ -59,7 +73,6 @@ public class MetaController {
                 }
                 mesesRestantes.put(meta.getId(), meses);
 
-                // Cálculo de aporte mensal necessário
                 BigDecimal restante = meta.getValorAlvo().subtract(meta.getValorAtual());
                 BigDecimal aporte = BigDecimal.ZERO;
                 if (restante.compareTo(BigDecimal.ZERO) > 0) {
@@ -111,7 +124,6 @@ public class MetaController {
             meta.setResponsavel(user);
         }
         
-        // Atribui ícone baseado na natureza se não definido
         if (meta.getIcone() == null || meta.getIcone().equals("target")) {
             switch (meta.getNatureza()) {
                 case VIAGEM -> meta.setIcone("palmtree");
@@ -135,4 +147,91 @@ public class MetaController {
         redirectAttributes.addFlashAttribute("successMessage", "Meta removida.");
         return "redirect:/app/financeiro/metas";
     }
+
+    // ── AI Suggestion Endpoints ───────────────────────────────────────────────
+
+    @PostMapping("/ai-suggest")
+    @ResponseBody
+    public ResponseEntity<List<MetaSugestaoDTO>> aiSuggest(Principal principal) {
+        User user = usuarioRepository.findByEmail(principal.getName()).orElse(null);
+        if (user == null) return ResponseEntity.badRequest().build();
+
+        List<Investimento> investimentos = investimentoRepository.findByResponsavel(user);
+        List<MetaFinanceira> metasExistentes = metaRepository.findByResponsavel(user);
+
+        BigDecimal totalInvestido = investimentos.stream()
+            .map(i -> i.getValorAtual() != null ? i.getValorAtual() : BigDecimal.ZERO)
+            .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        StringBuilder ctx = new StringBuilder();
+        ctx.append("- Rendimento mensal: €").append(user.getOrcamentoMensal()).append("\n");
+        ctx.append("- Perfil financeiro: ").append(user.getTipoPerfilFinanceiro()).append("\n");
+        ctx.append("- Meta de poupança mensal: ").append(user.getMetaPoupancaMensal()).append("%\n");
+        ctx.append("- Total em investimentos: €").append(totalInvestido).append("\n");
+        ctx.append("- Número de investimentos ativos: ").append(investimentos.size()).append("\n");
+        ctx.append("- Metas financeiras já definidas: ").append(metasExistentes.size()).append("\n");
+        if (!metasExistentes.isEmpty()) {
+            ctx.append("- Metas existentes: ");
+            metasExistentes.forEach(m -> ctx.append(m.getTitulo()).append(" (€").append(m.getValorAlvo()).append("), "));
+        }
+
+        String rawJson = openRouterService.suggestGoals(ctx.toString());
+
+        // Strip markdown fences if the model wrapped the JSON
+        rawJson = rawJson.trim();
+        if (rawJson.startsWith("```")) {
+            rawJson = rawJson.replaceAll("(?s)^```[a-zA-Z]*\\n?", "").replaceAll("```$", "").trim();
+        }
+
+        try {
+            List<MetaSugestaoDTO> sugestoes = objectMapper.readValue(rawJson,
+                new TypeReference<List<MetaSugestaoDTO>>() {});
+            return ResponseEntity.ok(sugestoes);
+        } catch (Exception e) {
+            System.err.println("[MetaController] Failed to parse AI response: " + e.getMessage());
+            System.err.println("[MetaController] Raw response: " + rawJson);
+            return ResponseEntity.ok(List.of());
+        }
+    }
+
+    @PostMapping("/ai-criar")
+    public String aiCriar(@RequestParam String titulo,
+                           @RequestParam BigDecimal valorAlvo,
+                           @RequestParam BigDecimal aporteMensal,
+                           @RequestParam int prazoMeses,
+                           @RequestParam NaturezaMeta natureza,
+                           @RequestParam(required = false) String justificativa,
+                           Principal principal,
+                           RedirectAttributes redirectAttributes) {
+        User user = usuarioRepository.findByEmail(principal.getName()).orElse(null);
+        if (user == null) return "redirect:/app/financeiro/metas";
+
+        String icone = switch (natureza) {
+            case VIAGEM -> "palmtree";
+            case CARRO -> "car";
+            case CASA -> "home";
+            case APOSENTADORIA -> "trending-up";
+            case RESERVA_EMERGENCIA -> "shield-check";
+            case EDUCACAO -> "graduation-cap";
+            default -> "target";
+        };
+
+        MetaFinanceira nova = MetaFinanceira.builder()
+            .titulo(titulo)
+            .valorAlvo(valorAlvo)
+            .valorAtual(BigDecimal.ZERO)
+            .natureza(natureza)
+            .icone(icone)
+            .prazo(LocalDate.now().plusMonths(prazoMeses))
+            .status("EM_ANDAMENTO")
+            .isGeradoPeloSistema(true)
+            .responsavel(user)
+            .build();
+
+        metaRepository.save(nova);
+        redirectAttributes.addFlashAttribute("successMessage",
+            "✨ Meta criada pela IA: " + nova.getTitulo());
+        return "redirect:/app/financeiro/metas";
+    }
 }
+

@@ -145,4 +145,36 @@ public class OpenRouterService {
 
         return "Não consegui gerar uma resposta.";
     }
+
+    // ── Sugestão de Metas Financeiras (retorna JSON estruturado) ──────────────
+    public String suggestGoals(String financialContext) {
+        if (openRouterApiKey == null || openRouterApiKey.isBlank()) {
+            return "[]";
+        }
+
+        String systemPrompt = "Você é um consultor financeiro especialista. " +
+            "Com base nos dados financeiros fornecidos, sugira EXATAMENTE 3 metas financeiras personalizadas. " +
+            "Responda SOMENTE com um array JSON válido, sem texto adicional, markdown, ou blocos de código. " +
+            "O formato de cada objeto deve ser exatamente: " +
+            "[{\"titulo\":\"string\",\"valorAlvo\":number,\"aporteMensal\":number,\"prazoMeses\":number," +
+            "\"natureza\":\"APOSENTADORIA|VIAGEM|CASA|CARRO|RESERVA_EMERGENCIA|EDUCACAO|OUTROS\"," +
+            "\"justificativa\":\"string max 120 chars\"}]";
+
+        String userMessage = "Dados financeiros do utilizador:\n" + financialContext +
+            "\n\nGere 3 metas financeiras concretas e realistas. Responda apenas com o array JSON, sem markdown.";
+
+        List<Map<String, String>> messages = new ArrayList<>();
+        messages.add(Map.of("role", "system", "content", systemPrompt));
+        messages.add(Map.of("role", "user", "content", userMessage));
+
+        try {
+            return callModel(FALLBACK_MODEL, messages);
+        } catch (HttpClientErrorException e) {
+            System.err.println("[OpenRouter] suggestGoals failed: " + e.getMessage());
+            return "[]";
+        } catch (Exception e) {
+            System.err.println("[OpenRouter] suggestGoals unexpected error: " + e.getMessage());
+            return "[]";
+        }
+    }
 }
