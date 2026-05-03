@@ -1,15 +1,21 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" lang="pt-BR">
+
 <head>
     <meta charset="UTF-8">
 </head>
+
 <body>
-    <!-- NAVBAR FRAGMENT -->
-    <header th:fragment="navbar" class="sticky top-0 z-30 h-[64px] bg-zen-surface/90 backdrop-blur-md border-b border-zen-border shrink-0">
+
+    <header th:fragment="navbar"
+        class="sticky top-0 z-30 h-[64px] bg-zen-surface/90 backdrop-blur-md border-b border-zen-border shrink-0">
         <div class="flex items-center justify-between h-full px-5 md:px-7">
+
             <!-- Left: Hamburger & Breadcrumb -->
             <div class="flex items-center gap-2 md:gap-3">
-                <button id="hamburgerBtn" class="md:hidden flex items-center justify-center w-9 h-9 rounded-md text-zen-t2 hover:bg-zen-surfaceH transition-colors">
+                <button id="hamburgerBtn"
+                    class="md:hidden flex items-center justify-center w-9 h-9 rounded-md text-zen-t2 hover:bg-zen-surfaceH transition-colors"
+                    aria-label="Abrir menu">
                     <i data-lucide="menu" class="w-5 h-5"></i>
                 </button>
                 <div class="flex items-center gap-1.5 text-[13px] text-zen-t3">
@@ -21,55 +27,67 @@
 
             <!-- Right: Actions & Profile -->
             <div class="flex items-center gap-2 md:gap-3">
-                <a th:href="@{/app/financeiro/contas/nova}" class="hidden sm:flex items-center gap-1.5 px-4 py-2 bg-brand hover:bg-brand-hover text-white rounded-md text-[13px] font-medium transition-all shadow-[0_2px_8px_rgba(15,118,110,0.2)] hover:shadow-[0_4px_16px_rgba(15,118,110,0.30)]">
+                <a th:href="@{/app/financeiro/contas/nova}"
+                    class="hidden sm:flex items-center gap-1.5 px-4 py-2 bg-brand hover:bg-brand-h text-white rounded-md text-[13px] font-medium transition-all shadow-[0_2px_8px_rgba(15,118,110,0.2)] hover:shadow-[0_4px_16px_rgba(15,118,110,0.30)]">
                     <i data-lucide="plus" class="w-4 h-4"></i>
                     Nova Despesa
                 </a>
-                <button id="themeToggleBtn" title="Alternar Tema" class="relative w-9 h-9 flex items-center justify-center rounded-md border border-zen-border bg-zen-surface text-zen-t2 hover:bg-zen-surfaceH hover:text-zen-t1 transition-colors">
+
+                <!-- FIX #3: theme toggle — ícone inicializado via JS depois do DOM pronto -->
+                <button id="themeToggleBtn" title="Alternar Tema"
+                    class="relative w-9 h-9 flex items-center justify-center rounded-md border border-zen-border bg-zen-surface text-zen-t2 hover:bg-zen-surfaceH hover:text-zen-t1 transition-colors"
+                    aria-label="Alternar tema">
                     <i id="themeToggleIcon" data-lucide="moon" class="w-4 h-4"></i>
                 </button>
 
-                <button title="Notificações" class="relative w-9 h-9 flex items-center justify-center rounded-md border border-zen-border bg-zen-surface text-zen-t2 hover:bg-zen-surfaceH hover:text-zen-t1 transition-colors">
+                <button title="Notificações"
+                    class="relative w-9 h-9 flex items-center justify-center rounded-md border border-zen-border bg-zen-surface text-zen-t2 hover:bg-zen-surfaceH hover:text-zen-t1 transition-colors"
+                    aria-label="Notificações">
                     <i data-lucide="bell" class="w-4 h-4"></i>
-                    <span class="absolute top-[5px] right-[5px] w-2 h-2 bg-red-600 rounded-full border-2 border-zen-surface"></span>
+                    <span
+                        class="absolute top-[5px] right-[5px] w-2 h-2 bg-red-600 rounded-full border-2 border-zen-surface"></span>
                 </button>
 
-                <img th:if="${user != null and user.fotoPerfil != null}" th:src="@{${user.fotoPerfil}}" class="w-8 h-8 rounded-full object-cover bg-brand text-white flex items-center justify-center shrink-0 text-xs font-semibold ml-1" alt="Avatar">
-                <div th:unless="${user != null and user.fotoPerfil != null}" class="w-8 h-8 rounded-full bg-brand text-white flex items-center justify-center shrink-0 text-xs font-semibold ml-1">
+                <img th:if="${user != null and user.fotoPerfil != null}" th:src="@{${user.fotoPerfil}}"
+                    class="w-8 h-8 rounded-full object-cover bg-brand text-white flex items-center justify-center shrink-0 text-xs font-semibold ml-1"
+                    alt="Avatar">
+                <div th:unless="${user != null and user.fotoPerfil != null}"
+                    class="w-8 h-8 rounded-full bg-brand text-white flex items-center justify-center shrink-0 text-xs font-semibold ml-1">
                     <a th:href="@{/app/settings/perfil}" class="no-underline text-inherit">
                         <span th:text="${user != null ? #strings.substring(user.email,0,1).toUpperCase() : 'U'}"></span>
                     </a>
                 </div>
             </div>
         </div>
-        
-        <script>
-            document.addEventListener('DOMContentLoaded', () => {
-                const themeToggleBtn = document.getElementById('themeToggleBtn');
-                const themeToggleIcon = document.getElementById('themeToggleIcon');
-                
-                // Initialize icon based on current theme
-                if (document.documentElement.classList.contains('dark')) {
-                    themeToggleIcon.setAttribute('data-lucide', 'sun');
-                } else {
-                    themeToggleIcon.setAttribute('data-lucide', 'moon');
-                }
-                lucide.createIcons();
-                
-                themeToggleBtn.addEventListener('click', () => {
-                    const html = document.documentElement;
-                    html.classList.toggle('dark');
-                    const isDark = html.classList.contains('dark');
-                    
-                    // Save to local storage
-                    localStorage.setItem('theme', isDark ? 'dark' : 'light');
-                    
-                    // Update icon visually
-                    themeToggleIcon.setAttribute('data-lucide', isDark ? 'sun' : 'moon');
-                    lucide.createIcons();
-                });
-            });
-        </script>
     </header>
+
+    <!--
+  FIX #3: Script movido para FORA do <header> e usa DOMContentLoaded.
+  Lucide já foi carregado no <head> do layout.html, então está garantido aqui.
+-->
+    <script th:inline="none">
+        document.addEventListener('DOMContentLoaded', function () {
+            var themeToggleBtn = document.getElementById('themeToggleBtn');
+            var themeToggleIcon = document.getElementById('themeToggleIcon');
+
+            if (!themeToggleBtn) return;
+
+            // Init icon to match current theme
+            var isDark = document.documentElement.classList.contains('dark');
+            themeToggleIcon.setAttribute('data-lucide', isDark ? 'sun' : 'moon');
+            lucide.createIcons();
+
+            themeToggleBtn.addEventListener('click', function () {
+                var html = document.documentElement;
+                html.classList.toggle('dark');
+                var nowDark = html.classList.contains('dark');
+                localStorage.setItem('theme', nowDark ? 'dark' : 'light');
+                themeToggleIcon.setAttribute('data-lucide', nowDark ? 'sun' : 'moon');
+                lucide.createIcons();
+            });
+        });
+    </script>
+
 </body>
+
 </html>
