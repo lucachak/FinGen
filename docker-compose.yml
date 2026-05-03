@@ -3,16 +3,15 @@ services:
     image: postgres:15-alpine
     container_name: fingen-db
     environment:
-      POSTGRES_USER: sa
-      POSTGRES_PASSWORD: password
-      POSTGRES_DB: fin_db
-
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
     ports:
       - "5433:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U sa -d fin_db"]
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
       interval: 5s
       timeout: 5s
       retries: 5
@@ -28,9 +27,9 @@ services:
     ports:
       - "8000:8000"
     environment:
-      - GEMINI_TOKEN=${GEMINI_TOKEN} # Passa o seu token do ambiente para o Docker
+      - GEMINI_TOKEN=${GEMINI_TOKEN}
     volumes:
-      - ./main.py:/app/main.py # Mantém o live-reload local
+      - ./main.py:/app/main.py
 
   app:
     build: .
@@ -41,14 +40,14 @@ services:
     ports:
       - "8080:8080"
     environment:
-      - DB_URL=jdbc:postgresql://db:5432/fin_db
-      - DB_USER=sa
-      - DB_PASS=password
+      - DB_URL=jdbc:postgresql://db:5432/${DB_NAME}
+      - DB_USER=${DB_USERNAME}
+      - DB_PASS=${DB_PASSWORD}
       - DB_DRIVER=org.postgresql.Driver
-      # Em vez de localhost, o Java chama o serviço "python-ia" pela rede interna do Docker!
-      - PYTHON_API_URL=http://python-ia:8000
-      - SPRING_SERVLET_MULTIPART_MAX_FILE_SIZE=15MB
-      - SPRING_SERVLET_MULTIPART_MAX_REQUEST_SIZE=15MB
+      - OPENROUTER_API_KEY=${OPENROUTER_API_KEY}
+      - PYTHON_API_URL=${PYTHON_API_URL}
+      - SPRING_SERVLET_MULTIPART_MAX_FILE_SIZE=${SPRING_SERVLET_MULTIPART_MAX_FILE_SIZE}
+      - SPRING_SERVLET_MULTIPART_MAX_REQUEST_SIZE=${SPRING_SERVLET_MULTIPART_MAX_REQUEST_SIZE}
     volumes:
       - app_uploads:/app/uploads
     depends_on:
