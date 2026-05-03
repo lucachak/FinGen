@@ -1,0 +1,31 @@
+services:
+  # Serviço do Backend Java
+  - type: web
+    name: fingen-java
+    env: docker
+    dockerfilePath: ./Dockerfile
+    plan: free
+    healthCheckPath: /
+    envVars:
+      - key: OPENROUTER_API_KEY
+        sync: false # Você preenche no painel do Render
+      - key: GEMINI_TOKEN
+        sync: false
+      - key: PYTHON_API_URL
+        value: http://fingen-ia:8000
+      - key: DB_URL
+        value: jdbc:h2:file:./data/fingen;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE;AUTO_RECONNECT=TRUE
+      - key: DB_USERNAME
+        value: sa
+      - key: DB_PASSWORD
+        value: password
+
+  # Serviço da IA Python
+  - type: web
+    name: fingen-ia
+    env: docker
+    dockerfilePath: ./Dockerfile.python
+    plan: free
+    envVars:
+      - key: GEMINI_TOKEN
+        sync: false
