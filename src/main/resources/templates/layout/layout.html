@@ -425,7 +425,7 @@
       <th:block th:replace="~{fragments/navbar :: navbar}"></th:block>
 
       <!-- PAGE CONTENT -->
-      <div class="flex-1 p-5 md:p-0 flex flex-col">
+      <div class="flex-1 p-5 md:p-5 flex flex-col">
         <th:block th:replace="${content}"></th:block>
       </div>
 
@@ -486,7 +486,7 @@
     window.getCsrfHeaders = function () {
       const token = document.querySelector('meta[name="_csrf"]')?.content;
       const header = document.querySelector('meta[name="_csrf_header"]')?.content;
-      return token && header ? { [header]: token } : {};
+      return token && header ? {[header]: token} : {};
     };
   </script>
 
