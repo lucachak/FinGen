@@ -1,8 +1,11 @@
 # 💸 FinGen
 
 > Uma aplicação web inteligente e otimizada para a gestão financeira doméstica e controle de despesas.
+[![Live Demo](https://img.shields.io/badge/Live_Demo-Cambiomatic-blue?style=for-the-badge&logo=render)](https://fingen-zcke.onrender.com/)
 
 [![GitHub Repo](https://img.shields.io/badge/GitHub-Repository-black?style=for-the-badge&logo=github)](https://github.com/lucachak/FinGen)
+
+
 
 O **FinGen** foi desenvolvido para simplificar a vida financeira familiar. Ele oferece um ambiente seguro e intuitivo para o rastreamento de receitas, despesas e planejamento do orçamento doméstico, combinando um frontend reativo com um backend robusto e fácil de escalar graças à sua arquitetura em contêineres.
 
