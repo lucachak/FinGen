@@ -2,14 +2,14 @@ FROM python:3.11-slim
 
 WORKDIR /app
 
-# Instala dependências básicas
-COPY main.py .
-# Se você tiver um requirements.txt, descomente as linhas abaixo:
-# COPY requirements.txt .
-# RUN pip install --no-cache-dir -r requirements.txt
+# Copia o requirements primeiro para aproveitar o cache do Docker
+COPY requirements.txt .
 
-# Instalando dependências comuns para IAs (ajuste se necessário)
-RUN pip install --no-cache-dir fastapi uvicorn google-generativeai python-dotenv
+# Instala as dependências exatas
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Agora copia o código
+COPY main.py .
 
 EXPOSE 8000
 

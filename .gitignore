@@ -35,3 +35,4 @@ build/
 
 ### Runtime Environment ###
 .env
+venv/
