@@ -8,10 +8,10 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title th:text="${pageTitle}">FinGen</title>
-  <meta name="description" content="FinGen Auth Minimal">
-  <meta property="og:title" th:content="${pageTitle}">
-  <meta property="og:description" content="FinGen Auth Minimal">
+  <title th:text="${pageTitle ?: 'FinGen'}">FinGen</title>
+  <meta name="description" content="Acesse a sua conta FinGen e gira o seu património com clareza e inteligência artificial.">
+  <meta property="og:title" th:content="${pageTitle ?: 'FinGen'}">
+  <meta property="og:description" content="FinGen — O seu gestor de patrimônio inteligente.">
   <meta property="og:type" content="website">
   <link rel="icon" type="image/png" th:href="@{/favicon-96x96.png}" sizes="96x96" />
   <link rel="icon" type="image/svg+xml" th:href="@{/favicon.svg}" />
