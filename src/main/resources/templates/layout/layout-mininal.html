@@ -14,10 +14,11 @@
   <meta property="og:description" content="FinGen — O seu gestor de patrimônio inteligente.">
   <meta property="og:type" content="website">
   <script>
-    if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+    if (localStorage.theme === 'dark') {
       document.documentElement.classList.add('dark')
     } else {
       document.documentElement.classList.remove('dark')
+      localStorage.setItem('theme', 'light')
     }
   </script>
   <link rel="icon" type="image/png" th:href="@{/favicon-96x96.png}" sizes="96x96" />

@@ -43,7 +43,7 @@
                                     </div>
                                     <input type="number" step="0.01" name="income" id="incomeInput" 
                                            class="w-full bg-zen-surface2 border border-zen-border rounded-xl pl-11 pr-4 py-4 text-zen-t1 text-[18px] font-semibold focus:outline-none focus:ring-2 focus:ring-brand/30 focus:bg-zen-surface transition-all" 
-                                           placeholder="0,00" required>
+                                           placeholder="0,00" onkeypress="return (event.charCode >= 48 && event.charCode <= 57) || event.charCode === 44 || event.charCode === 46" required>
                                 </div>
                             </div>
 
