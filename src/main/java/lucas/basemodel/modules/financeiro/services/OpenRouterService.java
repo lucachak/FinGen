@@ -17,6 +17,7 @@ import lucas.basemodel.modules.financeiro.enums.TipoTransacao;
 import java.math.BigDecimal;
 
 @Service
+@lombok.extern.slf4j.Slf4j
 public class OpenRouterService {
 
     @Value("${openrouter.api.key}")
@@ -87,14 +88,14 @@ public class OpenRouterService {
             return callModel(PRIMARY_MODEL, messages);
         } catch (HttpClientErrorException e) {
             int status = e.getStatusCode().value();
-            System.err.println("[OpenRouter] Modelo principal falhou com HTTP " + status + ": " + e.getMessage());
+            log.error("[OpenRouter] Modelo principal falhou com HTTP {}: {}", status, e.getMessage());
 
             if (status == 429 || status == 503 || status == 502) {
-                System.out.println("[OpenRouter] Tentando modelo fallback: " + FALLBACK_MODEL);
+                log.info("[OpenRouter] Tentando modelo fallback: {}", FALLBACK_MODEL);
                 try {
                     return callModel(FALLBACK_MODEL, messages);
                 } catch (Exception fallbackEx) {
-                    System.err.println("[OpenRouter] Fallback também falhou: " + fallbackEx.getMessage());
+                    log.error("[OpenRouter] Fallback também falhou: ", fallbackEx);
                     return "A rede Neural está temporariamente sobrecarregada. Por favor, tente novamente em alguns instantes.";
                 }
             }
@@ -105,10 +106,10 @@ public class OpenRouterService {
 
             return "Ocorreu um erro na comunicação com a IA (HTTP " + status + ").";
         } catch (ResourceAccessException e) {
-            System.err.println("[OpenRouter] Timeout ou erro de rede: " + e.getMessage());
+            log.error("[OpenRouter] Timeout ou erro de rede: ", e);
             return "Não foi possível contactar a rede Neural. Verifique a sua ligação e tente novamente.";
         } catch (Exception e) {
-            System.err.println("[OpenRouter] Erro inesperado: " + e.getMessage());
+            log.error("[OpenRouter] Erro inesperado: ", e);
             return "Ocorreu um erro inesperado ao comunicar com a IA.";
         }
     }
@@ -170,10 +171,10 @@ public class OpenRouterService {
         try {
             return callModel(FALLBACK_MODEL, messages);
         } catch (HttpClientErrorException e) {
-            System.err.println("[OpenRouter] suggestGoals failed: " + e.getMessage());
+            log.error("[OpenRouter] suggestGoals failed: ", e);
             return "[]";
         } catch (Exception e) {
-            System.err.println("[OpenRouter] suggestGoals unexpected error: " + e.getMessage());
+            log.error("[OpenRouter] suggestGoals unexpected error: ", e);
             return "[]";
         }
     }

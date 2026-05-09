@@ -9,6 +9,14 @@
   <meta property="og:title" content="Acesso - FinGen">
   <meta property="og:description" content="Acesse a sua conta FinGen.">
   <meta property="og:type" content="website">
+  <script>
+    if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+      document.documentElement.classList.add('dark')
+    } else {
+      document.documentElement.classList.remove('dark')
+    }
+  </script>
+  <meta property="og:type" content="website">
   <link rel="icon" type="image/png" th:href="@{/favicon-96x96.png}" sizes="96x96" />
   <link rel="icon" type="image/svg+xml" th:href="@{/favicon.svg}" />
   <link rel="shortcut icon" th:href="@{/favicon.ico}" />
@@ -61,6 +69,17 @@
       --r-lg: 16px;
       --r-xl: 20px;
       --r-full: 9999px;
+    }
+
+    html.dark {
+      --bg: #0F172A;
+      --surface: #1E293B;
+      --surface-2: #334155;
+      --border: rgba(255, 255, 255, 0.10);
+      --t1: #F8FAFC;
+      --t2: #94A3B8;
+      --t3: #64748B;
+      --t-inv: #0F172A;
     }
 
     html {

@@ -195,13 +195,18 @@
       font-weight: 500;
       cursor: pointer;
       text-decoration: none;
-      transition: background .2s ease, box-shadow .2s ease;
+      transition: all .2s cubic-bezier(0.4, 0, 0.2, 1);
       box-shadow: 0 2px 8px rgba(15, 118, 110, 0.2);
     }
-
+    
     .btn-primary:hover {
       background: var(--brand-h);
-      box-shadow: 0 4px 16px rgba(15, 118, 110, 0.30);
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(15, 118, 110, 0.3);
+    }
+    
+    .btn-primary:active {
+      transform: scale(0.97);
     }
 
     .btn-ghost {

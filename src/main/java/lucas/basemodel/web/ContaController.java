@@ -193,7 +193,7 @@ public class ContaController {
                 Files.write(caminhoFicheiro, arquivo.getBytes());
                 conta.setComprovante(nomeArquivo);
             } catch (IOException e) {
-                e.printStackTrace();
+                log.error("Erro ao salvar comprovante: ", e);
             }
         }
 

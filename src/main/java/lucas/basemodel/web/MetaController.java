@@ -29,6 +29,7 @@ import java.util.UUID;
 
 @Controller
 @RequestMapping("/app/financeiro/metas")
+@lombok.extern.slf4j.Slf4j
 public class MetaController {
 
     private final MetaFinanceiraRepository metaRepository;
@@ -188,8 +189,8 @@ public class MetaController {
                 new TypeReference<List<MetaSugestaoDTO>>() {});
             return ResponseEntity.ok(sugestoes);
         } catch (Exception e) {
-            System.err.println("[MetaController] Failed to parse AI response: " + e.getMessage());
-            System.err.println("[MetaController] Raw response: " + rawJson);
+            log.error("[MetaController] Failed to parse AI response: {}", e.getMessage());
+            log.error("[MetaController] Raw response: {}", rawJson);
             return ResponseEntity.ok(List.of());
         }
     }

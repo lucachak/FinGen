@@ -49,13 +49,14 @@ public class AuthController {
             
             UserDetails user = userDetailsService.loadUserByUsername(email);
             String jwtToken = jwtService.generateToken(user);
-            
+
+            boolean secureCookie = !"false".equalsIgnoreCase(System.getenv("COOKIE_SECURE"));
             ResponseCookie jwtCookie = ResponseCookie.from("jwtData", jwtToken)
                     .httpOnly(true)
-                    .secure(false) // Set to true in production with HTTPS
+                    .secure(secureCookie)
                     .path("/")
-                    .maxAge(-1) // Session-only cookie (clears on browser close)
-                    .sameSite("Lax") // Protects against most CSRF attacks
+                    .maxAge(-1)
+                    .sameSite("Lax")
                     .build();
             
             response.addHeader(HttpHeaders.SET_COOKIE, jwtCookie.toString());

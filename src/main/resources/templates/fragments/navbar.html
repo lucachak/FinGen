@@ -35,9 +35,10 @@
 
                 <!-- FIX #3: theme toggle — ícone inicializado via JS depois do DOM pronto -->
                 <button id="themeToggleBtn" title="Alternar Tema"
-                    class="relative w-9 h-9 flex items-center justify-center rounded-md border border-zen-border bg-zen-surface text-zen-t2 hover:bg-zen-surfaceH hover:text-zen-t1 transition-colors"
+                    class="relative w-9 h-9 flex items-center justify-center rounded-md border border-zen-border bg-zen-surface text-zen-t2 hover:bg-zen-surfaceH hover:text-zen-t1 active:scale-95 transition-all shadow-sm"
                     aria-label="Alternar tema">
-                    <i id="themeToggleIcon" data-lucide="moon" class="w-4 h-4"></i>
+                    <i data-lucide="moon" class="w-4 h-4 block dark:hidden"></i>
+                    <i data-lucide="sun" class="w-4 h-4 hidden dark:block text-amber-500"></i>
                 </button>
 
                 <button title="Notificações"
@@ -65,28 +66,20 @@
   FIX #3: Script movido para FORA do <header> e usa DOMContentLoaded.
   Lucide já foi carregado no <head> do layout.html, então está garantido aqui.
 -->
-    <script th:inline="none">
-        document.addEventListener('DOMContentLoaded', function () {
-            var themeToggleBtn = document.getElementById('themeToggleBtn');
-            var themeToggleIcon = document.getElementById('themeToggleIcon');
-
-            if (!themeToggleBtn) return;
-
-            // Init icon to match current theme
-            var isDark = document.documentElement.classList.contains('dark');
-            themeToggleIcon.setAttribute('data-lucide', isDark ? 'sun' : 'moon');
-            lucide.createIcons();
-
-            themeToggleBtn.addEventListener('click', function () {
-                var html = document.documentElement;
-                html.classList.toggle('dark');
-                var nowDark = html.classList.contains('dark');
-                localStorage.setItem('theme', nowDark ? 'dark' : 'light');
-                themeToggleIcon.setAttribute('data-lucide', nowDark ? 'sun' : 'moon');
-                lucide.createIcons();
+        <script th:inline="none">
+            document.addEventListener('DOMContentLoaded', function () {
+                var themeToggleBtn = document.getElementById('themeToggleBtn');
+    
+                if (!themeToggleBtn) return;
+    
+                themeToggleBtn.addEventListener('click', function () {
+                    var html = document.documentElement;
+                    html.classList.toggle('dark');
+                    var nowDark = html.classList.contains('dark');
+                    localStorage.setItem('theme', nowDark ? 'dark' : 'light');
+                });
             });
-        });
-    </script>
+        </script>
 
 </body>
 

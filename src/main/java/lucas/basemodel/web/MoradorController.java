@@ -69,7 +69,7 @@ public class MoradorController {
                 }
                 novaFoto = "/uploads/perfis/" + fileName;
             } catch (Exception e) {
-                e.printStackTrace();
+                log.error("Erro ao salvar foto do morador: ", e);
             }
         }
 

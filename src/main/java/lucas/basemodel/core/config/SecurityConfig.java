@@ -32,14 +32,13 @@ public class SecurityConfig {
         public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
                 http
                                 .csrf(csrf -> csrf
-                                                .ignoringRequestMatchers("/auth/**", "/logout",
-                                                                "/h2-console/**")
+                                                .ignoringRequestMatchers("/auth/**", "/logout")
                                                 .csrfTokenRequestHandler(new CsrfTokenRequestAttributeHandler())
                                                 .csrfTokenRepository(customCsrfTokenRepository()))
                                 .headers(headers -> headers.frameOptions(f -> f.sameOrigin()))
                                 .authorizeHttpRequests(auth -> auth
-                                                // LIBERA OS ARQUIVOS ESTÁTICOS AQUI!
-                                                .requestMatchers("/css/**", "/js/**", "/images/**", "/*.glb", "/", "/auth/**")
+                                                .requestMatchers("/css/**", "/js/**", "/images/**", "/*.glb", "/",
+                                                                "/auth/**")
                                                 .permitAll()
                                                 .requestMatchers("/app/**", "/api/**", "/api/v1/**").authenticated()
                                                 .anyRequest().authenticated())
@@ -47,18 +46,21 @@ public class SecurityConfig {
                                                 sess -> sess.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED))
                                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
                                 .addFilterAfter(new OncePerRequestFilter() {
-                                    @Override
-                                    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
-                                            throws ServletException, IOException {
-                                        CsrfToken csrfToken = (CsrfToken) request.getAttribute(CsrfToken.class.getName());
-                                        if (csrfToken != null) {
-                                            csrfToken.getToken(); // Forces the token to be resolved and cookie to be written
+                                        @Override
+                                        protected void doFilterInternal(HttpServletRequest request,
+                                                        HttpServletResponse response, FilterChain filterChain)
+                                                        throws ServletException, IOException {
+                                                CsrfToken csrfToken = (CsrfToken) request
+                                                                .getAttribute(CsrfToken.class.getName());
+                                                if (csrfToken != null) {
+                                                        csrfToken.getToken();
+                                                }
+                                                filterChain.doFilter(request, response);
                                         }
-                                        filterChain.doFilter(request, response);
-                                    }
                                 }, CsrfFilter.class)
                                 .exceptionHandling(ex -> ex.authenticationEntryPoint(
-                                                (request, response, authException) -> response.sendRedirect("/auth/login")))
+                                                (request, response, authException) -> response
+                                                                .sendRedirect("/auth/login")))
                                 .logout(logout -> logout
                                                 .logoutUrl("/logout")
                                                 .logoutSuccessUrl("/auth/login?logout")

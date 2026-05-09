@@ -28,6 +28,7 @@ import java.time.LocalDate;
 import java.util.*;
 
 @Service
+@lombok.extern.slf4j.Slf4j
 public class GeminiService {
 
     private final ContaRepository contaRepository;
@@ -206,7 +207,7 @@ public class GeminiService {
                                 gastosPorCategoria.merge(categoriaMapeada.getNome(), valorTransacao, BigDecimal::add);
                             }
                         } catch (Exception ex) {
-                            System.err.println("Erro ao mapear transação: " + ex.getMessage());
+                            log.error("Erro ao mapear transação: ", ex);
                         }
                     }
                 }
@@ -233,7 +234,7 @@ public class GeminiService {
                 return resultado;
             }
         } catch (Exception e) {
-            System.err.println("Erro interno no processarExtratoIA: " + e.getMessage());
+            log.error("Erro interno no processarExtratoIA: ", e);
             resultado.put("status", "erro");
             resultado.put("mensagem", "Erro interno ao comunicar com o servidor de Inteligência Artificial.");
             return resultado;
@@ -343,7 +344,7 @@ public class GeminiService {
             }
             return "<i>Análise não disponível.</i>";
         } catch (Exception e) {
-            System.err.println("Erro no gerarPlanoInvestimentos: " + e.getMessage());
+            log.error("Erro no gerarPlanoInvestimentos: ", e);
             return "<div style='color: #ef4444;'>🚨 O servidor Python está offline ou inacessível.</div>";
         }
     }
@@ -401,7 +402,7 @@ public class GeminiService {
             return "<i>Análise não disponível no momento.</i>";
 
         } catch (Exception e) {
-            System.err.println("Erro no analisarAnomalias: " + e.getMessage());
+            log.error("Erro no analisarAnomalias: ", e);
             return "<div style='color: #e11d48; padding: 15px; background: #fee2e2; border-radius: 8px; border: 1px solid #fca5a5;'>🚨 O Detetive IA (Python) está offline ou inacessível.</div>";
         }
     }
@@ -434,7 +435,7 @@ public class GeminiService {
                 return new BigDecimal(responseBody.get("valorCalculado").toString());
             }
         } catch (Exception e) {
-            System.err.println("Erro de conexão ao prever com Gemini IA. Acionando Fallback Matemático: " + e.getMessage());
+            log.error("Erro de conexão ao prever com Gemini IA. Acionando Fallback Matemático: ", e);
         }
 
         // Fallback: Média aritmética simples

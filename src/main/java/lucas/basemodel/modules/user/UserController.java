@@ -27,6 +27,7 @@ import java.util.UUID;
 @Controller
 @RequestMapping("/app/settings")
 @RequiredArgsConstructor
+@lombok.extern.slf4j.Slf4j
 public class UserController {
 
     private final UsuarioRepository repository;
@@ -108,7 +109,7 @@ public class UserController {
             attributes.addFlashAttribute("mensagemSucesso", "Foto de perfil atualizada com sucesso!");
         } catch (Exception e) {
             attributes.addFlashAttribute("mensagemErro", "Ocorreu um erro ao gravar a imagem.");
-            e.printStackTrace();
+            log.error("Erro ao atualizar foto de perfil: ", e);
         }
 
         return "redirect:/app/settings/perfil";
