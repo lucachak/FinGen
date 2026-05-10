@@ -207,14 +207,20 @@ public class ContaController {
     }
 
     @PostMapping("/excluir/{id}")
-    public String excluirConta(@PathVariable Long id, Principal principal) {
+    public String excluirConta(@PathVariable Long id, Principal principal,
+                               @RequestHeader(value = "HX-Request", required = false) String htmxRequest) {
         User usuarioLogado = usuarioRepository.findByEmail(principal.getName()).orElseThrow(() -> new IllegalArgumentException("Registo não encontrado."));
         contaService.excluir(id, usuarioLogado);
+        
+        if (htmxRequest != null) {
+            return "redirect:/app/financeiro/contas/fragmento-vazio"; // Ou um fragmento específico
+        }
         return "redirect:/app/financeiro/contas";
     }
 
     @PostMapping("/pagar/{id}")
     public String pagarContaRapido(@PathVariable Long id, Principal principal,
+                                   @RequestHeader(value = "HX-Request", required = false) String htmxRequest,
                                    org.springframework.web.servlet.mvc.support.RedirectAttributes redirectAttributes) {
         User usuarioLogado = usuarioRepository.findByEmail(principal.getName()).orElseThrow(() -> new IllegalArgumentException("Registo não encontrado."));
         Conta conta = contaService.buscarPorId(id, usuarioLogado);
@@ -224,10 +230,21 @@ public class ContaController {
             try {
                 contaService.salvar(conta);
             } catch (IllegalStateException e) {
+                if (htmxRequest != null) return "redirect:/app/financeiro/contas/erro-htmx";
                 redirectAttributes.addFlashAttribute("erroValidacao", e.getMessage());
                 return "redirect:/app/financeiro/contas/editar/" + id;
             }
         }
+        
+        if (htmxRequest != null) {
+            return "redirect:/app/financeiro/contas/fragmento-vazio";
+        }
         return "redirect:/app/financeiro/contas";
+    }
+    
+    @GetMapping("/fragmento-vazio")
+    @ResponseBody
+    public String fragmentoVazio() {
+        return "";
     }
 }

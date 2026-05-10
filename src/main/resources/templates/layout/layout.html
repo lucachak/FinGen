@@ -14,6 +14,11 @@
       document.documentElement.classList.remove('dark')
       localStorage.setItem('theme', 'light')
     }
+
+    function toggleTheme() {
+      document.documentElement.classList.toggle('dark');
+      localStorage.setItem('theme', document.documentElement.classList.contains('dark') ? 'dark' : 'light');
+    }
   </script>
   <title th:text="${pageTitle ?: 'FinGen'}">FinGen</title>
   <meta name="description" content="FinGen - Seu património sob controlo com inteligência artificial.">

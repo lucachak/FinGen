@@ -33,8 +33,8 @@
                     Nova Despesa
                 </a>
 
-                <!-- FIX #3: theme toggle — ícone inicializado via JS depois do DOM pronto -->
-                <button id="themeToggleBtn" title="Alternar Tema"
+                <!-- FIX #3: theme toggle inline for HTMX compatibility -->
+                <button id="themeToggleBtn" title="Alternar Tema" onclick="toggleTheme()"
                     class="relative w-9 h-9 flex items-center justify-center rounded-md border border-zen-border bg-zen-surface text-zen-t2 hover:bg-zen-surfaceH hover:text-zen-t1 active:scale-95 transition-all shadow-sm"
                     aria-label="Alternar tema">
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4 block dark:hidden"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"></path></svg>
@@ -62,24 +62,6 @@
         </div>
     </header>
 
-    <!--
-  FIX #3: Script movido para FORA do <header> e usa DOMContentLoaded.
-  Lucide já foi carregado no <head> do layout.html, então está garantido aqui.
--->
-        <script th:inline="none">
-            document.addEventListener('DOMContentLoaded', function () {
-                var themeToggleBtn = document.getElementById('themeToggleBtn');
-    
-                if (!themeToggleBtn) return;
-    
-                themeToggleBtn.addEventListener('click', function () {
-                    var html = document.documentElement;
-                    html.classList.toggle('dark');
-                    var nowDark = html.classList.contains('dark');
-                    localStorage.setItem('theme', nowDark ? 'dark' : 'light');
-                });
-            });
-        </script>
 
 </body>
 

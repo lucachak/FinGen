@@ -7,6 +7,9 @@ import lombok.NoArgsConstructor;
 import lucas.basemodel.modules.financeiro.enums.*;
 import lucas.basemodel.modules.user.User;
 import lucas.basemodel.modules.wealth.models.Asset;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
@@ -26,12 +29,16 @@ public class Conta {
     @Builder.Default
     private Prioridade prioridade = Prioridade.MEDIA;
 
+    @NotBlank(message = "A descrição é obrigatória")
     @Column(nullable = false)
     private String descricao;
 
+    @NotNull(message = "O valor é obrigatório")
+    @Positive(message = "O valor deve ser maior que zero")
     @Column(nullable = false)
     private BigDecimal valor;
 
+    @NotNull(message = "A data de vencimento é obrigatória")
     @Column(nullable = false)
     private LocalDate dataVencimento;
 

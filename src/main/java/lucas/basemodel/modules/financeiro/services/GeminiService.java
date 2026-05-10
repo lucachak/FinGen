@@ -35,6 +35,13 @@ public class GeminiService {
     private final CategoriaRepository categoriaRepository;
     private final UsuarioRepository usuarioRepository; // 1. O Novo Injetor
     private final RestTemplate restTemplate;
+    
+    // Progress Tracking for AI Operations
+    private final Map<String, String> statusMap = new java.util.concurrent.ConcurrentHashMap<>();
+    
+    public String getStatus(String key) {
+        return statusMap.getOrDefault(key, "Iniciando...");
+    }
 
     @Value("${python.microservice.url:http://127.0.0.1:8000}")
     private String pythonBaseUrl;
@@ -118,14 +125,18 @@ public class GeminiService {
             body.add("file", file.getResource());
             body.add("historico", historicoJson);
 
+            statusMap.put(usernameResponsavel, "Enviando ficheiro para o Motor Gemini...");
+            
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.MULTIPART_FORM_DATA);
             HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(body, headers);
 
+            statusMap.put(usernameResponsavel, "IA a analisar estrutura do extrato...");
             ResponseEntity<Map> response = restTemplate.postForEntity(pythonBaseUrl + "/api/ia/extrato", requestEntity, Map.class);
             Map<String, Object> responseBody = response.getBody();
 
             if (responseBody != null && "sucesso".equals(responseBody.get("status"))) {
+                statusMap.put(usernameResponsavel, "Classificando transações e mapeando categorias...");
                 String titularPdf = (String) responseBody.get("titular");
                 User responsavelFinal = responsavelReal;
 
@@ -219,6 +230,7 @@ public class GeminiService {
                 resultado.put("responsavelFinal", responsavelFinal);
                 resultado.put("totalEntradas", totalEntradas);
                 resultado.put("totalSaidas", totalSaidas);
+                statusMap.put(usernameResponsavel, "Finalizado!");
                 resultado.put("gastosPorCategoria", gastosPorCategoria);
                 
                 Map<String, Object> debug = (Map<String, Object>) responseBody.get("_debug");

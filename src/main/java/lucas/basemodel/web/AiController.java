@@ -146,6 +146,12 @@ public class AiController {
         return "home/fragmentos :: resultado-ia-premium";
     }
 
+    @GetMapping("/extracao-status")
+    @ResponseBody
+    public String checkExtractionStatus(Principal principal) {
+        return geminiService.getStatus(principal.getName());
+    }
+
     @GetMapping("/status")
     @ResponseBody
     public java.util.Map<String, Object> checkAiStatus() {

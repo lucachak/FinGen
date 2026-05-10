@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head></head>
+<body>
+
+    <!-- 🍱 Bento Card Base -->
+    <!-- Fragmento para cartões padrão com bordas arredondadas e sombras suaves -->
+    <div th:fragment="card(class)" 
+         th:class="'bg-zen-surface border border-zen-border rounded-[24px] shadow-sm transition-all ' + (${class} ?: '')">
+        <div th:replace="${content}"></div>
+    </div>
+
+    <!-- 📊 Metric Card (Usado no Hub Financeiro) -->
+    <div th:fragment="metric(title, value, subtitle, colorClass, animationDelay)"
+         th:class="'bg-zen-surface border border-zen-border p-6 rounded-[24px] shadow-sm hover:shadow-md transition-all group overflow-hidden relative animate-[fade-up_.5s_ease_both_' + ${animationDelay} + ']'">
+        <div class="flex items-center gap-3 mb-4">
+            <div th:class="'w-10 h-10 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform ' + ${colorClass}">
+                <th:block th:replace="${icon}"></th:block>
+            </div>
+            <span class="text-[13px] font-medium text-zen-t2" th:text="${title}">Título</span>
+        </div>
+        <div th:class="'font-serif text-[28px] font-semibold mb-1 ' + (${colorClass} ?: 'text-zen-t1')" th:text="${value}">R$ 0,00</div>
+        <div th:class="'text-[11px] uppercase tracking-widest font-bold opacity-70 ' + (${colorClass} ?: 'text-zen-t3')" th:text="${subtitle}">Subtítulo</div>
+    </div>
+
+    <!-- 🔘 Standard Button (Primary) -->
+    <button th:fragment="btn-primary(text, iconLucide, type, class)"
+            th:type="${type ?: 'button'}"
+            th:class="'inline-flex items-center justify-center gap-2.5 px-7 py-3.5 bg-brand hover:bg-brand-h text-white rounded-full font-medium transition-all shadow-lg shadow-brand/10 hover:-translate-y-0.5 active:scale-95 text-[14px] ' + (${class} ?: '')">
+        <i th:if="${iconLucide}" th:data-lucide="${iconLucide}" class="w-4 h-4"></i>
+        <span th:text="${text}">Botão</span>
+    </button>
+
+    <!-- 🏷️ Category Badge -->
+    <span th:fragment="badge(text, color)"
+          th:style="'background-color: ' + ${color} + '15; color: ' + ${color} + '; border: 1px solid ' + ${color} + '30;'"
+          class="text-[10px] uppercase font-bold tracking-widest px-2 py-0.5 rounded-md"
+          th:text="${text}">
+        Categoria
+    </span>
+
+</body>
+</html>
