@@ -44,6 +44,7 @@ services:
       - DB_USER=${DB_USERNAME}
       - DB_PASS=${DB_PASSWORD}
       - DB_DRIVER=org.postgresql.Driver
+      - DB_DIALECT=org.hibernate.dialect.PostgreSQLDialect
       - OPENROUTER_API_KEY=${OPENROUTER_API_KEY}
       - PYTHON_API_URL=${PYTHON_API_URL}
       - SPRING_SERVLET_MULTIPART_MAX_FILE_SIZE=${SPRING_SERVLET_MULTIPART_MAX_FILE_SIZE}

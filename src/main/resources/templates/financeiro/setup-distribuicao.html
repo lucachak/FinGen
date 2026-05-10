@@ -30,7 +30,7 @@
                         <h2 class="font-serif text-[32px] font-medium text-zen-t1 mb-2 tracking-tight">Setup de Distribuição</h2>
                         <p class="text-[15px] text-zen-t3 mb-8 leading-relaxed">Configure como sua renda será distribuída automaticamente entre orçamentos e metas.</p>
                         
-                        <form th:action="@{/app/financeiro/setup}" method="POST" id="setupForm" class="space-y-6">
+                        <form th:action="@{/app/financeiro/setup}" method="POST" id="setupForm" class="space-y-6" onsubmit="return validateSetupForm(this)">
                             <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
                             <input type="hidden" name="strategy" id="selectedStrategy" value="REGRA_50_30_20">
                             
@@ -209,6 +209,15 @@
             });
             element.classList.add('selected');
             updatePreview();
+        }
+
+        function validateSetupForm(form) {
+            const income = parseFloat(form.income.value || 0);
+            if (income <= 0) {
+                alert("Por favor, informe uma renda mensal válida maior que zero.");
+                return false;
+            }
+            return true;
         }
 
         incomeInput.addEventListener('input', updatePreview);

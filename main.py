@@ -336,10 +336,6 @@ def parsear_pdf_tabular(conteudo_bytes: bytes) -> tuple[str, list[dict]]:
     return titular, transacoes
 
 
-# =========================================================
-# 🤖 CATEGORIZAÇÃO EM LOTE VIA IA
-# =========================================================
-
 async def categorizar_em_lote_via_ia(descricoes: list[str]) -> dict[str, str]:
     """
     Envia descrições desconhecidas para a IA categorizar em lote.
@@ -377,9 +373,14 @@ async def categorizar_em_lote_via_ia(descricoes: list[str]) -> dict[str, str]:
         return {}
 
 
-# =========================================================
-# ROTA 1: ASSISTENTE DE IA (DETEÇÃO DE ANOMALIAS)
-# =========================================================
+
+
+
+@app.get("/")
+async def root():
+    return {"message": "Api is Running..." }
+
+
 @app.post("/api/ia/analisar")
 async def analisar_financas(request_data: AnaliseRequest):
     logger.info("📥 POST /api/ia/analisar")
@@ -404,19 +405,15 @@ async def analisar_financas(request_data: AnaliseRequest):
             df_sync["is_anomalia"] = modelo_ml.fit_predict(df_sync[["valor"]])
             
             leaks = []
-            # Anomalias de valor (Gastos muito altos fora do comum)
             df_anoms = df_sync[df_sync["is_anomalia"] == -1]
             for _, row in df_anoms.iterrows():
                 leaks.append(f"<b>Anomalia Detectada:</b> {row['descricao']} (R$ {row['valor']:.2f})")
 
-            # Frequência (Vazamentos recorrentes de 'Delivery' ou 'Lazer')
             vc = df_sync[df_sync["tipo"] == "SAIDA"]["descricao"].value_counts()
             frequentes = vc[vc > 3].index.tolist()
             if frequentes:
                 leaks.append(f"<b>Vazamento de Hábito:</b> Detectamos gastos repetitivos em '{', '.join(frequentes[:2])}'.")
 
-            # 2. Wealth Growth Logic
-            # Calculamos se o usuário está batendo a meta de poupança definida no Perfil
             saldo_atual = total_entrada - total_saida
             pct_poupanca_real = (saldo_atual / total_entrada * 100) if total_entrada > 0 else 0
             objetivo_poupanca = perfil_data.meta_poupanca
@@ -450,9 +447,6 @@ async def analisar_financas(request_data: AnaliseRequest):
         return {"insight": f"<i>Erro ao processar: {str(e)}</i>"}
 
 
-# =========================================================
-# ROTA 2: LEITURA OTIMIZADA (PDF/CSV) COM EXTRAÇÃO PROFUNDA
-# =========================================================
 @app.post("/api/ia/extrato", response_model=ExtratoAPIResponse)
 async def processar_extrato(
     file: UploadFile = File(...),
