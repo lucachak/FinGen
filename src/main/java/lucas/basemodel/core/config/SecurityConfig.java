@@ -37,8 +37,10 @@ public class SecurityConfig {
                                                 .csrfTokenRepository(customCsrfTokenRepository()))
                                 .headers(headers -> headers.frameOptions(f -> f.sameOrigin()))
                                 .authorizeHttpRequests(auth -> auth
-                                                .requestMatchers("/css/**", "/js/**", "/images/**", "/*.glb", "/",
-                                                                "/auth/**")
+                                                .requestMatchers("/css/**", "/js/**", "/images/**", "/*.glb", 
+                                                                "/favicon.ico", "/favicon.svg", "/favicon-96x96.png", 
+                                                                "/apple-touch-icon.png", "/site.webmanifest", "/sw.js", 
+                                                                "/web-app-manifest-*.png", "/", "/auth/**")
                                                 .permitAll()
                                                 .requestMatchers("/app/**", "/api/**", "/api/v1/**").authenticated()
                                                 .anyRequest().authenticated())
