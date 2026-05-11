@@ -5,7 +5,6 @@ services:
     env: docker
     dockerfilePath: ./Dockerfile.combined
     plan: free
-    port: 8080
     healthCheckPath: /
     envVars:
       - key: GEMINI_TOKEN
