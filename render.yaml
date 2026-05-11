@@ -5,6 +5,7 @@ services:
     env: docker
     dockerfilePath: ./Dockerfile
     plan: free
+    port: 8080
     healthCheckPath: /
     envVars:
       - key: OPENROUTER_API_KEY
@@ -26,6 +27,7 @@ services:
     env: docker
     dockerfilePath: ./Dockerfile.python
     plan: free
+    port: 8000
     envVars:
       - key: GEMINI_TOKEN
         sync: false
