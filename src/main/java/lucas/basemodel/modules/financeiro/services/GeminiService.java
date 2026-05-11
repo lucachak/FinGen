@@ -22,7 +22,6 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.transaction.annotation.Transactional;
 
-
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.*;
@@ -35,10 +34,10 @@ public class GeminiService {
     private final CategoriaRepository categoriaRepository;
     private final UsuarioRepository usuarioRepository; // 1. O Novo Injetor
     private final RestTemplate restTemplate;
-    
+
     // Progress Tracking for AI Operations
     private final Map<String, String> statusMap = new java.util.concurrent.ConcurrentHashMap<>();
-    
+
     public String getStatus(String key) {
         return statusMap.getOrDefault(key, "Iniciando...");
     }
@@ -55,23 +54,23 @@ public class GeminiService {
         }
     }
 
-
-    public GeminiService(ContaRepository contaRepository, CategoriaRepository categoriaRepository, UsuarioRepository usuarioRepository) {
+    public GeminiService(ContaRepository contaRepository, CategoriaRepository categoriaRepository,
+            UsuarioRepository usuarioRepository) {
         this.contaRepository = contaRepository;
         this.categoriaRepository = categoriaRepository;
         this.usuarioRepository = usuarioRepository;
 
         // Security Fix: Timeouts to prevent thread starvation if Python API hangs
-        org.springframework.http.client.SimpleClientHttpRequestFactory factory =
-                new org.springframework.http.client.SimpleClientHttpRequestFactory();
-        factory.setConnectTimeout(5000);   // 5s to establish connection
-        factory.setReadTimeout(60000);     // 60s to wait for AI response
+        org.springframework.http.client.SimpleClientHttpRequestFactory factory = new org.springframework.http.client.SimpleClientHttpRequestFactory();
+        factory.setConnectTimeout(15000); // 5s to establish connection
+        factory.setReadTimeout(60000); // 60s to wait for AI response
         this.restTemplate = new RestTemplate(factory);
     }
 
     // --- 1. MÉTODO DE INSIGHTS (O ASSISTENTE DE IA) ---
     public String gerarInsightsFinanceiros(String usernameResponsavel) {
-        User responsavelReal = usuarioRepository.findByEmail(usernameResponsavel).orElseThrow(() -> new IllegalArgumentException("Registo não encontrado."));
+        User responsavelReal = usuarioRepository.findByEmail(usernameResponsavel)
+                .orElseThrow(() -> new IllegalArgumentException("Registo não encontrado."));
         List<Conta> contas = contaRepository.findByResponsavelAndEscopo(responsavelReal, EscopoTransacao.PESSOAL);
         List<Map<String, Object>> contasSimplificadas = new ArrayList<>();
 
@@ -80,7 +79,8 @@ public class GeminiService {
             contaMap.put("valor", c.getValor());
             contaMap.put("tipo", c.getTipo().name());
             contaMap.put("categoria", c.getCategoria() != null ? c.getCategoria().getNome() : "Sem Categoria");
-            contaMap.put("responsavel", c.getResponsavel() != null ? c.getResponsavel().getNomeCompleto() : "Desconhecido");
+            contaMap.put("responsavel",
+                    c.getResponsavel() != null ? c.getResponsavel().getNomeCompleto() : "Desconhecido");
             contaMap.put("descricao", c.getDescricao());
             contaMap.put("data", c.getDataVencimento() != null ? c.getDataVencimento().toString() : "");
             contasSimplificadas.add(contaMap);
@@ -94,7 +94,8 @@ public class GeminiService {
         HttpEntity<Map<String, Object>> request = new HttpEntity<>(body, headers);
 
         try {
-            ResponseEntity<Map> response = restTemplate.postForEntity(pythonBaseUrl + "/api/ia/analisar", request, Map.class);
+            ResponseEntity<Map> response = restTemplate.postForEntity(pythonBaseUrl + "/api/ia/analisar", request,
+                    Map.class);
             Map<String, Object> responseBody = response.getBody();
             if (responseBody != null && responseBody.containsKey("insight")) {
                 return (String) responseBody.get("insight");
@@ -107,16 +108,19 @@ public class GeminiService {
 
     // --- 2. IMPORTAÇÃO DE EXTRATO (COM PROTEÇÃO ENTERPRISE) ---
 
-    // Removed @Transactional to prevent DB connection pool exhaustion on 30-60s AI calls
+    // Removed @Transactional to prevent DB connection pool exhaustion on 30-60s AI
+    // calls
     public Map<String, Object> processarExtratoIA(MultipartFile file, String usernameResponsavel) {
         Map<String, Object> resultado = new HashMap<>();
         try {
-            User responsavelReal = usuarioRepository.findByEmail(usernameResponsavel).orElseThrow(() -> new IllegalArgumentException("Registo não encontrado."));
+            User responsavelReal = usuarioRepository.findByEmail(usernameResponsavel)
+                    .orElseThrow(() -> new IllegalArgumentException("Registo não encontrado."));
 
             Map<String, String> historicoUsuario = new HashMap<>();
             for (Conta c : contaRepository.findByResponsavelAndEscopo(responsavelReal, EscopoTransacao.PESSOAL)) {
                 if (c.getCategoria() != null) {
-                    historicoUsuario.put(c.getDescricao().toUpperCase(), c.getCategoria().getNome().toUpperCase().replace(" ", "_"));
+                    historicoUsuario.put(c.getDescricao().toUpperCase(),
+                            c.getCategoria().getNome().toUpperCase().replace(" ", "_"));
                 }
             }
             String historicoJson = new ObjectMapper().writeValueAsString(historicoUsuario);
@@ -126,13 +130,14 @@ public class GeminiService {
             body.add("historico", historicoJson);
 
             statusMap.put(usernameResponsavel, "Enviando ficheiro para o Motor Gemini...");
-            
+
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.MULTIPART_FORM_DATA);
             HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(body, headers);
 
             statusMap.put(usernameResponsavel, "IA a analisar estrutura do extrato...");
-            ResponseEntity<Map> response = restTemplate.postForEntity(pythonBaseUrl + "/api/ia/extrato", requestEntity, Map.class);
+            ResponseEntity<Map> response = restTemplate.postForEntity(pythonBaseUrl + "/api/ia/extrato", requestEntity,
+                    Map.class);
             Map<String, Object> responseBody = response.getBody();
 
             if (responseBody != null && "sucesso".equals(responseBody.get("status"))) {
@@ -154,7 +159,7 @@ public class GeminiService {
                 for (Categoria cat : categoriaRepository.findAll()) {
                     categoriaMap.put(cat.getNome().toLowerCase(), cat);
                 }
-                
+
                 List<Conta> loteDeContas = new ArrayList<>();
                 BigDecimal totalEntradas = BigDecimal.ZERO;
                 BigDecimal totalSaidas = BigDecimal.ZERO;
@@ -180,17 +185,21 @@ public class GeminiService {
                             novaConta.setDataVencimento(data);
                             novaConta.setDataPagamento(data);
                             novaConta.setPaga(true);
-                            
+
                             String freqObj = (String) t.get("frequencia");
                             if (freqObj != null) {
-                                try { novaConta.setFrequencia(Frequencia.valueOf(freqObj)); } catch(Exception ignored) {}
+                                try {
+                                    novaConta.setFrequencia(Frequencia.valueOf(freqObj));
+                                } catch (Exception ignored) {
+                                }
                             }
 
                             String catIaBruta = (String) t.get("categoria");
                             String[] palavras = catIaBruta.split("_");
                             StringBuilder formatado = new StringBuilder();
                             for (String p : palavras) {
-                                formatado.append(p.substring(0, 1).toUpperCase()).append(p.substring(1).toLowerCase()).append(" ");
+                                formatado.append(p.substring(0, 1).toUpperCase()).append(p.substring(1).toLowerCase())
+                                        .append(" ");
                             }
                             String nomeCatFormatado = formatado.toString().trim();
 
@@ -198,7 +207,8 @@ public class GeminiService {
                             if (categoriaMapeada == null) {
                                 categoriaMapeada = new Categoria();
                                 categoriaMapeada.setNome(nomeCatFormatado);
-                                categoriaMapeada.setNatureza(lucas.basemodel.modules.financeiro.enums.NaturezaCategoria.DESPESA);
+                                categoriaMapeada.setNatureza(
+                                        lucas.basemodel.modules.financeiro.enums.NaturezaCategoria.DESPESA);
                                 categoriaMapeada = categoriaRepository.save(categoriaMapeada);
                                 categoriaMap.put(nomeCatFormatado.toLowerCase(), categoriaMapeada);
                             }
@@ -232,12 +242,12 @@ public class GeminiService {
                 resultado.put("totalSaidas", totalSaidas);
                 statusMap.put(usernameResponsavel, "Finalizado!");
                 resultado.put("gastosPorCategoria", gastosPorCategoria);
-                
+
                 Map<String, Object> debug = (Map<String, Object>) responseBody.get("_debug");
                 if (debug != null) {
                     resultado.put("via_ia", debug.get("categorizadas_via_ia"));
                 }
-                
+
                 return resultado;
 
             } else {
@@ -253,12 +263,11 @@ public class GeminiService {
         }
     }
 
-
-
     // --- A LENTE: PROCESSAR FOTO DE RECIBO ---
     public String processarReciboIA(MultipartFile file, String usernameResponsavel) {
         try {
-            User responsavelReal = usuarioRepository.findByEmail(usernameResponsavel).orElseThrow(() -> new IllegalArgumentException("Registo não encontrado."));
+            User responsavelReal = usuarioRepository.findByEmail(usernameResponsavel)
+                    .orElseThrow(() -> new IllegalArgumentException("Registo não encontrado."));
 
             MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
             body.add("file", file.getResource());
@@ -267,7 +276,8 @@ public class GeminiService {
             headers.setContentType(MediaType.MULTIPART_FORM_DATA);
             HttpEntity<MultiValueMap<String, Object>> request = new HttpEntity<>(body, headers);
 
-            ResponseEntity<Map> response = restTemplate.postForEntity(pythonBaseUrl + "/api/ia/recibo", request, Map.class);
+            ResponseEntity<Map> response = restTemplate.postForEntity(pythonBaseUrl + "/api/ia/recibo", request,
+                    Map.class);
             Map<String, Object> bodyResp = response.getBody();
 
             if (bodyResp != null && "sucesso".equals(bodyResp.get("status"))) {
@@ -290,10 +300,13 @@ public class GeminiService {
                 }
                 novaConta.setDataPagamento(novaConta.getDataVencimento());
                 novaConta.setPaga(true);
-                
+
                 Object recObj = t.get("frequencia");
                 if (recObj != null && recObj instanceof String) {
-                    try { novaConta.setFrequencia(Frequencia.valueOf((String) recObj)); } catch(Exception ignored) {}
+                    try {
+                        novaConta.setFrequencia(Frequencia.valueOf((String) recObj));
+                    } catch (Exception ignored) {
+                    }
                 }
 
                 List<Categoria> cats = categoriaRepository.findAll();
@@ -307,7 +320,8 @@ public class GeminiService {
 
                 contaRepository.save(novaConta);
 
-                return "<div style='color: #10b981; font-weight: bold;'>📸 Mágica! " + novaConta.getDescricao() + " guardado.</div>" +
+                return "<div style='color: #10b981; font-weight: bold;'>📸 Mágica! " + novaConta.getDescricao()
+                        + " guardado.</div>" +
                         "<script>setTimeout(function(){ window.location.reload(); }, 1500);</script>";
             }
             return "<div style='color: #ef4444;'>A IA não conseguiu ler o talão.</div>";
@@ -315,13 +329,16 @@ public class GeminiService {
             return "<div style='color: #ef4444;'>Erro de comunicação visual com o Python.</div>";
         }
     }
+
     // --- CONSULTOR DE INVESTIMENTOS (WEALTH MANAGEMENT) ---
     public String gerarPlanoInvestimentos(String usernameResponsavel) {
         try {
-            User responsavelReal = usuarioRepository.findByEmail(usernameResponsavel).orElseThrow(() -> new IllegalArgumentException("Registo não encontrado."));
+            User responsavelReal = usuarioRepository.findByEmail(usernameResponsavel)
+                    .orElseThrow(() -> new IllegalArgumentException("Registo não encontrado."));
 
             // Puxa APENAS as contas privadas do utilizador logado
-            List<Conta> contasPessoais = contaRepository.findByResponsavelAndEscopo(responsavelReal, EscopoTransacao.PESSOAL);
+            List<Conta> contasPessoais = contaRepository.findByResponsavelAndEscopo(responsavelReal,
+                    EscopoTransacao.PESSOAL);
             List<Map<String, Object>> contasSimplificadas = new ArrayList<>();
 
             for (Conta c : contasPessoais) {
@@ -335,10 +352,18 @@ public class GeminiService {
             }
 
             Map<String, Object> perfilMap = new HashMap<>();
-            perfilMap.put("tipo", responsavelReal.getTipoPerfilFinanceiro() != null ? responsavelReal.getTipoPerfilFinanceiro() : "CONSERVADOR");
-            perfilMap.put("meta_poupanca", responsavelReal.getMetaPoupancaMensal() != null ? responsavelReal.getMetaPoupancaMensal() : new BigDecimal("20.00"));
-            perfilMap.put("teto_essenciais", responsavelReal.getTetoGastosEssenciais() != null ? responsavelReal.getTetoGastosEssenciais() : new BigDecimal("50.00"));
-            perfilMap.put("orcamento_mensal", responsavelReal.getOrcamentoMensal() != null ? responsavelReal.getOrcamentoMensal() : new BigDecimal("3500.00"));
+            perfilMap.put("tipo",
+                    responsavelReal.getTipoPerfilFinanceiro() != null ? responsavelReal.getTipoPerfilFinanceiro()
+                            : "CONSERVADOR");
+            perfilMap.put("meta_poupanca",
+                    responsavelReal.getMetaPoupancaMensal() != null ? responsavelReal.getMetaPoupancaMensal()
+                            : new BigDecimal("20.00"));
+            perfilMap.put("teto_essenciais",
+                    responsavelReal.getTetoGastosEssenciais() != null ? responsavelReal.getTetoGastosEssenciais()
+                            : new BigDecimal("50.00"));
+            perfilMap.put("orcamento_mensal",
+                    responsavelReal.getOrcamentoMensal() != null ? responsavelReal.getOrcamentoMensal()
+                            : new BigDecimal("3500.00"));
 
             Map<String, Object> body = new HashMap<>();
             body.put("transacoes", contasSimplificadas);
@@ -348,7 +373,8 @@ public class GeminiService {
             headers.setContentType(MediaType.APPLICATION_JSON);
             HttpEntity<Map<String, Object>> request = new HttpEntity<>(body, headers);
 
-            ResponseEntity<Map> response = restTemplate.postForEntity(pythonBaseUrl + "/api/ia/investimentos", request, Map.class);
+            ResponseEntity<Map> response = restTemplate.postForEntity(pythonBaseUrl + "/api/ia/investimentos", request,
+                    Map.class);
             Map<String, Object> responseBody = response.getBody();
 
             if (responseBody != null && responseBody.containsKey("relatorio")) {
@@ -360,42 +386,55 @@ public class GeminiService {
             return "<div style='color: #ef4444;'>🚨 O servidor Python está offline ou inacessível.</div>";
         }
     }
+
     // --- 1. DETETIVE FINANCEIRO (ANÁLISE DE ANOMALIAS) ---
     public String analisarAnomalias(String usernameResponsavel) {
         try {
             // Identifica quem está a pedir a análise
-            User responsavelReal = usuarioRepository.findByEmail(usernameResponsavel).orElseThrow(() -> new IllegalArgumentException("Registo não encontrado."));
+            User responsavelReal = usuarioRepository.findByEmail(usernameResponsavel)
+                    .orElseThrow(() -> new IllegalArgumentException("Registo não encontrado."));
 
             // Scalability Fix: use scoped queries instead of findAll()
             List<Conta> contasCasa = contaRepository.findByResponsavelAndEscopo(responsavelReal, EscopoTransacao.CASA);
-            List<Conta> contasPessoais = contaRepository.findByResponsavelAndEscopo(responsavelReal, EscopoTransacao.PESSOAL);
+            List<Conta> contasPessoais = contaRepository.findByResponsavelAndEscopo(responsavelReal,
+                    EscopoTransacao.PESSOAL);
             List<Conta> todasContas = new ArrayList<>(contasCasa);
             todasContas.addAll(contasPessoais);
-            
+
             // Limit to last 6 months to avoid overflowing context window
             LocalDate limite = LocalDate.now().minusMonths(6);
             List<Conta> contasRecentes = todasContas.stream()
-                .filter(c -> c.getDataVencimento() != null && c.getDataVencimento().isAfter(limite))
-                .toList();
-                
+                    .filter(c -> c.getDataVencimento() != null && c.getDataVencimento().isAfter(limite))
+                    .toList();
+
             List<Map<String, Object>> contasSimplificadas = new ArrayList<>();
 
             for (Conta c : contasRecentes) {
-                    Map<String, Object> contaMap = new HashMap<>();
-                    contaMap.put("valor", c.getValor());
-                    contaMap.put("tipo", c.getTipo().name());
-                    contaMap.put("categoria", c.getCategoria() != null ? c.getCategoria().getNome() : "Sem Categoria");
-                    contaMap.put("responsavel", c.getResponsavel() != null ? c.getResponsavel().getNomeCompleto() : "Desconhecido");
-                    contaMap.put("descricao", c.getDescricao());
-                    contaMap.put("data", c.getDataVencimento() != null ? c.getDataVencimento().toString() : LocalDate.now().toString());
-                    contasSimplificadas.add(contaMap);
+                Map<String, Object> contaMap = new HashMap<>();
+                contaMap.put("valor", c.getValor());
+                contaMap.put("tipo", c.getTipo().name());
+                contaMap.put("categoria", c.getCategoria() != null ? c.getCategoria().getNome() : "Sem Categoria");
+                contaMap.put("responsavel",
+                        c.getResponsavel() != null ? c.getResponsavel().getNomeCompleto() : "Desconhecido");
+                contaMap.put("descricao", c.getDescricao());
+                contaMap.put("data",
+                        c.getDataVencimento() != null ? c.getDataVencimento().toString() : LocalDate.now().toString());
+                contasSimplificadas.add(contaMap);
             }
 
             Map<String, Object> perfilMap = new HashMap<>();
-            perfilMap.put("tipo", responsavelReal.getTipoPerfilFinanceiro() != null ? responsavelReal.getTipoPerfilFinanceiro() : "CONSERVADOR");
-            perfilMap.put("meta_poupanca", responsavelReal.getMetaPoupancaMensal() != null ? responsavelReal.getMetaPoupancaMensal() : new BigDecimal("20.00"));
-            perfilMap.put("teto_essenciais", responsavelReal.getTetoGastosEssenciais() != null ? responsavelReal.getTetoGastosEssenciais() : new BigDecimal("50.00"));
-            perfilMap.put("orcamento_mensal", responsavelReal.getOrcamentoMensal() != null ? responsavelReal.getOrcamentoMensal() : new BigDecimal("3500.00"));
+            perfilMap.put("tipo",
+                    responsavelReal.getTipoPerfilFinanceiro() != null ? responsavelReal.getTipoPerfilFinanceiro()
+                            : "CONSERVADOR");
+            perfilMap.put("meta_poupanca",
+                    responsavelReal.getMetaPoupancaMensal() != null ? responsavelReal.getMetaPoupancaMensal()
+                            : new BigDecimal("20.00"));
+            perfilMap.put("teto_essenciais",
+                    responsavelReal.getTetoGastosEssenciais() != null ? responsavelReal.getTetoGastosEssenciais()
+                            : new BigDecimal("50.00"));
+            perfilMap.put("orcamento_mensal",
+                    responsavelReal.getOrcamentoMensal() != null ? responsavelReal.getOrcamentoMensal()
+                            : new BigDecimal("3500.00"));
 
             Map<String, Object> body = new HashMap<>();
             body.put("contas", contasSimplificadas);
@@ -405,7 +444,8 @@ public class GeminiService {
             headers.setContentType(MediaType.APPLICATION_JSON);
             HttpEntity<Map<String, Object>> request = new HttpEntity<>(body, headers);
 
-            ResponseEntity<Map> response = restTemplate.postForEntity(pythonBaseUrl + "/api/ia/analisar", request, Map.class);
+            ResponseEntity<Map> response = restTemplate.postForEntity(pythonBaseUrl + "/api/ia/analisar", request,
+                    Map.class);
             Map<String, Object> responseBody = response.getBody();
 
             if (responseBody != null && responseBody.containsKey("insight")) {
@@ -440,7 +480,8 @@ public class GeminiService {
             headers.setContentType(MediaType.APPLICATION_JSON);
             HttpEntity<Map<String, Object>> request = new HttpEntity<>(body, headers);
 
-            ResponseEntity<Map> response = restTemplate.postForEntity(pythonBaseUrl + "/api/ia/prever", request, Map.class);
+            ResponseEntity<Map> response = restTemplate.postForEntity(pythonBaseUrl + "/api/ia/prever", request,
+                    Map.class);
             Map<String, Object> responseBody = response.getBody();
 
             if (responseBody != null && responseBody.containsKey("valorCalculado")) {

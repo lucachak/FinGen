@@ -22,7 +22,7 @@ services:
         value: password
 
   # Serviço da IA Python
-  - type: web
+  - type: pservice  # <--- Alterado de web para pservice
     name: fingen-ia
     env: docker
     dockerfilePath: ./Dockerfile.python
