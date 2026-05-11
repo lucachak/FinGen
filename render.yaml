@@ -1,33 +1,24 @@
 services:
-  # Serviço do Backend Java
+  # Serviço Único Híbrido (Java + IA Python)
   - type: web
-    name: fingen-java
+    name: fingen-app
     env: docker
-    dockerfilePath: ./Dockerfile
+    dockerfilePath: ./Dockerfile.combined
     plan: free
     port: 8080
     healthCheckPath: /
     envVars:
-      - key: OPENROUTER_API_KEY
-        sync: false # Você preenche no painel do Render
       - key: GEMINI_TOKEN
         sync: false
+      - key: OPENROUTER_API_KEY
+        sync: false
       - key: PYTHON_API_URL
-        value: http://fingen-ia:8000
+        value: http://localhost:8000
       - key: DB_URL
         value: jdbc:h2:file:./data/fingen;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE;AUTO_RECONNECT=TRUE
       - key: DB_USERNAME
         value: sa
       - key: DB_PASSWORD
         value: password
-
-  # Serviço da IA Python
-  - type: pservice  # <--- Alterado de web para pservice
-    name: fingen-ia
-    env: docker
-    dockerfilePath: ./Dockerfile.python
-    plan: free
-    port: 8000
-    envVars:
-      - key: GEMINI_TOKEN
-        sync: false
+      - key: SPRING_PROFILES_ACTIVE
+        value: prod

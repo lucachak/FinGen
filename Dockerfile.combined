@@ -1,0 +1,43 @@
+# ETAPA 1: Build do Java (Maven)
+FROM maven:3.9.6-eclipse-temurin-21-alpine AS java-build
+WORKDIR /app
+
+# Copia pom e baixa dependências (cache)
+COPY pom.xml .
+RUN mvn dependency:go-offline
+
+# Copia código e compila
+COPY src ./src
+RUN mvn clean package -DskipTests
+
+# ETAPA 2: Imagem Final Híbrida (Python + Java JRE)
+FROM python:3.11-slim
+WORKDIR /app
+
+# Instala o Java 21 JRE no Debian
+RUN apt-get update && \
+    apt-get install -y openjdk-21-jre-headless && \
+    rm -rf /var/lib/apt/lists/*
+
+# Instala dependências do Python
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Copia o JAR compilado da Etapa 1
+COPY --from=java-build /app/target/*.jar app.jar
+
+# Copia o código Python
+COPY main.py .
+
+# Copia e dá permissão ao script de inicialização
+COPY scripts/start.sh ./start.sh
+RUN chmod +x ./start.sh
+
+# Garante que as pastas necessárias existam
+RUN mkdir uploads data
+
+# Expõe a porta principal (Web do Render)
+EXPOSE 8080
+
+# O script start.sh inicia o Python (8000) e o Java (8080)
+CMD ["./start.sh"]
