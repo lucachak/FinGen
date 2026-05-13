@@ -2,7 +2,7 @@
 
 > Plataforma web completa para controle financeiro doméstico e pessoal, com inteligência artificial integrada, gestão de patrimônio e orçamentos automatizados.
 
-[![Live Demo](https://img.shields.io/badge/Live_Demo-FinGen-4CAF50?style=for-the-badge&logo=render)](https://fingen-zcke.onrender.com/)
+[![Live Demo](https://img.shields.io/badge/Live_Demo-FinGen-4CAF50?style=for-the-badge&logo=render)](https://fingen-app.onrender.com)
 [![GitHub Repo](https://img.shields.io/badge/GitHub-lucachak/FinGen-black?style=for-the-badge&logo=github)](https://github.com/lucachak/FinGen)
 [![Java](https://img.shields.io/badge/Java-21-ED8B00?style=for-the-badge&logo=openjdk)](https://openjdk.org/projects/jdk/21/)
 [![Spring Boot](https://img.shields.io/badge/Spring_Boot-3.3-6DB33F?style=for-the-badge&logo=springboot)](https://spring.io/projects/spring-boot)
