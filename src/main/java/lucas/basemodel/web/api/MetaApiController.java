@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
 import java.util.List;
+import java.util.UUID;
 
 /**
  * REST API for Metas (financial goals).
@@ -36,7 +37,7 @@ public class MetaApiController {
      * GET /api/v1/metas/{id}
      */
     @GetMapping("/{id}")
-    public ResponseEntity<MetaResponse> buscarPorId(@PathVariable Long id, Principal principal) {
+    public ResponseEntity<MetaResponse> buscarPorId(@PathVariable UUID id, Principal principal) {
         return ResponseEntity.ok(metaService.buscarPorId(id, principal.getName()));
     }
 
@@ -62,17 +63,14 @@ public class MetaApiController {
      */
     @PutMapping("/{id}")
     public ResponseEntity<MetaResponse> atualizar(
-            @PathVariable Long id,
+            @PathVariable UUID id,
             @Valid @RequestBody MetaRequest request,
             Principal principal) {
         return ResponseEntity.ok(metaService.atualizar(id, request, principal.getName()));
     }
 
-    /**
-     * DELETE /api/v1/metas/{id}
-     */
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> excluir(@PathVariable Long id, Principal principal) {
+    public ResponseEntity<Void> excluir(@PathVariable UUID id, Principal principal) {
         metaService.excluir(id, principal.getName());
         return ResponseEntity.noContent().build();
     }

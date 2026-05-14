@@ -32,7 +32,7 @@ public class SecurityConfig {
         public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
                 http
                                 .csrf(csrf -> csrf
-                                                .ignoringRequestMatchers("/auth/**", "/logout")
+                                                .ignoringRequestMatchers("/auth/**", "/logout", "/api/v1/**")
                                                 .csrfTokenRequestHandler(new CsrfTokenRequestAttributeHandler())
                                                 .csrfTokenRepository(customCsrfTokenRepository()))
                                 .headers(headers -> headers.frameOptions(f -> f.sameOrigin()))
@@ -61,8 +61,15 @@ public class SecurityConfig {
                                         }
                                 }, CsrfFilter.class)
                                 .exceptionHandling(ex -> ex.authenticationEntryPoint(
-                                                (request, response, authException) -> response
-                                                                .sendRedirect("/auth/login")))
+                                                (request, response, authException) -> {
+                                                        if (request.getRequestURI().startsWith("/api/v1/")) {
+                                                                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                                                                response.setContentType("application/json");
+                                                                response.getWriter().write("{\"error\": \"Unauthorized\"}");
+                                                        } else {
+                                                                response.sendRedirect("/auth/login");
+                                                        }
+                                                }))
                                 .logout(logout -> logout
                                                 .logoutUrl("/logout")
                                                 .logoutSuccessUrl("/auth/login?logout")

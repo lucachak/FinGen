@@ -67,9 +67,9 @@ public class InvestimentoService {
         return toResponse(investimentoRepository.save(inv));
     }
 
-    public InvestimentoResponse atualizar(Long id, InvestimentoRequest request, String email) {
+    public InvestimentoResponse atualizar(UUID id, InvestimentoRequest request, String email) {
         User user = findUser(email);
-        Investimento inv = investimentoRepository.findById(UUID.fromString(id.toString()))
+        Investimento inv = investimentoRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Investimento não encontrado"));
         
         if (!inv.getResponsavel().getId().equals(user.getId())) {
@@ -85,9 +85,9 @@ public class InvestimentoService {
         return toResponse(investimentoRepository.save(inv));
     }
 
-    public void excluir(Long id, String email) {
+    public void excluir(UUID id, String email) {
         User user = findUser(email);
-        Investimento inv = investimentoRepository.findById(UUID.fromString(id.toString())).orElseThrow();
+        Investimento inv = investimentoRepository.findById(id).orElseThrow();
         if (inv.getResponsavel().getId().equals(user.getId())) {
             investimentoRepository.delete(inv);
         }

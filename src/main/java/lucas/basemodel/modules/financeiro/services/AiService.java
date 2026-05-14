@@ -11,6 +11,7 @@ import lucas.basemodel.modules.financeiro.repositories.ContaRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -37,11 +38,28 @@ public class AiService {
                 .build();
     }
 
+    @SuppressWarnings("unchecked")
     public List<ContaResponse> processarExtrato(MultipartFile file, String email) {
-        // Use geminiService.processarExtratoIA
         Map<String, Object> result = geminiService.processarExtratoIA(file, email);
-        // Map result to List<ContaResponse> (simplified)
-        return (List<ContaResponse>) result.get("transacoes");
+        if (result == null || "erro".equals(result.get("status"))) {
+            return new ArrayList<>();
+        }
+        List<Conta> contas = (List<Conta>) result.get("loteDeContas");
+        if (contas == null) return new ArrayList<>();
+        return contas.stream()
+                .map(c -> ContaResponse.builder()
+                        .id(c.getId())
+                        .descricao(c.getDescricao())
+                        .valor(c.getValor())
+                        .dataVencimento(c.getDataVencimento())
+                        .tipo(c.getTipo())
+                        .status(c.getStatus())
+                        .escopo(c.getEscopo())
+                        .frequencia(c.getFrequencia())
+                        .prioridade(c.getPrioridade())
+                        .categoriaNome(c.getCategoria() != null ? c.getCategoria().getNome() : null)
+                        .build())
+                .toList();
     }
 
     public List<ContaResponse> confirmarImportacao(ConfirmarImportacaoRequest request, String email) {
