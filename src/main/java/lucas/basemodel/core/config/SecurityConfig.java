@@ -40,8 +40,8 @@ public class SecurityConfig {
                                                 .requestMatchers("/css/**", "/js/**", "/images/**", "/*.glb", 
                                                                 "/favicon.ico", "/favicon.svg", "/favicon-96x96.png", 
                                                                 "/apple-touch-icon.png", "/site.webmanifest", "/sw.js", 
-                                                                "/web-app-manifest-*.png", "/", "/auth/**")
-                                                .permitAll()
+                                                                "/web-app-manifest-*.png", "/", "/auth/**").permitAll()
+                                                .requestMatchers("/api/v1/auth/**").permitAll()
                                                 .requestMatchers("/app/**", "/api/**", "/api/v1/**").authenticated()
                                                 .anyRequest().authenticated())
                                 .sessionManagement(

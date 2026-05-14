@@ -1,0 +1,318 @@
+Launching lib/main.dart on SM S901B in debug mode...
+Running Gradle task 'assembleDebug'...                          
+Warning: The plugin flutter_secure_storage requires Android SDK version 36 or higher.
+For more information about build configuration, see https://docs.flutter.dev/deployment/android#reviewing-the-gradle-build-configuration.
+One or more plugins require a higher Android SDK version.
+Fix this issue by adding the following to /home/lucas/Documents/Code/Prod/FinGen/mobile/android/app/build.gradle:
+android {
+  compileSdkVersion 36
+  ...
+}
+
+lib/features/dashboard/presentation/screens/dashboard_screen.dart:7:8: Error: Error when reading 'lib/features/dashboard/auth/presentation/providers/auth_provider.dart': No such file or directory
+import '../../auth/presentation/providers/auth_provider.dart';
+       ^
+lib/features/dashboard/presentation/screens/dashboard_screen.dart:8:8: Error: Error when reading 'lib/features/dashboard/presentation/data/dashboard_repository.dart': No such file or directory
+import '../data/dashboard_repository.dart';
+       ^
+lib/features/dashboard/presentation/screens/dashboard_screen.dart:9:8: Error: Error when reading 'lib/features/dashboard/presentation/data/models/dashboard_models.dart': No such file or directory
+import '../data/models/dashboard_models.dart';
+       ^
+lib/features/transactions/presentation/screens/transaction_list_screen.dart:5:8: Error: Error when reading 'lib/features/transactions/presentation/data/transaction_repository.dart': No such file or directory
+import '../data/transaction_repository.dart';
+       ^
+lib/features/transactions/presentation/screens/create_transaction_screen.dart:6:8: Error: Error when reading 'lib/features/transactions/presentation/data/transaction_repository.dart': No such file or directory
+import '../data/transaction_repository.dart';
+       ^
+lib/features/transactions/presentation/screens/transaction_list_screen.dart:6:8: Error: Error when reading 'lib/features/transactions/presentation/data/models/transaction_models.dart': No such file or directory
+import '../data/models/transaction_models.dart';
+       ^
+lib/features/transactions/presentation/screens/create_transaction_screen.dart:7:8: Error: Error when reading 'lib/features/transactions/presentation/data/models/transaction_models.dart': No such file or directory
+import '../data/models/transaction_models.dart';
+       ^
+lib/features/ai_assistant/presentation/screens/ai_chat_screen.dart:5:8: Error: Error when reading 'lib/features/ai_assistant/presentation/data/ai_repository.dart': No such file or directory
+import '../data/ai_repository.dart';
+       ^
+lib/features/ai_assistant/presentation/screens/investment_plan_screen.dart:5:8: Error: Error when reading 'lib/features/ai_assistant/presentation/data/ai_repository.dart': No such file or directory
+import '../data/ai_repository.dart';
+       ^
+lib/features/auth/presentation/providers/auth_provider.dart:2:8: Error: Error when reading 'lib/features/shared/api/api_provider.dart': No such file or directory
+import '../../../shared/api/api_provider.dart';
+       ^
+lib/features/dashboard/presentation/screens/dashboard_screen.dart:53:46: Error: Type 'DashboardSummary' not found.
+  Widget _buildContent(BuildContext context, DashboardSummary summary) {
+                                             ^^^^^^^^^^^^^^^^
+lib/features/dashboard/presentation/screens/dashboard_screen.dart:183:24: Error: Type 'KpiModel' not found.
+  Widget _buildKpiCard(KpiModel kpi) {
+                       ^^^^^^^^
+lib/features/transactions/presentation/screens/transaction_list_screen.dart:40:48: Error: Type 'TransactionModel' not found.
+  Widget _buildList(BuildContext context, List<TransactionModel> transactions, WidgetRef ref) {
+                                               ^^^^^^^^^^^^^^^^
+lib/features/transactions/presentation/screens/transaction_list_screen.dart:60:32: Error: Type 'TransactionModel' not found.
+  Widget _buildTransactionCard(TransactionModel tx) {
+                               ^^^^^^^^^^^^^^^^
+lib/features/transactions/presentation/screens/transaction_list_screen.dart:129:25: Error: Type 'TransactionStatus' not found.
+  Color _getStatusColor(TransactionStatus status) {
+                        ^^^^^^^^^^^^^^^^^
+lib/features/transactions/presentation/screens/create_transaction_screen.dart:20:3: Error: Type 'TransactionType' not found.
+  TransactionType _tipo = TransactionType.expense;
+  ^^^^^^^^^^^^^^^
+lib/features/transactions/presentation/screens/create_transaction_screen.dart:21:3: Error: Type 'TransactionScope' not found.
+  TransactionScope _escopo = TransactionScope.personal;
+  ^^^^^^^^^^^^^^^^
+lib/features/transactions/presentation/screens/create_transaction_screen.dart:22:3: Error: Type 'TransactionPriority' not found.
+  TransactionPriority _prioridade = TransactionPriority.medium;
+  ^^^^^^^^^^^^^^^^^^^
+lib/features/transactions/presentation/screens/create_transaction_screen.dart:23:3: Error: Type 'TransactionFrequency' not found.
+  TransactionFrequency _frequencia = TransactionFrequency.oneTime;
+  ^^^^^^^^^^^^^^^^^^^^
+lib/features/ai_assistant/presentation/screens/investment_plan_screen.dart:50:26: Error: Undefined name 'aiRepositoryProvider'.
+  return await ref.watch(aiRepositoryProvider).getInvestmentPlan();
+                         ^^^^^^^^^^^^^^^^^^^^
+lib/features/dashboard/presentation/screens/dashboard_screen.dart:16:36: Error: The getter 'dashboardSummaryProvider' isn't defined for the class 'DashboardScreen'.
+ - 'DashboardScreen' is from 'package:fingen_mobile/features/dashboard/presentation/screens/dashboard_screen.dart' ('lib/features/dashboard/presentation/screens/dashboard_screen.dart').
+Try correcting the name to the name of an existing getter, or defining a getter or field named 'dashboardSummaryProvider'.
+    final summaryAsync = ref.watch(dashboardSummaryProvider);
+                                   ^^^^^^^^^^^^^^^^^^^^^^^^
+lib/features/dashboard/presentation/screens/dashboard_screen.dart:25:24: Error: The getter 'authProvider' isn't defined for the class 'DashboardScreen'.
+ - 'DashboardScreen' is from 'package:fingen_mobile/features/dashboard/presentation/screens/dashboard_screen.dart' ('lib/features/dashboard/presentation/screens/dashboard_screen.dart').
+Try correcting the name to the name of an existing getter, or defining a getter or field named 'authProvider'.
+              ref.read(authProvider.notifier).logout();
+                       ^^^^^^^^^^^^
+lib/features/dashboard/presentation/screens/dashboard_screen.dart:43:38: Error: The getter 'dashboardSummaryProvider' isn't defined for the class 'DashboardScreen'.
+ - 'DashboardScreen' is from 'package:fingen_mobile/features/dashboard/presentation/screens/dashboard_screen.dart' ('lib/features/dashboard/presentation/screens/dashboard_screen.dart').
+Try correcting the name to the name of an existing getter, or defining a getter or field named 'dashboardSummaryProvider'.
+        onRefresh: () => ref.refresh(dashboardSummaryProvider.future),
+                                     ^^^^^^^^^^^^^^^^^^^^^^^^
+lib/features/dashboard/presentation/screens/dashboard_screen.dart:53:46: Error: 'DashboardSummary' isn't a type.
+  Widget _buildContent(BuildContext context, DashboardSummary summary) {
+                                             ^^^^^^^^^^^^^^^^
+lib/features/dashboard/presentation/screens/dashboard_screen.dart:183:24: Error: 'KpiModel' isn't a type.
+  Widget _buildKpiCard(KpiModel kpi) {
+                       ^^^^^^^^
+lib/features/transactions/presentation/screens/transaction_list_screen.dart:13:41: Error: The method 'transactionsListProvider' isn't defined for the class 'TransactionListScreen'.
+ - 'TransactionListScreen' is from 'package:fingen_mobile/features/transactions/presentation/screens/transaction_list_screen.dart' ('lib/features/transactions/presentation/screens/transaction_list_screen.dart').
+Try correcting the name to the name of an existing method, or defining a method named 'transactionsListProvider'.
+    final transactionsAsync = ref.watch(transactionsListProvider());
+                                        ^^^^^^^^^^^^^^^^^^^^^^^^
+lib/features/transactions/presentation/screens/transaction_list_screen.dart:33:34: Error: The method 'push' isn't defined for the class 'BuildContext'.
+ - 'BuildContext' is from 'package:flutter/src/widgets/framework.dart' ('../../../../../flutter/packages/flutter/lib/src/widgets/framework.dart').
+Try correcting the name to the name of an existing method, or defining a method named 'push'.
+        onPressed: () => context.push('/create-transaction'),
+                                 ^^^^
+lib/features/transactions/presentation/screens/transaction_list_screen.dart:40:48: Error: 'TransactionModel' isn't a type.
+  Widget _buildList(BuildContext context, List<TransactionModel> transactions, WidgetRef ref) {
+                                               ^^^^^^^^^^^^^^^^
+lib/features/transactions/presentation/screens/transaction_list_screen.dart:60:32: Error: 'TransactionModel' isn't a type.
+  Widget _buildTransactionCard(TransactionModel tx) {
+                               ^^^^^^^^^^^^^^^^
+lib/features/transactions/presentation/screens/transaction_list_screen.dart:61:33: Error: The getter 'TransactionType' isn't defined for the class 'TransactionListScreen'.
+ - 'TransactionListScreen' is from 'package:fingen_mobile/features/transactions/presentation/screens/transaction_list_screen.dart' ('lib/features/transactions/presentation/screens/transaction_list_screen.dart').
+Try correcting the name to the name of an existing getter, or defining a getter or field named 'TransactionType'.
+    final isIncome = tx.tipo == TransactionType.income;
+                                ^^^^^^^^^^^^^^^
+lib/features/transactions/presentation/screens/transaction_list_screen.dart:129:25: Error: 'TransactionStatus' isn't a type.
+  Color _getStatusColor(TransactionStatus status) {
+                        ^^^^^^^^^^^^^^^^^
+lib/features/transactions/presentation/screens/transaction_list_screen.dart:131:12: Error: Undefined name 'TransactionStatus'.
+      case TransactionStatus.paid:
+           ^^^^^^^^^^^^^^^^^
+lib/features/transactions/presentation/screens/transaction_list_screen.dart:133:12: Error: Undefined name 'TransactionStatus'.
+      case TransactionStatus.pending:
+           ^^^^^^^^^^^^^^^^^
+lib/features/transactions/presentation/screens/transaction_list_screen.dart:135:12: Error: Undefined name 'TransactionStatus'.
+      case TransactionStatus.overdue:
+           ^^^^^^^^^^^^^^^^^
+lib/features/transactions/presentation/screens/transaction_list_screen.dart:129:9: Error: A non-null value must be returned since the return type 'Color' doesn't allow null.
+ - 'Color' is from 'dart:ui'.
+  Color _getStatusColor(TransactionStatus status) {
+        ^
+lib/features/transactions/presentation/screens/create_transaction_screen.dart:20:3: Error: 'TransactionType' isn't a type.
+  TransactionType _tipo = TransactionType.expense;
+  ^^^^^^^^^^^^^^^
+lib/features/transactions/presentation/screens/create_transaction_screen.dart:20:27: Error: Undefined name 'TransactionType'.
+  TransactionType _tipo = TransactionType.expense;
+                          ^^^^^^^^^^^^^^^
+lib/features/transactions/presentation/screens/create_transaction_screen.dart:21:3: Error: 'TransactionScope' isn't a type.
+  TransactionScope _escopo = TransactionScope.personal;
+  ^^^^^^^^^^^^^^^^
+lib/features/transactions/presentation/screens/create_transaction_screen.dart:21:30: Error: Undefined name 'TransactionScope'.
+  TransactionScope _escopo = TransactionScope.personal;
+                             ^^^^^^^^^^^^^^^^
+lib/features/transactions/presentation/screens/create_transaction_screen.dart:22:3: Error: 'TransactionPriority' isn't a type.
+  TransactionPriority _prioridade = TransactionPriority.medium;
+  ^^^^^^^^^^^^^^^^^^^
+lib/features/transactions/presentation/screens/create_transaction_screen.dart:22:37: Error: Undefined name 'TransactionPriority'.
+  TransactionPriority _prioridade = TransactionPriority.medium;
+                                    ^^^^^^^^^^^^^^^^^^^
+lib/features/transactions/presentation/screens/create_transaction_screen.dart:23:3: Error: 'TransactionFrequency' isn't a type.
+  TransactionFrequency _frequencia = TransactionFrequency.oneTime;
+  ^^^^^^^^^^^^^^^^^^^^
+lib/features/transactions/presentation/screens/create_transaction_screen.dart:23:38: Error: Undefined name 'TransactionFrequency'.
+  TransactionFrequency _frequencia = TransactionFrequency.oneTime;
+                                     ^^^^^^^^^^^^^^^^^^^^
+lib/features/transactions/presentation/screens/create_transaction_screen.dart:36:16: Error: The method 'TransactionModel' isn't defined for the class '_CreateTransactionScreenState'.
+ - '_CreateTransactionScreenState' is from 'package:fingen_mobile/features/transactions/presentation/screens/create_transaction_screen.dart' ('lib/features/transactions/presentation/screens/create_transaction_screen.dart').
+Try correcting the name to the name of an existing method, or defining a method named 'TransactionModel'.
+    final tx = TransactionModel(
+               ^^^^^^^^^^^^^^^^
+lib/features/transactions/presentation/screens/create_transaction_screen.dart:49:22: Error: The getter 'transactionRepositoryProvider' isn't defined for the class '_CreateTransactionScreenState'.
+ - '_CreateTransactionScreenState' is from 'package:fingen_mobile/features/transactions/presentation/screens/create_transaction_screen.dart' ('lib/features/transactions/presentation/screens/create_transaction_screen.dart').
+Try correcting the name to the name of an existing getter, or defining a getter or field named 'transactionRepositoryProvider'.
+      await ref.read(transactionRepositoryProvider).createTransaction(tx);
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+lib/features/transactions/presentation/screens/create_transaction_screen.dart:80:28: Error: 'TransactionType' isn't a type.
+            _buildDropdown<TransactionType>(
+                           ^^^^^^^^^^^^^^^
+lib/features/transactions/presentation/screens/create_transaction_screen.dart:87:28: Error: 'TransactionScope' isn't a type.
+            _buildDropdown<TransactionScope>(
+                           ^^^^^^^^^^^^^^^^
+lib/features/transactions/presentation/screens/create_transaction_screen.dart:83:15: Error: The getter 'TransactionType' isn't defined for the class '_CreateTransactionScreenState'.
+ - '_CreateTransactionScreenState' is from 'package:fingen_mobile/features/transactions/presentation/screens/create_transaction_screen.dart' ('lib/features/transactions/presentation/screens/create_transaction_screen.dart').
+Try correcting the name to the name of an existing getter, or defining a getter or field named 'TransactionType'.
+              TransactionType.values,
+              ^^^^^^^^^^^^^^^
+lib/features/transactions/presentation/screens/create_transaction_screen.dart:90:15: Error: The getter 'TransactionScope' isn't defined for the class '_CreateTransactionScreenState'.
+ - '_CreateTransactionScreenState' is from 'package:fingen_mobile/features/transactions/presentation/screens/create_transaction_screen.dart' ('lib/features/transactions/presentation/screens/create_transaction_screen.dart').
+Try correcting the name to the name of an existing getter, or defining a getter or field named 'TransactionScope'.
+              TransactionScope.values,
+              ^^^^^^^^^^^^^^^^
+lib/features/ai_assistant/presentation/screens/ai_chat_screen.dart:36:39: Error: The getter 'aiRepositoryProvider' isn't defined for the class '_AiChatScreenState'.
+ - '_AiChatScreenState' is from 'package:fingen_mobile/features/ai_assistant/presentation/screens/ai_chat_screen.dart' ('lib/features/ai_assistant/presentation/screens/ai_chat_screen.dart').
+Try correcting the name to the name of an existing getter, or defining a getter or field named 'aiRepositoryProvider'.
+      final response = await ref.read(aiRepositoryProvider).getChatResponse(text);
+                                      ^^^^^^^^^^^^^^^^^^^^
+lib/features/auth/presentation/providers/auth_provider.dart:27:34: Error: The getter 'authRepositoryProvider' isn't defined for the class 'Auth'.
+ - 'Auth' is from 'package:fingen_mobile/features/auth/presentation/providers/auth_provider.dart' ('lib/features/auth/presentation/providers/auth_provider.dart').
+Try correcting the name to the name of an existing getter, or defining a getter or field named 'authRepositoryProvider'.
+    final repository = ref.watch(authRepositoryProvider);
+                                 ^^^^^^^^^^^^^^^^^^^^^^
+lib/features/auth/presentation/providers/auth_provider.dart:45:35: Error: The getter 'authRepositoryProvider' isn't defined for the class 'Auth'.
+ - 'Auth' is from 'package:fingen_mobile/features/auth/presentation/providers/auth_provider.dart' ('lib/features/auth/presentation/providers/auth_provider.dart').
+Try correcting the name to the name of an existing getter, or defining a getter or field named 'authRepositoryProvider'.
+      final repository = ref.read(authRepositoryProvider);
+                                  ^^^^^^^^^^^^^^^^^^^^^^
+lib/features/auth/presentation/providers/auth_provider.dart:57:33: Error: The getter 'authRepositoryProvider' isn't defined for the class 'Auth'.
+ - 'Auth' is from 'package:fingen_mobile/features/auth/presentation/providers/auth_provider.dart' ('lib/features/auth/presentation/providers/auth_provider.dart').
+Try correcting the name to the name of an existing getter, or defining a getter or field named 'authRepositoryProvider'.
+    final repository = ref.read(authRepositoryProvider);
+                                ^^^^^^^^^^^^^^^^^^^^^^
+../../../../../.pub-cache/hosted/pub.dev/fl_chart-0.71.0/lib/src/extensions/color_extension.dart:9:20: Error: The getter 'a' isn't defined for the class 'Color'.
+ - 'Color' is from 'dart:ui'.
+Try correcting the name to the name of an existing getter, or defining a getter or field named 'a'.
+      _floatToInt8(a),
+                   ^
+../../../../../.pub-cache/hosted/pub.dev/fl_chart-0.71.0/lib/src/extensions/color_extension.dart:10:21: Error: The getter 'r' isn't defined for the class 'Color'.
+ - 'Color' is from 'dart:ui'.
+Try correcting the name to the name of an existing getter, or defining a getter or field named 'r'.
+      (_floatToInt8(r) * value).round(),
+                    ^
+../../../../../.pub-cache/hosted/pub.dev/fl_chart-0.71.0/lib/src/extensions/color_extension.dart:11:21: Error: The getter 'g' isn't defined for the class 'Color'.
+ - 'Color' is from 'dart:ui'.
+Try correcting the name to the name of an existing getter, or defining a getter or field named 'g'.
+      (_floatToInt8(g) * value).round(),
+                    ^
+../../../../../.pub-cache/hosted/pub.dev/fl_chart-0.71.0/lib/src/extensions/color_extension.dart:12:21: Error: The getter 'b' isn't defined for the class 'Color'.
+ - 'Color' is from 'dart:ui'.
+Try correcting the name to the name of an existing getter, or defining a getter or field named 'b'.
+      (_floatToInt8(b) * value).round(),
+                    ^
+../../../../../.pub-cache/hosted/pub.dev/fl_chart-0.71.0/lib/src/extensions/border_extension.dart:12:20: Error: The getter 'a' isn't defined for the class 'Color'.
+ - 'Color' is from 'dart:ui'.
+Try correcting the name to the name of an existing getter, or defining a getter or field named 'a'.
+    if (left.color.a == 0.0 &&
+                   ^
+../../../../../.pub-cache/hosted/pub.dev/fl_chart-0.71.0/lib/src/extensions/border_extension.dart:13:19: Error: The getter 'a' isn't defined for the class 'Color'.
+ - 'Color' is from 'dart:ui'.
+Try correcting the name to the name of an existing getter, or defining a getter or field named 'a'.
+        top.color.a == 0.0 &&
+                  ^
+../../../../../.pub-cache/hosted/pub.dev/fl_chart-0.71.0/lib/src/extensions/border_extension.dart:14:21: Error: The getter 'a' isn't defined for the class 'Color'.
+ - 'Color' is from 'dart:ui'.
+Try correcting the name to the name of an existing getter, or defining a getter or field named 'a'.
+        right.color.a == 0.0 &&
+                    ^
+../../../../../.pub-cache/hosted/pub.dev/fl_chart-0.71.0/lib/src/extensions/border_extension.dart:15:22: Error: The getter 'a' isn't defined for the class 'Color'.
+ - 'Color' is from 'dart:ui'.
+Try correcting the name to the name of an existing getter, or defining a getter or field named 'a'.
+        bottom.color.a == 0.0) {
+                     ^
+../../../../../.pub-cache/hosted/pub.dev/fl_chart-0.71.0/lib/src/chart/base/axis_chart/axis_chart_painter.dart:159:30: Error: The getter 'a' isn't defined for the class 'Color'.
+ - 'Color' is from 'dart:ui'.
+Try correcting the name to the name of an existing getter, or defining a getter or field named 'a'.
+    if (data.backgroundColor.a == 0.0) {
+                             ^
+../../../../../.pub-cache/hosted/pub.dev/fl_chart-0.71.0/lib/src/extensions/paint_extension.dart:8:21: Error: The method 'withValues' isn't defined for the class 'Color'.
+ - 'Color' is from 'dart:ui'.
+Try correcting the name to the name of an existing method, or defining a method named 'withValues'.
+      color = color.withValues(alpha: 0);
+                    ^^^^^^^^^^
+../../../../../.pub-cache/hosted/pub.dev/fl_chart-0.71.0/lib/src/chart/line_chart/line_chart_painter.dart:1001:47: Error: The getter 'a' isn't defined for the class 'Color'.
+ - 'Color' is from 'dart:ui'.
+Try correcting the name to the name of an existing getter, or defining a getter or field named 'a'.
+    if (!barData.show || barData.shadow.color.a == 0.0) {
+                                              ^
+../../../../../.pub-cache/hosted/pub.dev/fl_chart-0.71.0/lib/src/chart/bar_chart/bar_chart_painter.dart:339:56: Error: The getter 'a' isn't defined for the class 'Color'.
+ - 'Color' is from 'dart:ui'.
+Try correcting the name to the name of an existing getter, or defining a getter or field named 'a'.
+          if (borderSide.width > 0 && borderSide.color.a > 0) {
+                                                       ^
+../../../../../.pub-cache/hosted/pub.dev/fl_chart-0.71.0/lib/src/chart/bar_chart/bar_chart_painter.dart:636:71: Error: The getter 'a' isn't defined for the class 'Color'.
+ - 'Color' is from 'dart:ui'.
+Try correcting the name to the name of an existing getter, or defining a getter or field named 'a'.
+    if (stackItem.borderSide.width == 0 || stackItem.borderSide.color.a == 0) {
+                                                                      ^
+../../../../../.pub-cache/hosted/pub.dev/fl_chart-0.71.0/lib/src/chart/base/axis_chart/axis_chart_data.dart:1469:43: Error: The getter 'a' isn't defined for the class 'Color'.
+ - 'Color' is from 'dart:ui'.
+Try correcting the name to the name of an existing getter, or defining a getter or field named 'a'.
+    if (strokeWidth != 0.0 && strokeColor.a != 0.0) {
+                                          ^
+../../../../../.pub-cache/hosted/pub.dev/fl_chart-0.71.0/lib/src/chart/base/axis_chart/axis_chart_data.dart:1566:43: Error: The getter 'a' isn't defined for the class 'Color'.
+ - 'Color' is from 'dart:ui'.
+Try correcting the name to the name of an existing getter, or defining a getter or field named 'a'.
+    if (strokeWidth != 0.0 && strokeColor.a != 0.0) {
+                                          ^
+../../../../../.pub-cache/hosted/pub.dev/fl_chart-0.71.0/lib/src/chart/radar_chart/radar_chart_data.dart:301:46: Error: The method 'withValues' isn't defined for the class 'MaterialColor'.
+ - 'MaterialColor' is from 'package:flutter/src/material/colors.dart' ('../../../../../flutter/packages/flutter/lib/src/material/colors.dart').
+Try correcting the name to the name of an existing method, or defining a method named 'withValues'.
+        fillColor = fillColor ?? Colors.cyan.withValues(alpha: 0.2),
+                                             ^^^^^^^^^^
+../../../../../.pub-cache/hosted/pub.dev/fl_chart-0.71.0/lib/src/chart/pie_chart/pie_chart_painter.dart:146:38: Error: The getter 'a' isn't defined for the class 'Color'.
+ - 'Color' is from 'dart:ui'.
+Try correcting the name to the name of an existing getter, or defining a getter or field named 'a'.
+            section.borderSide.color.a != 0.0) {
+                                     ^
+../../../../../.pub-cache/hosted/pub.dev/fl_chart-0.71.0/lib/src/chart/pie_chart/pie_chart_painter.dart:332:69: Error: The getter 'a' isn't defined for the class 'Color'.
+ - 'Color' is from 'dart:ui'.
+Try correcting the name to the name of an existing getter, or defining a getter or field named 'a'.
+    if (section.borderSide.width != 0.0 && section.borderSide.color.a != 0.0) {
+                                                                    ^
+../../../../../.pub-cache/hosted/pub.dev/fl_chart-0.71.0/lib/src/chart/line_chart/line_chart_data.dart:549:35: Error: The method 'withValues' isn't defined for the class 'MaterialColor'.
+ - 'MaterialColor' is from 'package:flutter/src/material/colors.dart' ('../../../../../flutter/packages/flutter/lib/src/material/colors.dart').
+Try correcting the name to the name of an existing method, or defining a method named 'withValues'.
+                ? Colors.blueGrey.withValues(alpha: 0.5)
+                                  ^^^^^^^^^^
+../../../../../.pub-cache/hosted/pub.dev/fl_chart-0.71.0/lib/src/chart/line_chart/line_chart_data.dart:605:35: Error: The method 'withValues' isn't defined for the class 'MaterialColor'.
+ - 'MaterialColor' is from 'package:flutter/src/material/colors.dart' ('../../../../../flutter/packages/flutter/lib/src/material/colors.dart').
+Try correcting the name to the name of an existing method, or defining a method named 'withValues'.
+                ? Colors.blueGrey.withValues(alpha: 0.5)
+                                  ^^^^^^^^^^
+Target kernel_snapshot failed: Exception
+
+
+FAILURE: Build failed with an exception.
+
+* What went wrong:
+Execution failed for task ':app:compileFlutterBuildDebug'.
+> Process 'command '/home/lucas/flutter/bin/flutter'' finished with non-zero exit value 1
+
+* Try:
+> Run with --stacktrace option to get the stack trace.
+> Run with --info or --debug option to get more log output.
+> Run with --scan to get full insights.
+
+* Get more help at https://help.gradle.org
+
+BUILD FAILED in 3s
+Running Gradle task 'assembleDebug'...                              3.6s
+Error: Gradle task assembleDebug failed with exit code 1

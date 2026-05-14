@@ -43,8 +43,10 @@ public class AuthService {
         String token = jwtService.generateToken(userDetails);
         return AuthResponse.builder()
                 .token(token)
+                .userId(user.getId().toString())
                 .email(user.getEmail())
                 .username(user.getUsername())
+                .setupCompleted(user.isSetupCompleted())
                 .build();
     }
 
@@ -60,17 +62,21 @@ public class AuthService {
         
         return AuthResponse.builder()
                 .token(token)
+                .userId(user.getId().toString())
                 .email(user.getEmail())
                 .username(user.getUsername())
+                .setupCompleted(user.isSetupCompleted())
                 .build();
     }
 
     public AuthResponse getCurrentUserInfo(String email) {
         User user = usuarioRepository.findByEmail(email).orElseThrow();
         return AuthResponse.builder()
-                .token(null) // Token not needed for "me" endpoint
+                .token("") // Empty string instead of null for Flutter null-safety
+                .userId(user.getId().toString())
                 .email(user.getEmail())
                 .username(user.getUsername())
+                .setupCompleted(user.isSetupCompleted())
                 .build();
     }
 }

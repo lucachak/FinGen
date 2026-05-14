@@ -33,12 +33,12 @@ public class ContaApiController {
      * Returns paginated list of transactions.
      */
     @GetMapping
-    public ResponseEntity<Page<ContaResponse>> listar(
+    public ResponseEntity<List<ContaResponse>> listar(
             @RequestParam(required = false) String status,
             @RequestParam(required = false) String escopo,
-            @PageableDefault(size = 20) Pageable pageable,
+            @PageableDefault(size = 100) Pageable pageable, // Aumentado para pegar mais sem paginação no app
             Principal principal) {
-        return ResponseEntity.ok(contaService.listar(principal.getName(), status, escopo, pageable));
+        return ResponseEntity.ok(contaService.listar(principal.getName(), status, escopo, pageable).getContent());
     }
 
     /**

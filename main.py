@@ -18,7 +18,7 @@ from pypdf import PdfReader
 from sklearn.ensemble import IsolationForest
 from sklearn.linear_model import LinearRegression
 from pydantic import BaseModel, Field
-from enum import Enum
+from enum import Enum 
 
 '''
 
@@ -357,7 +357,7 @@ async def categorizar_em_lote_via_ia(descricoes: list[str]) -> dict[str, str]:
 
     t0 = time.perf_counter()
     resposta = await client.aio.models.generate_content(
-        model="gemini-2.5-flash", 
+        model="gemini-2.0-exp", 
         contents=prompt,
         config=types.GenerateContentConfig(response_mime_type="application/json")
     )
