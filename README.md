@@ -190,8 +190,8 @@ FinGen
 │   └── Gemini API integration (extrato processing)
 │
 └── Database
-    ├── H2 (produção Render - file-based)
-    └── PostgreSQL (desenvolvimento local via Docker)
+    ├── Supabase (Produção/Cloud - PostgreSQL)
+    └── PostgreSQL (Desenvolvimento local via Docker)
 ```
 
 ### Estrutura de Pacotes Java
@@ -249,7 +249,7 @@ lucas.basemodel/
 | **Framework** | Spring Boot | 3.3.0 |
 | **Persistência** | Spring Data JPA + Hibernate | — |
 | **Banco (Dev)** | PostgreSQL | 15 |
-| **Banco (Prod)** | H2 Database (file-based) | — |
+| **Banco (Prod)** | Supabase (PostgreSQL) | — |
 | **Templates** | Thymeleaf + Extras Spring Security 6 | — |
 | **Reatividade** | HTMX (htmx-spring-boot-thymeleaf) | 3.6.0 |
 | **Segurança** | Spring Security + JWT (JJWT) | 0.11.5 |
@@ -279,13 +279,10 @@ cd FinGen
 Crie um arquivo `.env` na raiz do projeto:
 
 ```env
-# Banco de Dados (Docker Compose)
-POSTGRES_USER=fingen
-POSTGRES_PASSWORD=senha_segura
-POSTGRES_DB=fingen_db
-DB_USERNAME=fingen
-DB_PASSWORD=senha_segura
-DB_NAME=fingen_db
+# Banco de Dados (Supabase - IPv4 Pooler)
+SUPABASE_DB_URL=jdbc:postgresql://[pooler-host]:6543/postgres?prepareThreshold=0&ssl=true&sslmode=require
+SUPABASE_DB_USER=postgres.[project-id]
+SUPABASE_DB_PASS=sua_senha_do_banco
 
 # Integração IA
 GEMINI_TOKEN=seu_token_gemini
@@ -333,12 +330,12 @@ O projeto usa o arquivo `render.yaml` para deploy automático no [Render.com](ht
 |----------|-----------|
 | `OPENROUTER_API_KEY` | Chave da API OpenRouter para o chat IA |
 | `GEMINI_TOKEN` | Token da API Google Gemini |
-| `DB_URL` | URL do banco H2 (configurada por padrão no render.yaml) |
-| `DB_USERNAME` | Usuário do banco (`sa`) |
-| `DB_PASSWORD` | Senha do banco |
+| `DB_URL` | URL do banco Supabase (JDBC) |
+| `DB_USERNAME` | Usuário do pooler Supabase |
+| `DB_PASSWORD` | Senha do banco Supabase |
 | `PYTHON_API_URL` | URL interna do serviço Python IA |
 
-> 💡 O banco padrão em produção é H2 file-based (`./data/fingen`), persistido no filesystem do contêiner. Para maior durabilidade em produção, considere migrar para PostgreSQL via Render Managed Database.
+> 💡 O banco de dados em produção foi migrado de H2 para **Supabase (PostgreSQL)**, garantindo persistência real e escalabilidade na nuvem.
 
 ---
 
