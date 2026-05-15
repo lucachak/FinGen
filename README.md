@@ -1,6 +1,6 @@
-# 💸 FinGen — Gestão Financeira Inteligente
+# 💸 FinGen — Intelligent Financial Management
 
-> Plataforma web completa para controle financeiro doméstico e pessoal, com inteligência artificial integrada, gestão de patrimônio e orçamentos automatizados.
+> A comprehensive web platform for domestic and personal financial control, featuring integrated AI, wealth management, and automated budgeting.
 
 [![Live Demo](https://img.shields.io/badge/Live_Demo-FinGen-4CAF50?style=for-the-badge&logo=render)](https://fingen-app.onrender.com)
 [![GitHub Repo](https://img.shields.io/badge/GitHub-lucachak/FinGen-black?style=for-the-badge&logo=github)](https://github.com/lucachak/FinGen)
@@ -10,191 +10,191 @@
 
 ---
 
-## 📖 Sobre o Projeto
+## 📖 About the Project
 
-O **FinGen** é uma aplicação web full-stack desenvolvida para simplificar e centralizar a gestão financeira familiar e pessoal. Combina um backend robusto em Spring Boot com um frontend reativo via HTMX e Thymeleaf, oferecendo uma experiência fluida sem a complexidade de um SPA separado.
+**FinGen** is a full-stack web application developed to simplify and centralize family and personal financial management. It combines a robust Spring Boot backend with a reactive frontend via HTMX and Thymeleaf, offering a fluid experience without the complexity of a separate SPA.
 
-A plataforma vai além do simples controle de despesas: integra **IA generativa** (Google Gemini + OpenRouter) para análise de extratos bancários, sugestão de metas financeiras e consultoria personalizada, além de um módulo completo de **gestão de patrimônio** com rastreamento de ativos (imóveis, ações, veículos, renda passiva).
+The platform goes beyond simple expense tracking: it integrates **generative AI** (Google Gemini + OpenRouter) for bank statement analysis, budget goal suggestions, and personalized financial coaching, plus a complete **wealth management** module for tracking assets (real estate, stocks, vehicles, passive income).
 
 ---
 
-## ✨ Funcionalidades Principais
+## ✨ Key Features
 
-### 💳 Gestão Financeira (Módulo Core)
-- **Contas a Pagar/Receber** — Registro completo de despesas e receitas com categorias, prioridades e comprovantes em anexo
-- **Escopos de Transação** — Separação por escopo: `CASA`, `PESSOAL` e `NEGÓCIO`
-- **Pagamento Rápido** — Marcar conta como paga com um clique, sem abrir o formulário
-- **Transações Recorrentes** — Automação de gastos mensais/semanais/anuais por grupo de recorrência
-- **Histórico de Transações** — Listagem completa com filtros de status (atrasada, a vencer, paga)
+### 💳 Financial Management (Core Module)
+- **Accounts Payable/Receivable** — Complete tracking of income and expenses with categories, priorities, and attachments.
+- **Transaction Scopes** — Separate tracking by scope: `HOUSE`, `PERSONAL`, and `BUSINESS`.
+- **Quick Pay** — Mark an account as paid with one click, without opening a form.
+- **Recurring Transactions** — Automation for monthly/weekly/annual expenses via recurrence groups.
+- **Transaction History** — Full listing with status filters (overdue, upcoming, paid).
 
-### 📊 Dashboard Centralizado
-- **Cards de KPIs mensais** — Gastos Casa, Pessoal e Negócio com valor pendente em destaque
-- **Free Cash Flow** — Cálculo em tempo real: Receitas − (Despesas realizadas + Pendentes)
-- **Gráfico Doughnut** — Distribuição de gastos da casa por categoria no mês atual
-- **Histórico de Patrimônio** — Gráfico de linha com evolução do patrimônio líquido (até 12 meses)
-- **Alertas de Orçamento** — Notificações automáticas quando 80%+ do limite de uma categoria é atingido
-- **Metas em Andamento** — Progresso visual das metas financeiras ativas
-- **Próximas Contas** — Lista das próximas despesas pendentes
-- **Transações Recentes** — Últimas 5 transações pagas
-- **Sugestões de IA** — Insights gerados automaticamente com base no snapshot patrimonial
+### 📊 Centralized Dashboard
+- **Monthly KPI Cards** — Home, Personal, and Business spending with highlighted pending amounts.
+- **Free Cash Flow** — Real-time calculation: Revenue − (Actual Expenses + Pending).
+- **Doughnut Chart** — Monthly household spending distribution by category.
+- **Wealth History** — Line chart showing net worth evolution (up to 12 months).
+- **Budget Alerts** — Automatic notifications when 80%+ of a category limit is reached.
+- **Active Goals** — Visual progress of ongoing financial goals.
+- **Upcoming Bills** — List of the next pending expenses.
+- **Recent Transactions** — Last 5 paid transactions.
+- **AI Suggestions** — Automatically generated insights based on your wealth snapshot.
 
-### 🤖 Inteligência Artificial (Dupla Stack)
-| Serviço | Função |
+### 🤖 Artificial Intelligence (Dual Stack)
+| Service | Function |
 |---------|--------|
-| **Google Gemini** | Processamento de extratos bancários (PDF/imagem), análise de anomalias de gastos, plano de investimentos personalizado |
-| **OpenRouter** | Chat financeiro conversacional, sugestão de metas baseada no perfil do usuário |
+| **Google Gemini** | Bank statement processing (PDF/Image), expense anomaly analysis, personalized investment planning. |
+| **OpenRouter** | Conversational financial chat, goal suggestions based on user profile. |
 
-**Fluxo de Importação de Extrato:**
-1. Upload de PDF/imagem do extrato bancário
-2. Gemini extrai e classifica automaticamente as transações
-3. Usuário revisa, edita e confirma as transações em staging
-4. Transações confirmadas são salvas no banco de dados
+**Statement Import Workflow:**
+1. Upload bank statement PDF/Image.
+2. Gemini automatically extracts and classifies transactions.
+3. User reviews, edits, and confirms transactions in staging.
+4. Confirmed transactions are saved to the database.
 
-### 🏦 Gestão de Patrimônio (Wealth Module)
-- **Tipos de Ativos Suportados:**
-  - `BankAccountAsset` — Contas bancárias e caixas
-  - `StockAsset` — Ações e fundos de investimento (com sync de cotações de mercado)
-  - `RealEstateAsset` — Imóveis
-  - `VehicleAsset` — Veículos
-  - `IncomeAsset` — Rendas passivas mensais
-- **Wealth Snapshot** — Foto instantânea do patrimônio total com breakdown por tipo de ativo
-- **Histórico Patrimonial** — Evolução do patrimônio líquido ao longo do tempo
-- **Sugestões Automáticas de IA** — Geradas a cada snapshot com base na composição de ativos
+### 🏦 Wealth Management (Wealth Module)
+- **Supported Asset Types:**
+  - `BankAccountAsset` — Bank accounts and cash.
+  - `StockAsset` — Stocks and investment funds (with market price sync).
+  - `RealEstateAsset` — Real estate.
+  - `VehicleAsset` — Vehicles.
+  - `IncomeAsset` — Monthly passive income.
+- **Wealth Snapshot** — Instant total net worth view with breakdown by asset type.
+- **Wealth Evolution** — Net worth growth tracking over time.
+- **Automated AI Suggestions** — Generated for every snapshot based on asset composition.
 
-### 🎯 Metas Financeiras
-- Criação manual de metas com natureza, valor-alvo, prazo e progresso
-- **Naturezas de Meta:** `VIAGEM`, `CARRO`, `CASA`, `APOSENTADORIA`, `RESERVA_EMERGENCIA`, `EDUCACAO`, `OUTRO`
-- Cálculo automático de aporte mensal necessário para atingir a meta no prazo
-- **Sugestão de Metas via IA** — OpenRouter sugere metas baseado no perfil financeiro do usuário
-- **Criação de Meta pela IA** — Um clique converte a sugestão em meta salva
+### 🎯 Financial Goals
+- Manual goal creation with type, target value, deadline, and progress tracking.
+- **Goal Types:** `TRAVEL`, `CAR`, `HOUSE`, `RETIREMENT`, `EMERGENCY_FUND`, `EDUCATION`, `OTHER`.
+- Automatic calculation of required monthly savings to reach the goal on time.
+- **AI Goal Suggestions** — OpenRouter suggests goals based on the user's financial profile.
+- **One-Click AI Goal Creation** — Convert suggestions into saved goals instantly.
 
-### 📈 Investimentos
-- Rastreamento de carteira de investimentos com valor aportado e valor atual
-- **Tipos de Ativo:** Tesouro Direto, CDB, LCI/LCA, Ações, FIIs, Fundos, Cripto, Poupança, Outros
-- Cálculo de ROI total da carteira
-- **Sync de Cotações** — Atualização automática de preços de mercado via `MercadoService`
+### 📈 Investments
+- Portfolio tracking with invested vs. current value.
+- **Asset Types:** Treasury, CD, Stocks, REITs, Funds, Crypto, Savings, Others.
+- Total portfolio ROI calculation.
+- **Price Sync** — Automatic market price updates via `MercadoService`.
 
-### 📋 Orçamentos por Categoria
-- Definição de limite mensal de gasto por categoria
-- Monitoramento em tempo real do consumo vs. limite (%)
-- **Status de Risco:** `NORMAL` (< 80%), `ALERTA` (80–99%), `CRÍTICO` (≥ 100%)
-- **Geração Automática** — Cria orçamentos baseados na média dos últimos 3 meses de gastos (+10% de margem)
+### 📋 Category Budgets
+- Monthly spending limit definition per category.
+- Real-time monitoring of consumption vs. limit (%).
+- **Risk Status:** `NORMAL` (< 80%), `WARNING` (80–99%), `CRITICAL` (≥ 100%).
+- **Auto-Generation** — Create budgets based on the average spending of the last 3 months (+10% margin).
 
-### 🏠 Gestão de Moradores
-- Suporte a múltiplos usuários no mesmo lar
-- Rateio de despesas entre moradores
-- Upload de foto de perfil
-- Controle de ativação/desativação (soft delete para preservar histórico)
+### 🏠 Member Management
+- Support for multiple users within the same household.
+- Expense splitting among residents.
+- Profile picture uploads.
+- Activation/Deactivation control (soft delete to preserve history).
 
-### 📝 Categorias
-- CRUD completo de categorias de transação
-- Naturezas de categoria para organização contábil
+### 📝 Categories
+- Full CRUD for transaction categories.
+- Category natures for accounting organization.
 
-### 📊 Relatórios
-- Módulo de relatórios financeiros (`/app/financeiro/relatorios`)
+### 📊 Reports
+- Financial reporting module (`/app/financeiro/relatorios`).
 
 ### 🚀 Onboarding
-- Fluxo guiado de configuração inicial do perfil financeiro
-- Coleta de: perfil financeiro, estratégia de orçamento, meta de poupança, teto de gastos essenciais
-- Setup de distribuição financeira com suporte a múltiplas estratégias (`EstrategiaDistribuicao`)
-- Redireciona para o dashboard apenas após a conclusão do setup
+- Guided initial setup of the financial profile.
+- Collection of: financial profile, budgeting strategy, savings goal, and essential spending cap.
+- Financial distribution setup with support for multiple strategies (`EstrategiaDistribuicao`).
+- Redirects to the dashboard only after setup completion.
 
 ---
 
-## 🗺️ Mapa de Rotas
+## 🗺️ Route Map
 
-| Método | Rota | Descrição |
+| Method | Route | Description |
 |--------|------|-----------|
-| `GET` | `/` | Página inicial (redireciona para `/app/dashboard`) |
-| `GET` | `/auth/login` | Página de login |
-| `GET/POST` | `/auth/register` | Cadastro de novo usuário |
+| `GET` | `/` | Home page (redirects to `/app/dashboard`) |
+| `GET` | `/auth/login` | Login page |
+| `GET/POST` | `/auth/register` | New user registration |
 | **Dashboard** | | |
-| `GET` | `/app/dashboard` | Dashboard principal |
-| `GET` | `/app/dashboard/chart-data` | Dados JSON para gráficos (HTMX) |
-| **Contas** | | |
-| `GET` | `/app/financeiro/contas` | Lista de contas pendentes e histórico |
-| `GET` | `/app/financeiro/contas/nova` | Formulário de nova conta |
-| `GET` | `/app/financeiro/contas/editar/{id}` | Edição de conta |
-| `POST` | `/app/financeiro/contas/salvar` | Salvar conta (com upload de comprovante) |
-| `POST` | `/app/financeiro/contas/pagar/{id}` | Pagamento rápido |
-| `POST` | `/app/financeiro/contas/excluir/{id}` | Excluir conta |
-| `POST` | `/app/financeiro/contas/salvar-lote` | Importação em lote (via IA) |
-| **Transações Recorrentes** | | |
-| `GET` | `/app/financeiro/recorrentes` | Lista de automações |
-| `GET` | `/app/financeiro/recorrentes/nova` | Nova automação |
-| `GET` | `/app/financeiro/recorrentes/editar/{id}` | Editar automação |
-| `POST` | `/app/financeiro/recorrentes/salvar` | Salvar automação |
-| `POST` | `/app/financeiro/recorrentes/excluir/{id}` | Excluir automação |
-| **Metas** | | |
-| `GET` | `/app/financeiro/metas` | Lista de metas |
-| `GET` | `/app/financeiro/metas/novo` | Nova meta |
-| `GET` | `/app/financeiro/metas/editar/{id}` | Editar meta |
-| `POST` | `/app/financeiro/metas/salvar` | Salvar meta |
-| `POST` | `/app/financeiro/metas/excluir/{id}` | Excluir meta |
-| `POST` | `/app/financeiro/metas/ai-suggest` | Sugestões de metas via IA (JSON) |
-| `POST` | `/app/financeiro/metas/ai-criar` | Criar meta a partir de sugestão da IA |
-| **Orçamentos** | | |
-| `GET` | `/app/financeiro/orcamentos` | Lista de orçamentos por categoria |
-| `GET` | `/app/financeiro/orcamentos/novo` | Novo orçamento |
-| `GET` | `/app/financeiro/orcamentos/editar/{id}` | Editar orçamento |
-| `POST` | `/app/financeiro/orcamentos/salvar` | Salvar orçamento |
-| `POST` | `/app/financeiro/orcamentos/excluir/{id}` | Excluir orçamento |
-| `POST` | `/app/financeiro/orcamentos/gerar-automatico` | Gerar orçamentos automaticamente |
-| **Relatórios** | | |
-| `GET` | `/app/financeiro/relatorios` | Relatórios financeiros |
-| **Investimentos** | | |
-| `GET` | `/app/wealth/investimentos` | Carteira de investimentos |
-| `GET` | `/app/wealth/investimentos/novo` | Novo investimento |
-| `GET` | `/app/wealth/investimentos/editar/{id}` | Editar investimento |
-| `POST` | `/app/wealth/investimentos/salvar` | Salvar investimento |
-| `POST` | `/app/wealth/investimentos/excluir/{id}` | Excluir investimento |
-| `POST` | `/app/wealth/investimentos/sync` | Sincronizar cotações de mercado |
-| **IA (Assistente)** | | |
-| `GET` | `/app/ia` | Interface do assistente IA |
-| `GET` | `/app/ia/revisar` | Revisão de extrato importado |
-| `POST` | `/api/ia/chat` | Chat com IA (OpenRouter) |
-| `POST` | `/api/ia/upload-extrato` | Upload de extrato para processamento |
-| `POST` | `/api/ia/confirmar` | Confirmar importação de transações |
-| `GET` | `/api/ia/consultor-pessoal` | Plano de investimentos personalizado |
-| `GET` | `/api/ia/analisar-anomalias` | Análise de anomalias (HTMX fragment) |
-| `GET` | `/api/ia/status` | Status do serviço de IA |
-| **Configurações** | | |
-| `GET` | `/app/settings/moradores` | Lista de moradores |
-| `GET` | `/app/settings/moradores/novo` | Adicionar morador |
-| `GET` | `/app/settings/moradores/editar/{id}` | Editar morador |
-| `POST` | `/app/settings/moradores/salvar` | Salvar morador |
-| `POST` | `/app/settings/moradores/remover/{id}` | Desativar morador |
-| **Categorias** | | |
-| `GET` | `/app/categorias` | Lista de categorias |
+| `GET` | `/app/dashboard` | Main dashboard |
+| `GET` | `/app/dashboard/chart-data` | JSON data for charts (HTMX) |
+| **Bills** | | |
+| `GET` | `/app/financeiro/contas` | Pending bills list and history |
+| `GET` | `/app/financeiro/contas/nova` | New bill form |
+| `GET` | `/app/financeiro/contas/editar/{id}` | Edit bill |
+| `POST` | `/app/financeiro/contas/salvar` | Save bill (with attachment upload) |
+| `POST` | `/app/financeiro/contas/pagar/{id}` | Quick payment |
+| `POST` | `/app/financeiro/contas/excluir/{id}` | Delete bill |
+| `POST` | `/app/financeiro/contas/salvar-lote` | Batch import (via AI) |
+| **Recurring Transactions** | | |
+| `GET` | `/app/financeiro/recorrentes` | Automation list |
+| `GET` | `/app/financeiro/recorrentes/nova` | New automation |
+| `GET` | `/app/financeiro/recorrentes/editar/{id}` | Edit automation |
+| `POST` | `/app/financeiro/recorrentes/salvar` | Save automation |
+| `POST` | `/app/financeiro/recorrentes/excluir/{id}` | Delete automation |
+| **Goals** | | |
+| `GET` | `/app/financeiro/metas` | Goals list |
+| `GET` | `/app/financeiro/metas/novo` | New goal |
+| `GET` | `/app/financeiro/metas/editar/{id}` | Edit goal |
+| `POST` | `/app/financeiro/metas/salvar` | Save goal |
+| `POST` | `/app/financeiro/metas/excluir/{id}` | Delete goal |
+| `POST` | `/app/financeiro/metas/ai-suggest` | AI goal suggestions (JSON) |
+| `POST` | `/app/financeiro/metas/ai-criar` | Create goal from AI suggestion |
+| **Budgets** | | |
+| `GET` | `/app/financeiro/orcamentos` | Budget list by category |
+| `GET` | `/app/financeiro/orcamentos/novo` | New budget |
+| `GET` | `/app/financeiro/orcamentos/editar/{id}` | Edit budget |
+| `POST` | `/app/financeiro/orcamentos/salvar` | Save budget |
+| `POST` | `/app/financeiro/orcamentos/excluir/{id}` | Delete budget |
+| `POST` | `/app/financeiro/orcamentos/gerar-automatico` | Generate budgets automatically |
+| **Reports** | | |
+| `GET` | `/app/financeiro/relatorios` | Financial reports |
+| **Investments** | | |
+| `GET` | `/app/wealth/investimentos` | Investment portfolio |
+| `GET` | `/app/wealth/investimentos/novo` | New investment |
+| `GET` | `/app/wealth/investimentos/editar/{id}` | Edit investment |
+| `POST` | `/app/wealth/investimentos/salvar` | Save investment |
+| `POST` | `/app/wealth/investimentos/excluir/{id}` | Delete investment |
+| `POST` | `/app/wealth/investimentos/sync` | Sync market prices |
+| **AI (Assistant)** | | |
+| `GET` | `/app/ia` | AI Assistant interface |
+| `GET` | `/app/ia/revisar` | Review imported statement |
+| `POST` | `/api/ia/chat` | AI Chat (OpenRouter) |
+| `POST` | `/api/ia/upload-extrato` | Upload statement for processing |
+| `POST` | `/api/ia/confirmar` | Confirm transaction import |
+| `GET` | `/api/ia/consultor-pessoal` | Personalized investment plan |
+| `GET` | `/api/ia/analisar-anomalias` | Anomaly analysis (HTMX fragment) |
+| `GET` | `/api/ia/status` | AI service status |
+| **Settings** | | |
+| `GET` | `/app/settings/moradores` | Member list |
+| `GET` | `/app/settings/moradores/novo` | Add member |
+| `GET` | `/app/settings/moradores/editar/{id}` | Edit member |
+| `POST` | `/app/settings/moradores/salvar` | Save member |
+| `POST` | `/app/settings/moradores/remover/{id}` | Deactivate member |
+| **Categories** | | |
+| `GET` | `/app/categorias` | Category list |
 | **Wealth API (REST)** | | |
-| `GET` | `/api/v1/wealth/summary` | Resumo patrimonial (JSON) |
-| `GET` | `/api/v1/wealth/history` | Histórico de snapshots (JSON) |
-| `POST` | `/api/v1/wealth/assets` | Adicionar ativo (JSON) |
+| `GET` | `/api/v1/wealth/summary` | Wealth summary (JSON) |
+| `GET` | `/api/v1/wealth/history` | Snapshot history (JSON) |
+| `POST` | `/api/v1/wealth/assets` | Add asset (JSON) |
 | **Onboarding** | | |
-| `GET/POST` | `/app/onboarding` | Configuração inicial do perfil |
-| `GET/POST` | `/app/setup/distribuicao` | Setup de estratégia de distribuição |
+| `GET/POST` | `/app/onboarding` | Initial profile setup |
+| `GET/POST` | `/app/setup/distribuicao` | Distribution strategy setup |
 
 ---
 
-## 🏗️ Arquitetura
+## 🏗️ Architecture
 
 ```
 FinGen
-├── Java Backend (Spring Boot)          → Porta 8080
+├── Java Backend (Spring Boot)          → Port 8080
 │   ├── Web Layer (Controllers + Thymeleaf/HTMX)
 │   ├── Service Layer (Business Logic)
 │   ├── Repository Layer (Spring Data JPA)
 │   └── Security Layer (Spring Security + JWT)
 │
-├── Python IA Service (FastAPI)         → Porta 8000
-│   └── Gemini API integration (extrato processing)
+├── Python IA Service (FastAPI)         → Port 8000
+│   └── Gemini API integration (statement processing)
 │
 └── Database
-    ├── Supabase (Produção/Cloud - PostgreSQL)
-    └── PostgreSQL (Desenvolvimento local via Docker)
+    ├── Supabase (Production/Cloud - PostgreSQL)
+    └── PostgreSQL (Local Development via Docker)
 ```
 
-### Estrutura de Pacotes Java
+### Java Package Structure
 
 ```
 lucas.basemodel/
@@ -206,12 +206,12 @@ lucas.basemodel/
 │   ├── security/                      # Spring Security config + JWT
 │   └── storage/                       # File storage service
 ├── modules/
-│   ├── auth/                          # Auth module (login, registro)
+│   ├── auth/                          # Auth module (login, registration)
 │   ├── financeiro/
 │   │   ├── controllers/               # Onboarding & setup controllers
 │   │   ├── dto/                       # Data Transfer Objects
-│   │   ├── enums/                     # Domínio enumerável
-│   │   ├── models/                    # Entidades JPA
+│   │   ├── enums/                     # Enumerable domain
+│   │   ├── models/                    # JPA Entities
 │   │   ├── repositories/              # Spring Data repos
 │   │   └── services/                  # Business logic
 │   ├── user/                          # User entity + repository
@@ -241,218 +241,218 @@ lucas.basemodel/
 
 ---
 
-## 🛠️ Stack Tecnológica
+## 🛠️ Technology Stack
 
-| Camada | Tecnologia | Versão |
+| Layer | Technology | Version |
 |--------|------------|--------|
 | **Runtime** | Java (OpenJDK) | 21 |
 | **Framework** | Spring Boot | 3.3.0 |
-| **Persistência** | Spring Data JPA + Hibernate | — |
-| **Banco (Dev)** | PostgreSQL | 15 |
-| **Banco (Prod)** | Supabase (PostgreSQL) | — |
-| **Templates** | Thymeleaf + Extras Spring Security 6 | — |
-| **Reatividade** | HTMX (htmx-spring-boot-thymeleaf) | 3.6.0 |
-| **Segurança** | Spring Security + JWT (JJWT) | 0.11.5 |
-| **Utilitários** | Lombok | 1.18.36 |
+| **Persistence** | Spring Data JPA + Hibernate | — |
+| **Database (Dev)** | PostgreSQL | 15 |
+| **Database (Prod)** | Supabase (PostgreSQL) | — |
+| **Templates** | Thymeleaf + Spring Security 6 Extras | — |
+| **Reactivity** | HTMX (htmx-spring-boot-thymeleaf) | 3.6.0 |
+| **Security** | Spring Security + JWT (JJWT) | 0.11.5 |
+| **Utilities** | Lombok | 1.18.36 |
 | **Build** | Maven Wrapper (mvnw) | 3.9.6 |
-| **Contêiner** | Docker (multi-stage build) | — |
-| **IA (Java)** | Google Gemini API (via GeminiService) | — |
-| **IA (Chat)** | OpenRouter API (via OpenRouterService) | — |
-| **IA (Python)** | FastAPI + Google Gemini | — |
+| **Container** | Docker (multi-stage build) | — |
+| **AI (Java)** | Google Gemini API (via GeminiService) | — |
+| **AI (Chat)** | OpenRouter API (via OpenRouterService) | — |
+| **AI (Python)** | FastAPI + Google Gemini | — |
 | **Deploy** | Render.com | — |
 
 ---
 
-## 🚀 Como Executar Localmente
+## 🚀 How to Run Locally
 
-### Pré-requisitos
-- [Docker](https://www.docker.com/) e [Docker Compose](https://docs.docker.com/compose/) instalados
-- *Alternativa sem Docker:* Java 21, Maven 3.9+
+### Prerequisites
+- [Docker](https://www.docker.com/) and [Docker Compose](https://docs.docker.com/compose/) installed.
+- *Alternative without Docker:* Java 21, Maven 3.9+.
 
-### 1. Clone o repositório
+### 1. Clone the repository
 ```bash
 git clone https://github.com/lucachak/FinGen.git
 cd FinGen
 ```
 
-### 2. Configure as variáveis de ambiente
-Crie um arquivo `.env` na raiz do projeto:
+### 2. Configure environment variables
+Create a `.env` file in the project root:
 
 ```env
-# Banco de Dados (Supabase - IPv4 Pooler)
+# Database (Supabase - IPv4 Pooler)
 SUPABASE_DB_URL=jdbc:postgresql://[pooler-host]:6543/postgres?prepareThreshold=0&ssl=true&sslmode=require
 SUPABASE_DB_USER=postgres.[project-id]
-SUPABASE_DB_PASS=sua_senha_do_banco
+SUPABASE_DB_PASS=your_db_password
 
-# Integração IA
-GEMINI_TOKEN=seu_token_gemini
-OPENROUTER_API_KEY=sua_chave_openrouter
+# AI Integration
+GEMINI_TOKEN=your_gemini_token
+OPENROUTER_API_KEY=your_openrouter_api_key
 PYTHON_API_URL=http://python-ia:8000
 
-# Upload de Arquivos
+# File Upload
 SPRING_SERVLET_MULTIPART_MAX_FILE_SIZE=10MB
 SPRING_SERVLET_MULTIPART_MAX_REQUEST_SIZE=10MB
 ```
 
-> ⚠️ **Nunca commit o arquivo `.env`** — ele já está no `.gitignore`.
+> ⚠️ **Never commit the `.env` file** — it is already in `.gitignore`.
 
-### 3. Suba os contêineres
+### 3. Start the containers
 ```bash
 docker-compose up --build
 ```
 
-A aplicação estará disponível em: **http://localhost:8080**
+The application will be available at: **http://localhost:8080**
 
-### 4. (Opcional) Executar sem Docker
+### 4. (Optional) Run without Docker
 
 ```bash
-# Apenas o banco e o serviço Python via Docker
+# Only the database and Python service via Docker
 docker-compose up db python-ia -d
 
-# Compile e execute o Java localmente
+# Compile and run Java locally
 ./mvnw spring-boot:run
 ```
 
 ---
 
-## 🌐 Deploy em Produção (Render)
+## 🌐 Production Deployment (Render)
 
-O projeto usa o arquivo `render.yaml` para deploy automático no [Render.com](https://render.com/).
+The project uses a `render.yaml` file for automatic deployment on [Render.com](https://render.com/).
 
-### Serviços configurados:
-| Serviço | Tipo | Dockerfile |
+### Configured Services:
+| Service | Type | Dockerfile |
 |---------|------|------------|
 | `fingen-java` | Web Service | `./Dockerfile` |
 | `fingen-ia` | Web Service | `./Dockerfile.python` |
 
-### Variáveis de ambiente necessárias no painel Render:
-| Variável | Descrição |
+### Required Environment Variables on Render Panel:
+| Variable | Description |
 |----------|-----------|
-| `OPENROUTER_API_KEY` | Chave da API OpenRouter para o chat IA |
-| `GEMINI_TOKEN` | Token da API Google Gemini |
-| `DB_URL` | URL do banco Supabase (JDBC) |
-| `DB_USERNAME` | Usuário do pooler Supabase |
-| `DB_PASSWORD` | Senha do banco Supabase |
-| `PYTHON_API_URL` | URL interna do serviço Python IA |
+| `OPENROUTER_API_KEY` | OpenRouter API Key for AI chat. |
+| `GEMINI_TOKEN` | Google Gemini API Token. |
+| `DB_URL` | Supabase Database URL (JDBC). |
+| `DB_USERNAME` | Supabase Pooler Username. |
+| `DB_PASSWORD` | Supabase Database Password. |
+| `PYTHON_API_URL` | Internal URL of the Python IA service. |
 
-> 💡 O banco de dados em produção foi migrado de H2 para **Supabase (PostgreSQL)**, garantindo persistência real e escalabilidade na nuvem.
+> 💡 The production database was migrated from H2 to **Supabase (PostgreSQL)**, ensuring real persistence and cloud scalability.
 
 ---
 
-## 🗄️ Modelo de Dados Principal
+## 🗄️ Main Data Model
 
-### Entidades Core
+### Core Entities
 
-**`Conta`** — Unidade central de transação financeira
-| Campo | Tipo | Descrição |
+**`Conta` (Bill)** — Central unit of financial transactions
+| Field | Type | Description |
 |-------|------|-----------|
-| `id` | `Long` | PK autoincremental |
-| `descricao` | `String` | Descrição da transação |
-| `valor` | `BigDecimal` | Valor da transação |
-| `tipo` | `TipoTransacao` | `RECEITA` ou `DESPESA` |
-| `escopo` | `EscopoTransacao` | `CASA`, `PESSOAL`, `NEGOCIO` |
-| `prioridade` | `Prioridade` | `ALTA`, `MEDIA`, `BAIXA` |
-| `frequencia` | `Frequencia` | `AVULSA`, `MENSAL`, `SEMANAL`, `ANUAL`, etc. |
-| `status` | `StatusTransacao` | `PENDENTE`, `PAGO`, `ATRASADO` |
-| `paga` | `boolean` | Flag de pagamento |
-| `dataVencimento` | `LocalDate` | Data de vencimento |
-| `dataPagamento` | `LocalDate` | Data efetiva de pagamento |
-| `categoria` | `Categoria` (FK) | Categoria da transação |
-| `responsavel` | `User` (FK) | Usuário responsável |
-| `asset` | `Asset` (FK) | Ativo associado (opcional) |
-| `comprovante` | `String` | Caminho do arquivo comprovante |
+| `id` | `Long` | Autoincremental PK |
+| `descricao` | `String` | Transaction description |
+| `valor` | `BigDecimal` | Transaction value |
+| `tipo` | `TipoTransacao` | `REVENUE` or `EXPENSE` |
+| `escopo` | `EscopoTransacao` | `HOUSE`, `PERSONAL`, `BUSINESS` |
+| `prioridade` | `Prioridade` | `HIGH`, `MEDIUM`, `LOW` |
+| `frequencia` | `Frequencia` | `ONCE`, `MONTHLY`, `WEEKLY`, `ANNUAL`, etc. |
+| `status` | `StatusTransacao` | `PENDING`, `PAID`, `OVERDUE` |
+| `paga` | `boolean` | Payment flag |
+| `dataVencimento` | `LocalDate` | Due date |
+| `dataPagamento` | `LocalDate` | Effective payment date |
+| `categoria` | `Categoria` (FK) | Transaction category |
+| `responsavel` | `User` (FK) | Responsible user |
+| `asset` | `Asset` (FK) | Associated asset (optional) |
+| `comprovante` | `String` | Path to the attachment file |
 
-**`User`** — Perfil do usuário/morador
-| Campo | Tipo | Descrição |
+**`User`** — User/Member Profile
+| Field | Type | Description |
 |-------|------|-----------|
-| `id` | `UUID` | PK gerada |
-| `email` | `String` | E-mail único (login) |
-| `username` | `String` | Nome de usuário único |
-| `orcamentoMensal` | `BigDecimal` | Orçamento mensal (padrão: 3500.00) |
-| `tipoPerfilFinanceiro` | `String` | Perfil de risco (`CONSERVADOR`, etc.) |
-| `budgetingStrategy` | `WealthStrategy` | Estratégia de orçamento |
-| `metaPoupancaMensal` | `BigDecimal` | % da renda para poupar (padrão: 20%) |
-| `tetoGastosEssenciais` | `BigDecimal` | % teto para gastos essenciais (padrão: 50%) |
-| `setupCompleted` | `boolean` | Flag de onboarding concluído |
+| `id` | `UUID` | Generated PK |
+| `email` | `String` | Unique email (login) |
+| `username` | `String` | Unique username |
+| `orcamentoMensal` | `BigDecimal` | Monthly budget (default: 3500.00) |
+| `tipoPerfilFinanceiro` | `String` | Risk profile (`CONSERVATIVE`, etc.) |
+| `budgetingStrategy` | `WealthStrategy` | Budgeting strategy |
+| `metaPoupancaMensal` | `BigDecimal` | % of income to save (default: 20%) |
+| `tetoGastosEssenciais` | `BigDecimal` | % cap for essential spending (default: 50%) |
+| `setupCompleted` | `boolean` | Onboarding completion flag |
 
 ---
 
-## 🔐 Segurança
+## 🔐 Security
 
-- **Autenticação:** Spring Security com sessão baseada em formulário + suporte a JWT
-- **Autorização:** Rotas `/app/**` requerem autenticação
-- **Isolamento de Dados:** Todos os controllers filtram dados pelo usuário autenticado via `Principal`
-- **Senhas:** Armazenadas com `PasswordEncoder` (BCrypt)
-- **Soft Delete:** Moradores são desativados (`ativo = false`) em vez de excluídos, preservando integridade histórica
-- **Upload Seguro:** Arquivos recebem nome UUID antes de serem persistidos
-- **Session Staging:** Cache em memória (`ConcurrentHashMap`) para staging de extratos, evitando bloat de sessão HTTP
+- **Authentication:** Spring Security with form-based session + JWT support.
+- **Authorization:** `/app/**` routes require authentication.
+- **Data Isolation:** All controllers filter data by the authenticated user via `Principal`.
+- **Passwords:** Stored with `PasswordEncoder` (BCrypt).
+- **Soft Delete:** Members are deactivated (`ativo = false`) instead of deleted to preserve history.
+- **Secure Upload:** Files are renamed to UUID before persistence.
+- **Session Staging:** In-memory cache (`ConcurrentHashMap`) for statement staging to avoid HTTP session bloat.
 
 ---
 
-## 🧪 Testes
+## 🧪 Testing
 
 ```bash
-# Executar todos os testes
+# Run all tests
 ./mvnw test
 
-# Executar com relatório de cobertura
+# Run with coverage report
 ./mvnw verify
 ```
 
 ---
 
-## 📁 Estrutura de Arquivos Importantes
+## 📁 Important File Structure
 
 ```
 FinGen/
 ├── src/
 │   ├── main/
-│   │   ├── java/lucas/basemodel/     # Código-fonte Java
+│   │   ├── java/lucas/basemodel/     # Java Source Code
 │   │   └── resources/
-│   │       ├── templates/            # Templates Thymeleaf
-│   │       │   ├── auth/             # Login & registro
-│   │       │   ├── dashboard/        # Dashboard principal
-│   │       │   ├── contas/           # Gestão de contas
-│   │       │   ├── metas/            # Metas financeiras
-│   │       │   ├── orcamentos/       # Orçamentos por categoria
-│   │       │   ├── investimentos/    # Carteira de investimentos
-│   │       │   ├── recorrentes/      # Transações recorrentes
-│   │       │   ├── moradores/        # Gestão de moradores
-│   │       │   ├── ia/               # Interface do assistente IA
-│   │       │   ├── wealth/           # Gestão de patrimônio
-│   │       │   ├── relatorios/       # Relatórios
-│   │       │   └── layout/           # Layout base (layout.html)
-│   │       ├── static/               # CSS, JS, imagens
+│   │       ├── templates/            # Thymeleaf Templates
+│   │       │   ├── auth/             # Login & Register
+│   │       │   ├── dashboard/        # Main Dashboard
+│   │       │   ├── contas/           # Bill Management
+│   │       │   ├── metas/            # Financial Goals
+│   │       │   ├── orcamentos/       # Category Budgets
+│   │       │   ├── investimentos/    # Investment Portfolio
+│   │       │   ├── recorrentes/      # Recurring Transactions
+│   │       │   ├── moradores/        # Member Management
+│   │       │   ├── ia/               # AI Assistant Interface
+│   │       │   ├── wealth/           # Wealth Management
+│   │       │   ├── relatorios/       # Reports
+│   │       │   └── layout/           # Base Layout (layout.html)
+│   │       ├── static/               # CSS, JS, Images
 │   │       └── application.properties
-│   └── test/                         # Testes automatizados
-├── main.py                           # Serviço Python (Gemini IA)
-├── requirements.txt                  # Dependências Python
-├── Dockerfile                        # Build do serviço Java
-├── Dockerfile.python                 # Build do serviço Python IA
-├── docker-compose.yml                # Orquestração local (Java + Python + PostgreSQL)
-├── render.yaml                       # Deploy em produção (Render.com)
-├── pom.xml                           # Dependências Maven
-└── .env                              # Variáveis de ambiente (não versionado)
+│   └── test/                         # Automated Tests
+├── main.py                           # Python Service (Gemini AI)
+├── requirements.txt                  # Python Dependencies
+├── Dockerfile                        # Java Service Build
+├── Dockerfile.python                 # Python IA Service Build
+├── docker-compose.yml                # Local Orchestration (Java + Python + PostgreSQL)
+├── render.yaml                       # Production Deploy (Render.com)
+├── pom.xml                           # Maven Dependencies
+└── .env                              # Environment Variables (not versioned)
 ```
 
 ---
 
-## 🤝 Contribuindo
+## 🤝 Contributing
 
-1. Faça um fork do repositório
-2. Crie uma branch para sua feature: `git checkout -b feature/minha-feature`
-3. Commit suas alterações: `git commit -m 'feat: adiciona nova funcionalidade'`
-4. Push para a branch: `git push origin feature/minha-feature`
-5. Abra um Pull Request
+1. Fork the repository.
+2. Create a branch for your feature: `git checkout -b feature/my-feature`.
+3. Commit your changes: `git commit -m 'feat: add new feature'`.
+4. Push to the branch: `git push origin feature/my-feature`.
+5. Open a Pull Request.
 
 ---
 
-## 📄 Licença
+## 📄 License
 
-Este projeto está sob licença MIT. Consulte o arquivo `LICENSE` para mais detalhes.
+This project is licensed under the MIT License. See the `LICENSE` file for more details.
 
 ---
 
 <div align="center">
-  Feito com ☕ e Java por <a href="https://github.com/lucachak">Lucas Lucachak</a>
+  Made with ☕ and Java by <a href="https://github.com/lucachak">Lucas Lucachak</a>
 </div>
