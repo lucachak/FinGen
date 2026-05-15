@@ -14,10 +14,10 @@ services:
       - key: PYTHON_API_URL
         value: http://localhost:8000
       - key: DB_URL
-        value: jdbc:h2:file:./data/fingen;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE;AUTO_RECONNECT=TRUE
+        value: jdbc:postgresql://aws-1-us-west-1.pooler.supabase.com:6543/postgres?prepareThreshold=0&ssl=true&sslmode=require
       - key: DB_USERNAME
-        value: sa
+        value: postgres.oylgvvcumpwnfycvkxvi
       - key: DB_PASSWORD
-        value: password
+        value: Lucachak02ls
       - key: SPRING_PROFILES_ACTIVE
         value: dev
