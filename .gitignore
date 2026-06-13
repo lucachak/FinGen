@@ -19,6 +19,9 @@ target/
 *.iml
 *.ipr
 *.agent
+.agent/
+.mvn/
+__pycache__/
 
 ### NetBeans ###
 /nbproject/private/
