@@ -102,6 +102,10 @@
       outline-offset: 2px
     }
 
+    ::-webkit-scrollbar {
+      display: none;
+    }
+
     .auth-shell {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -440,6 +444,31 @@
       transform: translateY(0)
     }
 
+    .btn-demo {
+      width: 100%;
+      padding: 14px;
+      background: var(--surface-2);
+      color: var(--t2);
+      border: 1.5px solid var(--border);
+      border-radius: var(--r-md);
+      font-family: var(--font);
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: all .2s;
+      margin-top: 12px;
+    }
+
+    .btn-demo:hover {
+      background: var(--surface);
+      border-color: var(--brand);
+      color: var(--brand);
+    }
+
     .card-footer {
       margin-top: 32px;
       font-size: 13px;
@@ -592,7 +621,7 @@
         </div>
 
         <!-- FIX #6: th:action em vez de action hardcoded + CSRF token -->
-        <form th:action="@{/auth/login}" method="post" class="fields">
+        <form th:action="@{/auth/login}" method="post" class="fields" id="loginForm">
           <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
 
           <div class="field">
@@ -630,6 +659,14 @@
           </button>
         </form>
 
+        <button type="button" class="btn-demo" onclick="loginDemo()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round">
+            <polygon points="5 3 19 12 5 21 5 3"></polygon>
+          </svg>
+          Conta Demo
+        </button>
+
         <div class="card-footer">
           <span>Não tem uma conta?</span>
           <!-- FIX #6: th:href em vez de href hardcoded -->
@@ -655,6 +692,12 @@
       ico.innerHTML = show
         ? '<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/><path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/><line x1="1" y1="1" x2="23" y2="23"/>'
         : '<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>';
+    }
+
+    function loginDemo() {
+      document.getElementById('email').value = 'demo@fingen.com';
+      document.getElementById('password').value = 'demo123';
+      document.getElementById('loginForm').submit();
     }
   </script>
 
