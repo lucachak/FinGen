@@ -42,6 +42,7 @@ public class SecurityConfig {
                                                                 "/apple-touch-icon.png", "/site.webmanifest", "/sw.js", 
                                                                 "/web-app-manifest-*.png", "/", "/auth/**").permitAll()
                                                 .requestMatchers("/api/v1/auth/**").permitAll()
+                                                .requestMatchers("/admin/**").hasAuthority("ROLE_ADMIN")
                                                 .requestMatchers("/app/**", "/api/**", "/api/v1/**").authenticated()
                                                 .anyRequest().authenticated())
                                 .sessionManagement(

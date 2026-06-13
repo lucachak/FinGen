@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout/layout :: layout(
+          pageTitle='Admin Dashboard',
+          content=~{::main},
+          pageStyles=~{::style},
+          pageScripts=~{::script}
+      )}"
+      lang="pt-BR">
+<head>
+    <style th:fragment="style">
+        body { background-color: var(--bg); font-family: var(--font); }
+        .shadow-md-zen { box-shadow: 0 8px 24px rgba(15,118,110,0.09), 0 2px 6px rgba(15,118,110,0.05); }
+    </style>
+</head>
+<body>
+<main class="max-w-[1200px] mx-auto">
+    <div class="mb-10 animate-[fade-up_0.6s_ease-out]">
+        <div class="flex flex-col md:flex-row md:items-end justify-between gap-6">
+            <div>
+                <span class="text-brand font-mono text-[11px] uppercase tracking-[0.2em] mb-2 block">Administração do Sistema</span>
+                <h1 class="font-serif text-3xl md:text-5xl text-zen-t1 tracking-tight font-medium">
+                    Gestão de Utilizadores
+                </h1>
+            </div>
+            
+            <div class="flex items-center gap-3">
+                <a th:href="@{/app/dashboard}" class="px-5 py-3 bg-zen-surface border border-zen-border text-zen-t2 rounded-2xl text-xs font-semibold flex items-center transition-all hover:bg-zen-surface2 shadow-sm">
+                    <i data-lucide="arrow-left" class="w-4 h-4 mr-2"></i>
+                    Voltar à App
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="bg-zen-surface border border-zen-border rounded-[32px] p-8 shadow-md-zen">
+        <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse">
+                <thead>
+                    <tr class="border-b border-zen-border">
+                        <th class="py-4 px-4 text-[11px] font-bold uppercase tracking-widest text-zen-t3">Nome</th>
+                        <th class="py-4 px-4 text-[11px] font-bold uppercase tracking-widest text-zen-t3">Email</th>
+                        <th class="py-4 px-4 text-[11px] font-bold uppercase tracking-widest text-zen-t3">Papel</th>
+                        <th class="py-4 px-4 text-[11px] font-bold uppercase tracking-widest text-zen-t3">Data Registo</th>
+                        <th class="py-4 px-4 text-[11px] font-bold uppercase tracking-widest text-zen-t3">Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="u : ${users}" class="border-b border-zen-border/50 hover:bg-zen-surface2 transition-colors">
+                        <td class="py-4 px-4">
+                            <div class="flex items-center gap-3">
+                                <div class="w-8 h-8 rounded-full bg-brand/10 text-brand flex items-center justify-center font-bold text-xs uppercase"
+                                     th:text="${#strings.substring(u.username, 0, 1)}">U</div>
+                                <span class="text-[13px] font-semibold text-zen-t1" th:text="${u.nomeCompleto}">Nome</span>
+                            </div>
+                        </td>
+                        <td class="py-4 px-4 text-[13px] text-zen-t2" th:text="${u.email}">email@domain.com</td>
+                        <td class="py-4 px-4">
+                            <span class="text-[10px] font-mono px-2 py-1 rounded-full bg-zen-surface2 border border-zen-border text-zen-t2" 
+                                  th:text="${u.role}">ROLE_USER</span>
+                        </td>
+                        <td class="py-4 px-4 text-[12px] text-zen-t3 font-mono" 
+                            th:text="${#temporals.format(u.criadoEm, 'dd/MM/yyyy HH:mm')}">01/01/2026</td>
+                        <td class="py-4 px-4">
+                            <span class="text-[10px] font-bold px-2 py-1 rounded-full"
+                                  th:classappend="${u.ativo} ? 'bg-emerald-50 text-emerald-600 border border-emerald-100' : 'bg-rose-50 text-rose-600 border border-rose-100'"
+                                  th:text="${u.ativo ? 'ATIVO' : 'INATIVO'}">ATIVO</span>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</main>
+<script th:fragment="script"></script>
+</body>
+</html>

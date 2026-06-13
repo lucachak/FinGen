@@ -60,6 +60,17 @@ public class SetupInicial implements CommandLineRunner {
             }
         }
 
+        // Setup da conta demo
+        if (repository.findByEmail("demo@fingen.com").isEmpty()) {
+            User demo = new User();
+            demo.setUsername("Demo");
+            demo.setNomeCompleto("Conta Demo");
+            demo.setPassword(passwordEncoder.encode("demo123"));
+            demo.setRole("ROLE_USER");
+            demo.setEmail("demo@fingen.com");
+            repository.save(demo);
+        }
+
         // 2. Setup das Categorias (Agora mapeadas automaticamente para a sua Natureza)
         if (categoriaRepository.count() == 0) {
             System.out.println("Criando categorias da casa com suas naturezas...");
