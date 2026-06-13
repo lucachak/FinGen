@@ -10,6 +10,19 @@
 
 ---
 
+<p align="center">
+  <img src="images/image1.png" width="800" alt="FinGen Application Screenshot 1" />
+</p>
+<p align="center">
+  <img src="images/image2.png" width="400" alt="FinGen Application Screenshot 2" />
+  <img src="images/image3.png" width="400" alt="FinGen Application Screenshot 3" />
+</p>
+<p align="center">
+  <img src="images/image4.png" width="800" alt="FinGen Application Screenshot 4" />
+</p>
+
+---
+
 ## 📖 About the Project
 
 **FinGen** is a full-stack web application developed to simplify and centralize family and personal financial management. It combines a robust Spring Boot backend with a reactive frontend via HTMX and Thymeleaf, offering a fluid experience without the complexity of a separate SPA.

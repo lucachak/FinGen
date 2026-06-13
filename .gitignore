@@ -23,6 +23,8 @@ target/
 .mvn/
 __pycache__/
 
+docs
+
 ### NetBeans ###
 /nbproject/private/
 /nbbuild/
