@@ -92,8 +92,17 @@ public class UserController {
                 Files.createDirectories(uploadPath);
             }
 
-            // 2. Gerar um nome único para o ficheiro para evitar sobreposições
-            String ext = file.getOriginalFilename().substring(file.getOriginalFilename().lastIndexOf("."));
+            // 2. Gerar um nome único para o ficheiro para evitar sobreposições e validar extensão
+            String originalName = file.getOriginalFilename();
+            if (originalName == null || !originalName.contains(".")) {
+                attributes.addFlashAttribute("mensagemErro", "Ficheiro inválido.");
+                return "redirect:/app/settings/perfil";
+            }
+            String ext = originalName.substring(originalName.lastIndexOf(".")).toLowerCase();
+            if (!java.util.List.of(".jpg", ".jpeg", ".png", ".gif", ".webp").contains(ext)) {
+                attributes.addFlashAttribute("mensagemErro", "Apenas imagens (.jpg, .jpeg, .png, .gif, .webp) são permitidas.");
+                return "redirect:/app/settings/perfil";
+            }
             String fileName = UUID.randomUUID().toString() + ext;
             Path filePath = uploadPath.resolve(fileName);
 

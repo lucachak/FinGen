@@ -8,6 +8,9 @@ import lucas.basemodel.modules.wealth.enums.AssetType;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
+import lucas.basemodel.core.config.DeterministicEncryptionConverter;
+import lucas.basemodel.core.config.RandomEncryptionConverter;
+
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -28,8 +31,10 @@ public abstract class Asset {
     private User user;
 
     @Column(nullable = false)
+    @Convert(converter = DeterministicEncryptionConverter.class)
     private String name;
 
+    @Convert(converter = RandomEncryptionConverter.class)
     private String description;
 
     @Enumerated(EnumType.STRING)

@@ -61,7 +61,13 @@ public class MoradorController {
                     java.nio.file.Files.createDirectories(uploadPath);
                 }
                 String originalFilename = fileFoto.getOriginalFilename();
-                String ext = originalFilename != null && originalFilename.contains(".") ? originalFilename.substring(originalFilename.lastIndexOf(".")) : ".jpg";
+                if (originalFilename == null || !originalFilename.contains(".")) {
+                    throw new IllegalArgumentException("Ficheiro inválido");
+                }
+                String ext = originalFilename.substring(originalFilename.lastIndexOf(".")).toLowerCase();
+                if (!java.util.List.of(".jpg", ".jpeg", ".png", ".gif", ".webp").contains(ext)) {
+                    throw new IllegalArgumentException("Apenas imagens são permitidas");
+                }
                 String fileName = java.util.UUID.randomUUID().toString() + ext;
                 java.nio.file.Path filePath = uploadPath.resolve(fileName);
                 try (java.io.InputStream inputStream = fileFoto.getInputStream()) {

@@ -7,6 +7,8 @@ import lucas.basemodel.modules.financeiro.enums.GrupoRecorrencia;
 import lucas.basemodel.modules.financeiro.enums.TipoTransacao;
 import lucas.basemodel.modules.user.User;
 
+import lucas.basemodel.core.config.DeterministicEncryptionConverter;
+
 import java.math.BigDecimal;
 import java.util.UUID;
 
@@ -37,6 +39,7 @@ public class TransacaoRecorrente {
     private Conta conta;
 
     @Column(nullable = false)
+    @Convert(converter = DeterministicEncryptionConverter.class)
     private String titulo;
 
     @Enumerated(EnumType.STRING)

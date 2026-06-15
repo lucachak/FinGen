@@ -216,35 +216,39 @@ public class ContaService {
 
 
     // Calcula as entradas e saídas dos últimos 6 meses para o gráfico
+    // OPTIMIZED: 1 query de intervalo + agrupamento em memória (antes: 6 queries sequenciais)
     public List<Map<String, Object>> obterFluxoCaixaUltimos6Meses(User responsavel) {
-        List<Map<String, Object>> fluxo = new ArrayList<>();
         LocalDate hoje = LocalDate.now();
+        LocalDate inicio = hoje.minusMonths(5).withDayOfMonth(1);
+        LocalDate fim = hoje.withDayOfMonth(hoje.lengthOfMonth());
 
-        // O loop vai de 5 até 0 (ex: volta 5 meses atrás, depois 4, 3... até o mês atual)
+        // Uma única query cobrindo o intervalo de 6 meses
+        List<Conta> todasContas = contaRepository.findByResponsavelAndPeriodo(responsavel, inicio, fim);
+
+        // Pré-agrupa por YearMonth em memória para acesso O(1) no loop
+        Map<java.time.YearMonth, List<Conta>> porMes = todasContas.stream()
+                .filter(c -> c.isPaga() && c.getDataPagamento() != null)
+                .collect(Collectors.groupingBy(c -> java.time.YearMonth.from(c.getDataPagamento())));
+
+        List<Map<String, Object>> fluxo = new ArrayList<>();
         for (int i = 5; i >= 0; i--) {
             LocalDate dataBase = hoje.minusMonths(i);
-            int mes = dataBase.getMonthValue();
-            int ano = dataBase.getYear();
+            java.time.YearMonth ym = java.time.YearMonth.from(dataBase);
+            List<Conta> contasDoMes = porMes.getOrDefault(ym, java.util.Collections.emptyList());
 
-            // Busca as contas daquele mês/ano específico
-            List<Conta> contasDoMes = contaRepository.findByResponsavelAndMesEAno(responsavel, mes, ano);
-
-            // Soma apenas o que já foi PAGO/RECEBIDO
             BigDecimal entradas = contasDoMes.stream()
-                    .filter(c -> c.isPaga() && c.getTipo() == TipoTransacao.RECEITA)
+                    .filter(c -> c.getTipo() == TipoTransacao.RECEITA)
                     .map(Conta::getValor)
                     .reduce(BigDecimal.ZERO, BigDecimal::add);
 
             BigDecimal saidas = contasDoMes.stream()
-                    .filter(c -> c.isPaga() && c.getTipo() == TipoTransacao.DESPESA)
+                    .filter(c -> c.getTipo() == TipoTransacao.DESPESA)
                     .map(Conta::getValor)
                     .reduce(BigDecimal.ZERO, BigDecimal::add);
 
-            // Pega o nome do mês abreviado (ex: jan, fev) e põe a 1ª letra maiúscula
             String nomeMes = dataBase.getMonth().getDisplayName(TextStyle.SHORT, new Locale("pt", "BR"));
             nomeMes = nomeMes.substring(0, 1).toUpperCase() + nomeMes.substring(1);
 
-            // Guarda os dados num Mapa para enviar ao Javascript
             Map<String, Object> mesData = new HashMap<>();
             mesData.put("mes", nomeMes);
             mesData.put("entrada", entradas);

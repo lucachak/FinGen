@@ -148,7 +148,9 @@ public class GeminiService {
                 String titularNormalizado = titularPdf != null ? titularPdf.trim().replaceAll("\\s+", " ") : "";
 
                 if (!titularNormalizado.isEmpty() && !titularNormalizado.equalsIgnoreCase("Desconhecido")) {
-                    Optional<User> userEncontrado = usuarioRepository.findByNomeCompletoIgnoreCase(titularNormalizado);
+                    Optional<User> userEncontrado = usuarioRepository.findAll().stream()
+                            .filter(u -> u.getNomeCompleto() != null && u.getNomeCompleto().trim().replaceAll("\\s+", " ").equalsIgnoreCase(titularNormalizado))
+                            .findFirst();
                     if (userEncontrado.isPresent()) {
                         responsavelFinal = userEncontrado.get();
                     }

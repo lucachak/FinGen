@@ -5,6 +5,8 @@ import lombok.*;
 import lombok.experimental.SuperBuilder;
 import lucas.basemodel.modules.wealth.enums.RealEstateType;
 
+import lucas.basemodel.core.config.RandomEncryptionConverter;
+
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
@@ -24,6 +26,8 @@ public class RealEstateAsset extends Asset {
     private Integer bedrooms;
     private Integer bathrooms;
     private Integer parkingSpots;
+
+    @Convert(converter = RandomEncryptionConverter.class)
     private String address;
 
     @Column(precision = 19, scale = 2)

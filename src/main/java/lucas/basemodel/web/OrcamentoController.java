@@ -32,35 +32,53 @@ public class OrcamentoController {
     private final CategoriaRepository categoriaRepository;
     private final UsuarioRepository usuarioRepository;
 
-    public OrcamentoController(OrcamentoRepository orcamentoRepository, 
-                               ContaRepository contaRepository, 
-                               CategoriaRepository categoriaRepository,
-                               UsuarioRepository usuarioRepository) {
+    public OrcamentoController(OrcamentoRepository orcamentoRepository,
+            ContaRepository contaRepository,
+            CategoriaRepository categoriaRepository,
+            UsuarioRepository usuarioRepository) {
         this.orcamentoRepository = orcamentoRepository;
         this.contaRepository = contaRepository;
         this.categoriaRepository = categoriaRepository;
         this.usuarioRepository = usuarioRepository;
     }
 
-    @GetMapping({"", "/"})
+    @GetMapping({ "", "/" })
     public String listar(Model model, Principal principal) {
         User user = usuarioRepository.findByEmail(principal.getName()).orElse(null);
         if (user != null) {
             List<Orcamento> orcamentos = orcamentoRepository.findByResponsavel(user);
-            
+
             Map<UUID, BigDecimal> gastosAtuais = new HashMap<>();
             Map<UUID, BigDecimal> percentuais = new HashMap<>();
             Map<UUID, String> statusRisco = new HashMap<>();
-            
+
             int mesAtual = LocalDate.now().getMonthValue();
             int anoAtual = LocalDate.now().getYear();
 
+            // OPTIMIZED: 1 batch query GROUP BY categoria (antes: 1 query por orçamento —
+            // N+1)
+            List<Long> categoriaIds = orcamentos.stream()
+                    .filter(o -> o.getCategoria() != null)
+                    .map(o -> o.getCategoria().getId())
+                    .toList();
+
+            Map<Long, BigDecimal> gastosBatch = new HashMap<>();
+            if (!categoriaIds.isEmpty()) {
+                List<Object[]> rows = contaRepository.sumGastosPorCategoriasBatch(user, categoriaIds, mesAtual,
+                        anoAtual);
+                for (Object[] row : rows) {
+                    Long catId = (Long) row[0]; // Mude de UUID para Long
+                    BigDecimal soma = row[1] instanceof BigDecimal bd ? bd : new BigDecimal(row[1].toString());
+                    gastosBatch.put(catId, soma);
+                }
+            }
+
             for (Orcamento orc : orcamentos) {
-                BigDecimal gasto = contaRepository.sumGastosPorCategoriaMesAno(user, orc.getCategoria(), mesAtual, anoAtual);
-                if (gasto == null) gasto = BigDecimal.ZERO;
-                
+                Long catId = orc.getCategoria() != null ? orc.getCategoria().getId() : null;
+                BigDecimal gasto = catId != null ? gastosBatch.getOrDefault(catId, BigDecimal.ZERO) : BigDecimal.ZERO;
+
                 gastosAtuais.put(orc.getId(), gasto);
-                
+
                 BigDecimal limite = orc.getLimiteMensal();
                 BigDecimal percentual = BigDecimal.ZERO;
                 String status = "NORMAL";
@@ -73,7 +91,7 @@ public class OrcamentoController {
                         status = "ALERTA";
                     }
                 }
-                
+
                 percentuais.put(orc.getId(), percentual);
                 statusRisco.put(orc.getId(), status);
             }
@@ -88,10 +106,10 @@ public class OrcamentoController {
             model.addAttribute("statusRisco", statusRisco);
             model.addAttribute("totalOrcado", totalOrcado);
         }
-        
+
         String mesNome = LocalDate.now().getMonth().getDisplayName(TextStyle.FULL, new Locale("pt", "BR"));
         mesNome = mesNome.substring(0, 1).toUpperCase() + mesNome.substring(1);
-        
+
         model.addAttribute("mesAtual", mesNome);
         model.addAttribute("activeMenu", "orcamentos");
         return "orcamentos/lista";
@@ -120,11 +138,14 @@ public class OrcamentoController {
         if (orcamento.getResponsavel() == null) {
             orcamento.setResponsavel(user);
         }
-        
+
         if (orcamento.getCategoria() != null) {
-            Orcamento existing = orcamentoRepository.findByCategoriaAndResponsavel(orcamento.getCategoria(), user).orElse(null);
+            Orcamento existing = orcamentoRepository.findByCategoriaAndResponsavel(orcamento.getCategoria(), user)
+                    .orElse(null);
             if (existing != null && !existing.getId().equals(orcamento.getId())) {
-                redirectAttributes.addFlashAttribute("errorMessage", "Oops! Você já definiu um limite mensal para a categoria: " + orcamento.getCategoria().getNome());
+                redirectAttributes.addFlashAttribute("errorMessage",
+                        "Oops! Você já definiu um limite mensal para a categoria: "
+                                + orcamento.getCategoria().getNome());
                 return "redirect:/app/financeiro/orcamentos/novo";
             }
         }
@@ -144,7 +165,8 @@ public class OrcamentoController {
     @PostMapping("/gerar-automatico")
     public String gerarAutomatico(Principal principal, RedirectAttributes redirectAttributes) {
         User user = usuarioRepository.findByEmail(principal.getName()).orElse(null);
-        if (user == null) return "redirect:/auth/login";
+        if (user == null)
+            return "redirect:/auth/login";
 
         LocalDate tresMesesAtras = LocalDate.now().minusMonths(3);
         List<lucas.basemodel.modules.financeiro.models.Conta> contas = contaRepository.findAll().stream()
@@ -154,7 +176,8 @@ public class OrcamentoController {
                 .toList();
 
         if (contas.isEmpty()) {
-            redirectAttributes.addFlashAttribute("errorMessage", "Sem dados suficientes nos últimos 3 meses para gerar um orçamento automático.");
+            redirectAttributes.addFlashAttribute("errorMessage",
+                    "Sem dados suficientes nos últimos 3 meses para gerar um orçamento automático.");
             return "redirect:/app/financeiro/orcamentos";
         }
 
@@ -169,7 +192,7 @@ public class OrcamentoController {
         for (Map.Entry<Categoria, BigDecimal> entry : gastosPorCategoria.entrySet()) {
             Categoria categoria = entry.getKey();
             BigDecimal mediaMensal = entry.getValue().divide(new BigDecimal("3"), 2, RoundingMode.HALF_UP)
-                                           .multiply(new BigDecimal("1.10"));
+                    .multiply(new BigDecimal("1.10"));
 
             Orcamento existing = orcamentoRepository.findByCategoriaAndResponsavel(categoria, user).orElse(null);
             if (existing == null) {
@@ -184,9 +207,11 @@ public class OrcamentoController {
         }
 
         if (gerados > 0) {
-            redirectAttributes.addFlashAttribute("successMessage", "Mágica feita! " + gerados + " novos orçamentos gerados com base no seu padrão de gastos.");
+            redirectAttributes.addFlashAttribute("successMessage",
+                    "Mágica feita! " + gerados + " novos orçamentos gerados com base no seu padrão de gastos.");
         } else {
-            redirectAttributes.addFlashAttribute("errorMessage", "Você já possui orçamentos para todas as categorias ativas.");
+            redirectAttributes.addFlashAttribute("errorMessage",
+                    "Você já possui orçamentos para todas as categorias ativas.");
         }
         return "redirect:/app/financeiro/orcamentos";
     }

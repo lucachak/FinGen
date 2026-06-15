@@ -7,7 +7,9 @@ import lucas.basemodel.modules.financeiro.services.ContaService;
 import lucas.basemodel.modules.financeiro.services.CategoriaService;
 import lucas.basemodel.modules.wealth.services.WealthService;
 import lucas.basemodel.modules.financeiro.dto.ContaStagingForm;
+import lucas.basemodel.modules.financeiro.repositories.ContaRepository;
 import lucas.basemodel.modules.user.UsuarioRepository;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
@@ -35,6 +37,8 @@ public class ContaController {
     private final CategoriaService categoriaService;
     private final UsuarioRepository usuarioRepository;
     private final WealthService wealthService;
+    private final ContaRepository contaRepository;
+
 
 
     @GetMapping("/nova")
@@ -81,29 +85,50 @@ public class ContaController {
 
         User usuarioLogado = usuarioRepository.findByEmail(principal.getName()).orElseThrow(() -> new IllegalArgumentException("Registo não encontrado."));
 
-        List<Conta> todasPendentes = contaService.listarTodasPendentes(usuarioLogado);
-        List<Conta> historico = contaService.listarHistoricoTransacoes(usuarioLogado);
+        // OPTIMIZED: 1 query unificada → filtros em memória (antes: 4 queries separadas)
+        java.time.LocalDate hoje = java.time.LocalDate.now();
+        java.time.YearMonth mesAtual = java.time.YearMonth.now();
 
-        // Cálculos de Resumo Pros Max
+        List<Conta> todasContas = contaRepository.findAllByResponsavelOrderByDataVencimentoAsc(usuarioLogado);
+
+        List<Conta> todasPendentes = todasContas.stream()
+                .filter(c -> !c.isPaga())
+                .toList();
+
+        List<Conta> historico = todasContas.stream()
+                .filter(Conta::isPaga)
+                .sorted(java.util.Comparator.comparing(Conta::getDataPagamento, java.util.Comparator.nullsLast(java.util.Comparator.reverseOrder())))
+                .limit(100)
+                .toList();
+
+        List<Conta> contasAtrasadas = todasPendentes.stream()
+                .filter(c -> c.getDataVencimento() != null && c.getDataVencimento().isBefore(hoje))
+                .toList();
+
+        List<Conta> contasAVencer = todasPendentes.stream()
+                .filter(c -> c.getDataVencimento() != null && !c.getDataVencimento().isBefore(hoje))
+                .toList();
+
+        List<Conta> contasUrgentes = todasPendentes.stream()
+                .filter(c -> c.getPrioridade() == Prioridade.ALTA)
+                .toList();
+
+        // Cálculos de Resumo
         BigDecimal totalPendente = todasPendentes.stream()
                 .map(Conta::getValor)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
-        java.time.LocalDate now = java.time.LocalDate.now();
-
         BigDecimal totalReceitasMes = historico.stream()
-                .filter(c -> c.getTipo() == TipoTransacao.RECEITA 
-                        && c.getDataPagamento() != null 
-                        && c.getDataPagamento().getMonth() == now.getMonth()
-                        && c.getDataPagamento().getYear() == now.getYear())
+                .filter(c -> c.getTipo() == TipoTransacao.RECEITA
+                        && c.getDataPagamento() != null
+                        && java.time.YearMonth.from(c.getDataPagamento()).equals(mesAtual))
                 .map(Conta::getValor)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
         BigDecimal totalDespesasMes = historico.stream()
-                .filter(c -> c.getTipo() == TipoTransacao.DESPESA 
-                        && c.getDataPagamento() != null 
-                        && c.getDataPagamento().getMonth() == now.getMonth()
-                        && c.getDataPagamento().getYear() == now.getYear())
+                .filter(c -> c.getTipo() == TipoTransacao.DESPESA
+                        && c.getDataPagamento() != null
+                        && java.time.YearMonth.from(c.getDataPagamento()).equals(mesAtual))
                 .map(Conta::getValor)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
@@ -111,14 +136,6 @@ public class ContaController {
         model.addAttribute("totalReceitasMes", totalReceitasMes);
         model.addAttribute("totalDespesasMes", totalDespesasMes);
         model.addAttribute("saldoMes", totalReceitasMes.subtract(totalDespesasMes));
-
-        List<Conta> contasAtrasadas = contaService.listarContasAtrasadas(usuarioLogado);
-        List<Conta> contasAVencer = contaService.listarContasAVencer(usuarioLogado);
-        
-        List<Conta> contasUrgentes = todasPendentes.stream()
-                .filter(c -> c.getPrioridade() == Prioridade.ALTA)
-                .toList();
-
         model.addAttribute("contasAtrasadas", contasAtrasadas);
         model.addAttribute("contasAVencer", contasAVencer);
         model.addAttribute("todasPendentes", todasPendentes);
@@ -186,7 +203,9 @@ public class ContaController {
 
         if (arquivo != null && !arquivo.isEmpty()) {
             try {
-                String nomeArquivo = UUID.randomUUID() + "_" + arquivo.getOriginalFilename();
+                String originalName = arquivo.getOriginalFilename();
+                String sanitizedName = originalName != null ? new java.io.File(originalName).getName() : "comprovante";
+                String nomeArquivo = UUID.randomUUID() + "_" + sanitizedName;
                 Path pastaUploads = Paths.get("uploads");
                 if (!Files.exists(pastaUploads)) Files.createDirectories(pastaUploads);
                 Path caminhoFicheiro = pastaUploads.resolve(nomeArquivo);

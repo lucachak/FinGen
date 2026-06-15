@@ -5,6 +5,9 @@ import lombok.*;
 import lombok.experimental.SuperBuilder;
 import lucas.basemodel.modules.wealth.enums.StockAssetClass;
 
+import lucas.basemodel.core.config.DeterministicEncryptionConverter;
+import lucas.basemodel.core.config.RandomEncryptionConverter;
+
 import java.math.BigDecimal;
 
 @Entity
@@ -15,6 +18,7 @@ import java.math.BigDecimal;
 public class StockAsset extends Asset {
 
     @Column(nullable = false)
+    @Convert(converter = DeterministicEncryptionConverter.class)
     private String ticker;
 
     @Column(precision = 19, scale = 4)
@@ -23,6 +27,7 @@ public class StockAsset extends Asset {
     @Column(precision = 19, scale = 4)
     private BigDecimal averagePurchasePrice;
 
+    @Convert(converter = RandomEncryptionConverter.class)
     private String broker;
 
     @Enumerated(EnumType.STRING)

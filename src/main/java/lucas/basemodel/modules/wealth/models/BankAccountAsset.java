@@ -5,6 +5,8 @@ import lombok.*;
 import lombok.experimental.SuperBuilder;
 import lucas.basemodel.modules.wealth.enums.BankAccountType;
 
+import lucas.basemodel.core.config.RandomEncryptionConverter;
+
 import java.math.BigDecimal;
 
 @Entity
@@ -14,6 +16,7 @@ import java.math.BigDecimal;
 @SuperBuilder
 public class BankAccountAsset extends Asset {
 
+    @Convert(converter = RandomEncryptionConverter.class)
     private String bankName;
 
     @Enumerated(EnumType.STRING)

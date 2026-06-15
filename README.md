@@ -392,12 +392,20 @@ The project uses a `render.yaml` file for automatic deployment on [Render.com](h
 
 ## 🔐 Security
 
-- **Authentication:** Spring Security with form-based session + JWT support.
-- **Authorization:** `/app/**` routes require authentication.
-- **Data Isolation:** All controllers filter data by the authenticated user via `Principal`.
-- **Passwords:** Stored with `PasswordEncoder` (BCrypt).
+- **Database Encryption (AES-256):** Sensitive columns are encrypted at rest in the database using JPA Attribute Converters:
+  - *Randomized Encryption (Unique IV per record):* Applied to user full names (`nomeCompleto`), phone numbers (`telefone`), bank names (`bankName`), home addresses (`address`), stock brokerages (`broker`), and asset descriptions (`description`).
+  - *Deterministic Encryption (Fixed IV per key):* Applied to transaction descriptions (`descricao`), goals titles (`titulo`), and stock tickers (`ticker`) to support database exact-match queries.
+  - *Key Management:* Derived securely from the `DB_ENCRYPTION_KEY` environment variable.
+- **HTTP Security Headers (CSP & HSTS):**
+  - *Content Security Policy (CSP):* Strict policy blocks unauthorized script execution, only whitelisting scripts/styles from trusted local endpoints and standard UI CDNs (`unpkg.com`, `tailwindcss.com`, `gsap`, `lucide`).
+  - *Strict Transport Security (HSTS):* Enforces SSL/HTTPS browser connections for all traffic.
+- **Authentication & Authorization:** Spring Security with form-based session + JWT support. All `/app/**` routes require authentication and isolate data by user.
+- **Passwords:** Hashed with `PasswordEncoder` (BCrypt).
+- **Secure File Uploads:**
+  - Receipts are saved with random UUIDs and filenames are sanitized to prevent directory traversal.
+  - Profile pictures are validated against whitelisted extensions (`.jpg`, `.jpeg`, `.png`, `.gif`, `.webp`) to prevent Remote Code Execution (RCE) via scripting files.
+- **Session & Cookie Security:** Session cookies (`JSESSIONID` and `jwtData`) are configured with `HttpOnly`, `Secure` (production), and `SameSite=Lax` to mitigate XSS-based token theft and CSRF.
 - **Soft Delete:** Members are deactivated (`ativo = false`) instead of deleted to preserve history.
-- **Secure Upload:** Files are renamed to UUID before persistence.
 - **Session Staging:** In-memory cache (`ConcurrentHashMap`) for statement staging to avoid HTTP session bloat.
 
 ---

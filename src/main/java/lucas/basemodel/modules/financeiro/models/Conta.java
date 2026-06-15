@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import lucas.basemodel.modules.financeiro.enums.*;
 import lucas.basemodel.modules.user.User;
 import lucas.basemodel.modules.wealth.models.Asset;
+import lucas.basemodel.core.config.DeterministicEncryptionConverter;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
@@ -31,6 +32,7 @@ public class Conta {
 
     @NotBlank(message = "A descrição é obrigatória")
     @Column(nullable = false)
+    @Convert(converter = DeterministicEncryptionConverter.class)
     private String descricao;
 
     @NotNull(message = "O valor é obrigatório")

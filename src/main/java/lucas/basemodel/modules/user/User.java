@@ -8,6 +8,8 @@ import org.hibernate.annotations.UpdateTimestamp;
 import lucas.basemodel.modules.financeiro.models.ConfiguracaoFinanceira;
 import lucas.basemodel.modules.wealth.enums.WealthStrategy;
 
+import lucas.basemodel.core.config.RandomEncryptionConverter;
+
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -35,8 +37,12 @@ public class User {
 
     private String role;
 
+    @Convert(converter = RandomEncryptionConverter.class)
     private String nomeCompleto;
+
+    @Convert(converter = RandomEncryptionConverter.class)
     private String telefone;
+
     private String fotoPerfil;
 
     @Builder.Default

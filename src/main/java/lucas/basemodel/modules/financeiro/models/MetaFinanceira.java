@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import lucas.basemodel.modules.user.User;
 import lucas.basemodel.modules.financeiro.enums.NaturezaMeta;
+import lucas.basemodel.core.config.DeterministicEncryptionConverter;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.UUID;
@@ -19,6 +20,7 @@ public class MetaFinanceira {
     @GeneratedValue
     private UUID id;
 
+    @Convert(converter = DeterministicEncryptionConverter.class)
     private String titulo;
     
     @Builder.Default
