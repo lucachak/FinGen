@@ -43,9 +43,13 @@ public class SecurityConfig {
                                                 .requestMatchers("/css/**", "/js/**", "/images/**", "/*.glb", 
                                                                 "/favicon.ico", "/favicon.svg", "/favicon-96x96.png", 
                                                                 "/apple-touch-icon.png", "/site.webmanifest", "/sw.js", 
-                                                                "/web-app-manifest-*.png", "/", "/auth/**").permitAll()
+                                                                "/web-app-manifest-*.png", "/", "/auth/**",
+                                                                "/actuator/health", "/actuator/health/**").permitAll()
                                                 .requestMatchers("/api/v1/auth/**").permitAll()
                                                 .requestMatchers("/admin/**").hasAuthority("ROLE_ADMIN")
+                                                .requestMatchers("/app/financeiro/categorias/nova",
+                                                                "/app/financeiro/categorias/editar/**",
+                                                                "/app/financeiro/categorias/salvar").hasAuthority("ROLE_ADMIN")
                                                 .requestMatchers("/app/**", "/api/**", "/api/v1/**").authenticated()
                                                 .anyRequest().authenticated())
                                 .sessionManagement(

@@ -3,6 +3,7 @@ package lucas.basemodel.modules.financeiro.models;
 import jakarta.persistence.*;
 import lombok.*;
 import lucas.basemodel.modules.financeiro.enums.Frequencia;
+import lucas.basemodel.modules.financeiro.enums.EscopoTransacao;
 import lucas.basemodel.modules.financeiro.enums.GrupoRecorrencia;
 import lucas.basemodel.modules.financeiro.enums.TipoTransacao;
 import lucas.basemodel.modules.user.User;
@@ -32,6 +33,10 @@ public class TransacaoRecorrente {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "categoria_id")
     private Categoria categoria;
+
+    @Enumerated(EnumType.STRING)
+    @Builder.Default
+    private EscopoTransacao escopo = EscopoTransacao.PESSOAL;
 
     // Optional reference if a specific generic account is tied to it
     @ManyToOne(fetch = FetchType.LAZY)

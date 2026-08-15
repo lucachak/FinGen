@@ -34,11 +34,8 @@ public class MetaService {
 
     public MetaResponse buscarPorId(UUID id, String email) {
         User user = findUser(email);
-        MetaFinanceira meta = metaRepository.findById(id)
+        MetaFinanceira meta = metaRepository.findByIdAndResponsavelId(id, user.getId())
                 .orElseThrow(() -> new ResourceNotFoundException("Meta não encontrada"));
-        if (!meta.getResponsavel().getId().equals(user.getId())) {
-            throw new RuntimeException("Acesso negado");
-        }
         return toResponse(meta);
     }
 
@@ -58,12 +55,8 @@ public class MetaService {
 
     public MetaResponse atualizar(UUID id, MetaRequest request, String email) {
         User user = findUser(email);
-        MetaFinanceira meta = metaRepository.findById(id)
+        MetaFinanceira meta = metaRepository.findByIdAndResponsavelId(id, user.getId())
                 .orElseThrow(() -> new ResourceNotFoundException("Meta não encontrada"));
-        
-        if (!meta.getResponsavel().getId().equals(user.getId())) {
-            throw new RuntimeException("Acesso negado");
-        }
 
         meta.setTitulo(request.getDescricao());
         meta.setNatureza(request.getNatureza());
@@ -77,10 +70,9 @@ public class MetaService {
 
     public void excluir(UUID id, String email) {
         User user = findUser(email);
-        MetaFinanceira meta = metaRepository.findById(id).orElseThrow();
-        if (meta.getResponsavel().getId().equals(user.getId())) {
-            metaRepository.delete(meta);
-        }
+        MetaFinanceira meta = metaRepository.findByIdAndResponsavelId(id, user.getId())
+                .orElseThrow(() -> new ResourceNotFoundException("Meta não encontrada"));
+        metaRepository.delete(meta);
     }
 
     public List<AiMetaSugestaoResponse> sugerirViaAi(String email) {

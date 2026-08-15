@@ -9,6 +9,7 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
+import jakarta.servlet.http.HttpServletResponse;
 
 /**
  * Updated SecurityConfig — adds a second filter chain for /api/v1/** routes.
@@ -57,6 +58,18 @@ public class ApiSecurityConfig {
 
                 // Inject JWT filter before the standard username/password filter
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+
+        http.exceptionHandling(ex -> ex
+                .authenticationEntryPoint((request, response, cause) -> {
+                    response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                    response.setContentType("application/json");
+                    response.getWriter().write("{\"status\":401,\"error\":\"Não autenticado\"}");
+                })
+                .accessDeniedHandler((request, response, cause) -> {
+                    response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+                    response.setContentType("application/json");
+                    response.getWriter().write("{\"status\":403,\"error\":\"Acesso negado\"}");
+                }));
 
         return http.build();
     }

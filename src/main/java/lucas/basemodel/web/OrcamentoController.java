@@ -1,12 +1,16 @@
 package lucas.basemodel.web;
 
 import lucas.basemodel.modules.financeiro.models.Categoria;
+import lucas.basemodel.modules.financeiro.enums.EscopoTransacao;
 import lucas.basemodel.modules.financeiro.models.Orcamento;
 import lucas.basemodel.modules.financeiro.repositories.CategoriaRepository;
 import lucas.basemodel.modules.financeiro.repositories.ContaRepository;
 import lucas.basemodel.modules.financeiro.repositories.OrcamentoRepository;
 import lucas.basemodel.modules.user.User;
 import lucas.basemodel.modules.user.UsuarioRepository;
+import lucas.basemodel.modules.financeiro.services.CategoriaService;
+import lucas.basemodel.modules.financeiro.services.EspacoFinanceiroService;
+import lucas.basemodel.core.exceptions.ResourceNotFoundException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -31,22 +35,31 @@ public class OrcamentoController {
     private final ContaRepository contaRepository;
     private final CategoriaRepository categoriaRepository;
     private final UsuarioRepository usuarioRepository;
+    private final CategoriaService categoriaService;
+    private final EspacoFinanceiroService espacoFinanceiroService;
 
     public OrcamentoController(OrcamentoRepository orcamentoRepository,
             ContaRepository contaRepository,
             CategoriaRepository categoriaRepository,
-            UsuarioRepository usuarioRepository) {
+            UsuarioRepository usuarioRepository,
+            CategoriaService categoriaService,
+            EspacoFinanceiroService espacoFinanceiroService) {
         this.orcamentoRepository = orcamentoRepository;
         this.contaRepository = contaRepository;
         this.categoriaRepository = categoriaRepository;
         this.usuarioRepository = usuarioRepository;
+        this.categoriaService = categoriaService;
+        this.espacoFinanceiroService = espacoFinanceiroService;
     }
 
     @GetMapping({ "", "/" })
-    public String listar(Model model, Principal principal) {
+    public String listar(@RequestParam(defaultValue = "PESSOAL") EscopoTransacao escopo, Model model, Principal principal) {
         User user = usuarioRepository.findByEmail(principal.getName()).orElse(null);
         if (user != null) {
-            List<Orcamento> orcamentos = orcamentoRepository.findByResponsavel(user);
+            espacoFinanceiroService.validarAcesso(user, escopo);
+            List<Orcamento> orcamentos = orcamentoRepository.findByResponsavel(user).stream()
+                    .filter(o -> o.getCategoria() != null && o.getCategoria().getEscopo() == escopo)
+                    .toList();
 
             Map<UUID, BigDecimal> gastosAtuais = new HashMap<>();
             Map<UUID, BigDecimal> percentuais = new HashMap<>();
@@ -112,22 +125,33 @@ public class OrcamentoController {
 
         model.addAttribute("mesAtual", mesNome);
         model.addAttribute("activeMenu", "orcamentos");
+        model.addAttribute("escopoSelecionado", escopo);
+        model.addAttribute("escopos", user != null ? espacoFinanceiroService.listarPermitidos(user) : List.of());
         return "orcamentos/lista";
     }
 
     @GetMapping("/novo")
-    public String novo(Model model) {
+    public String novo(@RequestParam(defaultValue = "PESSOAL") EscopoTransacao escopo, Model model, Principal principal) {
+        User user = usuarioRepository.findByEmail(principal.getName()).orElseThrow();
+        espacoFinanceiroService.validarAcesso(user, escopo);
         model.addAttribute("orcamento", new Orcamento());
-        model.addAttribute("categorias", categoriaRepository.findAll());
+        model.addAttribute("categorias", categoriaRepository.findByEscopoOrderByNomeAsc(escopo));
+        model.addAttribute("escopoSelecionado", escopo);
         model.addAttribute("activeMenu", "orcamentos");
         return "orcamentos/form";
     }
 
     @GetMapping("/editar/{id}")
-    public String editar(@PathVariable UUID id, Model model) {
-        Orcamento orcamento = orcamentoRepository.findById(id).orElse(null);
+    public String editar(@PathVariable UUID id, Model model, Principal principal) {
+        User user = usuarioRepository.findByEmail(principal.getName()).orElseThrow();
+        Orcamento orcamento = orcamentoRepository.findByIdAndResponsavelId(id, user.getId())
+                .orElseThrow(() -> new ResourceNotFoundException("Orçamento não encontrado"));
         model.addAttribute("orcamento", orcamento);
-        model.addAttribute("categorias", categoriaRepository.findAll());
+        EscopoTransacao escopo = orcamento != null && orcamento.getCategoria() != null
+                ? orcamento.getCategoria().getEscopo() : EscopoTransacao.PESSOAL;
+        espacoFinanceiroService.validarAcesso(user, escopo);
+        model.addAttribute("categorias", categoriaRepository.findByEscopoOrderByNomeAsc(escopo));
+        model.addAttribute("escopoSelecionado", escopo);
         model.addAttribute("activeMenu", "orcamentos");
         return "orcamentos/form";
     }
@@ -135,50 +159,76 @@ public class OrcamentoController {
     @PostMapping("/salvar")
     public String salvar(Orcamento orcamento, Principal principal, RedirectAttributes redirectAttributes) {
         User user = usuarioRepository.findByEmail(principal.getName()).orElse(null);
-        if (orcamento.getResponsavel() == null) {
-            orcamento.setResponsavel(user);
+        if (user == null) return "redirect:/auth/login";
+
+        Categoria categoria = orcamento.getCategoria() != null
+                ? categoriaRepository.findById(orcamento.getCategoria().getId())
+                    .orElseThrow(() -> new ResourceNotFoundException("Categoria não encontrada"))
+                : null;
+        if (categoria == null) {
+            throw new lucas.basemodel.core.exceptions.BadRequestException("Selecione uma categoria");
         }
+        espacoFinanceiroService.validarAcesso(user, categoria.getEscopo());
+        categoriaService.validarNoEscopo(categoria, categoria.getEscopo());
+
+        Orcamento alvo;
+        if (orcamento.getId() == null) {
+            alvo = new Orcamento();
+            alvo.setResponsavel(user);
+        } else {
+            alvo = orcamentoRepository.findByIdAndResponsavelId(orcamento.getId(), user.getId())
+                    .orElseThrow(() -> new ResourceNotFoundException("Orçamento não encontrado"));
+        }
+        alvo.setCategoria(categoria);
+        alvo.setLimiteMensal(orcamento.getLimiteMensal());
 
         if (orcamento.getCategoria() != null) {
-            Orcamento existing = orcamentoRepository.findByCategoriaAndResponsavel(orcamento.getCategoria(), user)
+            Orcamento existing = orcamentoRepository.findByCategoriaAndResponsavel(categoria, user)
                     .orElse(null);
-            if (existing != null && !existing.getId().equals(orcamento.getId())) {
+            if (existing != null && !existing.getId().equals(alvo.getId())) {
                 redirectAttributes.addFlashAttribute("errorMessage",
                         "Oops! Você já definiu um limite mensal para a categoria: "
-                                + orcamento.getCategoria().getNome());
+                                + categoria.getNome());
                 return "redirect:/app/financeiro/orcamentos/novo";
             }
         }
 
-        orcamentoRepository.save(orcamento);
+        orcamentoRepository.save(alvo);
         redirectAttributes.addFlashAttribute("successMessage", "Belo trabalho! Orçamento configurado com sucesso.");
-        return "redirect:/app/financeiro/orcamentos";
+        EscopoTransacao escopo = categoria.getEscopo();
+        return "redirect:/app/financeiro/orcamentos?escopo=" + escopo.name();
     }
 
     @PostMapping("/excluir/{id}")
-    public String excluir(@PathVariable UUID id, RedirectAttributes redirectAttributes) {
-        orcamentoRepository.deleteById(id);
+    public String excluir(@PathVariable UUID id, Principal principal, RedirectAttributes redirectAttributes) {
+        User user = usuarioRepository.findByEmail(principal.getName()).orElseThrow();
+        Orcamento orcamento = orcamentoRepository.findByIdAndResponsavelId(id, user.getId())
+                .orElseThrow(() -> new ResourceNotFoundException("Orçamento não encontrado"));
+        orcamentoRepository.delete(orcamento);
         redirectAttributes.addFlashAttribute("successMessage", "Orçamento removido.");
         return "redirect:/app/financeiro/orcamentos";
     }
 
     @PostMapping("/gerar-automatico")
-    public String gerarAutomatico(Principal principal, RedirectAttributes redirectAttributes) {
+    public String gerarAutomatico(@RequestParam(defaultValue = "PESSOAL") EscopoTransacao escopo,
+            Principal principal, RedirectAttributes redirectAttributes) {
         User user = usuarioRepository.findByEmail(principal.getName()).orElse(null);
         if (user == null)
             return "redirect:/auth/login";
+        espacoFinanceiroService.validarAcesso(user, escopo);
 
         LocalDate tresMesesAtras = LocalDate.now().minusMonths(3);
-        List<lucas.basemodel.modules.financeiro.models.Conta> contas = contaRepository.findAll().stream()
-                .filter(c -> c.getResponsavel() != null && c.getResponsavel().getId().equals(user.getId()))
+        List<lucas.basemodel.modules.financeiro.models.Conta> contas = contaRepository
+                .findByResponsavelAndPeriodo(user, tresMesesAtras, LocalDate.now()).stream()
                 .filter(c -> c.getTipo() == lucas.basemodel.modules.financeiro.enums.TipoTransacao.DESPESA)
+                .filter(c -> c.getEscopo() == escopo)
                 .filter(c -> c.getDataVencimento() != null && c.getDataVencimento().isAfter(tresMesesAtras))
                 .toList();
 
         if (contas.isEmpty()) {
             redirectAttributes.addFlashAttribute("errorMessage",
                     "Sem dados suficientes nos últimos 3 meses para gerar um orçamento automático.");
-            return "redirect:/app/financeiro/orcamentos";
+            return "redirect:/app/financeiro/orcamentos?escopo=" + escopo.name();
         }
 
         Map<Categoria, BigDecimal> gastosPorCategoria = new HashMap<>();
@@ -213,6 +263,6 @@ public class OrcamentoController {
             redirectAttributes.addFlashAttribute("errorMessage",
                     "Você já possui orçamentos para todas as categorias ativas.");
         }
-        return "redirect:/app/financeiro/orcamentos";
+        return "redirect:/app/financeiro/orcamentos?escopo=" + escopo.name();
     }
 }

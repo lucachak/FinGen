@@ -41,6 +41,12 @@ build/
 ### Runtime Environment ###
 .env
 venv/
+uploads/
+data/*.db
+data/*.mv.db
+data/*.trace.db
+*.log
+.attach_pid*
 
 ### Mobile ###
 mobile/.env

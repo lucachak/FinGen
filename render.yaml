@@ -5,7 +5,7 @@ services:
     env: docker
     dockerfilePath: ./Dockerfile.combined
     plan: free
-    healthCheckPath: /
+    healthCheckPath: /actuator/health
     envVars:
       - key: GEMINI_TOKEN
         sync: false
@@ -14,10 +14,16 @@ services:
       - key: PYTHON_API_URL
         value: http://localhost:8000
       - key: DB_URL
-        value: jdbc:postgresql://aws-1-us-west-1.pooler.supabase.com:6543/postgres?prepareThreshold=0&ssl=true&sslmode=require
+        sync: false
       - key: DB_USERNAME
-        value: postgres.oylgvvcumpwnfycvkxvi
+        sync: false
       - key: DB_PASSWORD
-        value: Lucachak02ls
+        sync: false
+      - key: JWT_SECRET
+        generateValue: true
+      - key: DB_ENCRYPTION_KEY
+        sync: false
+      - key: SESSION_COOKIE_SECURE
+        value: true
       - key: SPRING_PROFILES_ACTIVE
-        value: dev
+        value: prod

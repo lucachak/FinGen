@@ -158,7 +158,7 @@ public class GeminiService {
 
                 List<Map<String, Object>> transacoes = (List<Map<String, Object>>) responseBody.get("transacoes");
                 Map<String, Categoria> categoriaMap = new HashMap<>();
-                for (Categoria cat : categoriaRepository.findAll()) {
+                for (Categoria cat : categoriaRepository.findByEscopoOrderByNomeAsc(EscopoTransacao.PESSOAL)) {
                     categoriaMap.put(cat.getNome().toLowerCase(), cat);
                 }
 
@@ -209,6 +209,7 @@ public class GeminiService {
                             if (categoriaMapeada == null) {
                                 categoriaMapeada = new Categoria();
                                 categoriaMapeada.setNome(nomeCatFormatado);
+                                categoriaMapeada.setEscopo(EscopoTransacao.PESSOAL);
                                 categoriaMapeada.setNatureza(
                                         lucas.basemodel.modules.financeiro.enums.NaturezaCategoria.DESPESA);
                                 categoriaMapeada = categoriaRepository.save(categoriaMapeada);
@@ -311,12 +312,13 @@ public class GeminiService {
                     }
                 }
 
-                List<Categoria> cats = categoriaRepository.findAll();
+                List<Categoria> cats = categoriaRepository.findByEscopoOrderByNomeAsc(EscopoTransacao.PESSOAL);
                 String catBruta = (String) t.get("categoria");
                 Categoria cat = cats.stream().filter(c -> c.getNome().toUpperCase().contains(catBruta))
                         .findFirst().orElse(!cats.isEmpty() ? cats.get(0) : null);
 
                 novaConta.setCategoria(cat);
+                novaConta.setEscopo(EscopoTransacao.PESSOAL);
                 novaConta.setPrioridade(Prioridade.BAIXA);
                 novaConta.setResponsavel(responsavelReal);
 
@@ -391,17 +393,17 @@ public class GeminiService {
 
     // --- 1. DETETIVE FINANCEIRO (ANÁLISE DE ANOMALIAS) ---
     public String analisarAnomalias(String usernameResponsavel) {
+        return analisarAnomalias(usernameResponsavel, EscopoTransacao.PESSOAL);
+    }
+
+    public String analisarAnomalias(String usernameResponsavel, EscopoTransacao escopo) {
         try {
             // Identifica quem está a pedir a análise
             User responsavelReal = usuarioRepository.findByEmail(usernameResponsavel)
                     .orElseThrow(() -> new IllegalArgumentException("Registo não encontrado."));
 
             // Scalability Fix: use scoped queries instead of findAll()
-            List<Conta> contasCasa = contaRepository.findByResponsavelAndEscopo(responsavelReal, EscopoTransacao.CASA);
-            List<Conta> contasPessoais = contaRepository.findByResponsavelAndEscopo(responsavelReal,
-                    EscopoTransacao.PESSOAL);
-            List<Conta> todasContas = new ArrayList<>(contasCasa);
-            todasContas.addAll(contasPessoais);
+            List<Conta> todasContas = contaRepository.findByResponsavelAndEscopo(responsavelReal, escopo);
 
             // Limit to last 6 months to avoid overflowing context window
             LocalDate limite = LocalDate.now().minusMonths(6);
@@ -441,6 +443,7 @@ public class GeminiService {
             Map<String, Object> body = new HashMap<>();
             body.put("contas", contasSimplificadas);
             body.put("perfil", perfilMap);
+            body.put("escopo", escopo.name());
 
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_JSON);

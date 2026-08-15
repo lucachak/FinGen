@@ -23,7 +23,13 @@ public class Investimento {
     
     private BigDecimal valorAportado = BigDecimal.ZERO;
     private BigDecimal valorAtual = BigDecimal.ZERO;
-    private BigDecimal rentabilidade; // % ou valor numérico
+    private BigDecimal rentabilidade; // variação diária de mercado (%)
+
+    @Column(precision = 19, scale = 6)
+    private BigDecimal quantidade;
+
+    @Column(precision = 19, scale = 6)
+    private BigDecimal precoAtual;
 
     private String ticker; // Símbolo da Bolsa/Crypto (ex: PETR4.SA, BTC-USD)
 

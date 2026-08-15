@@ -8,6 +8,8 @@ import lucas.basemodel.modules.financeiro.models.TransacaoRecorrente;
 import lucas.basemodel.modules.user.User;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -17,6 +19,29 @@ import java.util.List;
 
 @Repository
 public interface ContaRepository extends JpaRepository<Conta, Long> {
+
+        @EntityGraph(attributePaths = { "responsavel", "categoria", "asset" })
+        @Query("SELECT c FROM Conta c WHERE c.responsavel = :responsavel " +
+                        "AND (:status IS NULL OR c.status = :status) " +
+                        "AND (:escopo IS NULL OR c.escopo = :escopo)")
+        Page<Conta> findForApi(
+                        @Param("responsavel") User responsavel,
+                        @Param("status") StatusTransacao status,
+                        @Param("escopo") EscopoTransacao escopo,
+                        Pageable pageable);
+
+        @EntityGraph(attributePaths = { "responsavel", "categoria", "asset" })
+        @Query("SELECT c FROM Conta c WHERE c.responsavel = :responsavel " +
+                        "AND c.paga = false AND c.dataVencimento < :hoje " +
+                        "AND (:escopo IS NULL OR c.escopo = :escopo)")
+        Page<Conta> findOverdueForApi(
+                        @Param("responsavel") User responsavel,
+                        @Param("escopo") EscopoTransacao escopo,
+                        @Param("hoje") LocalDate hoje,
+                        Pageable pageable);
+
+        @EntityGraph(attributePaths = { "responsavel", "categoria", "asset" })
+        java.util.Optional<Conta> findByIdAndResponsavelId(Long id, java.util.UUID responsavelId);
 
         @EntityGraph(attributePaths = { "responsavel", "categoria" })
         @Query("SELECT c FROM Conta c WHERE c.responsavel = :responsavel AND MONTH(c.dataVencimento) = :mes AND YEAR(c.dataVencimento) = :ano")

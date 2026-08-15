@@ -13,7 +13,7 @@
                 <h1 class="font-serif text-[32px] md:text-[40px] font-medium text-zen-t1 tracking-tight leading-tight mb-2">Categorias</h1>
                 <p class="text-[15px] text-zen-t3 font-light tracking-wide">Organiza as despesas para a IA e os gráficos.</p>
             </div>
-            <a th:href="@{/app/financeiro/categorias/nova}" class="inline-flex items-center justify-center gap-2.5 px-6 py-3 bg-brand hover:bg-brand-h text-white rounded-full font-medium transition-colors shadow-sm text-[14px]">
+            <a th:if="${podeGerenciarCategorias}" th:href="@{/app/financeiro/categorias/nova(escopo=${escopoSelecionado})}" class="inline-flex items-center justify-center gap-2.5 px-6 py-3 bg-brand hover:bg-brand-h text-white rounded-full font-medium transition-colors shadow-sm text-[14px]">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                     stroke-linecap="round">
                     <line x1="12" y1="5" x2="12" y2="19" />
@@ -22,6 +22,13 @@
                 Nova Categoria
             </a>
         </div>
+
+        <nav class="flex flex-wrap gap-2 mb-6" aria-label="Espaços financeiros">
+            <a th:each="esp : ${escopos}" th:href="@{/app/financeiro/categorias(escopo=${esp})}"
+               th:text="${esp.descricao}"
+               th:classappend="${esp == escopoSelecionado} ? ' bg-brand text-white border-brand' : ' bg-zen-surface text-zen-t2 border-zen-border hover:border-brand'"
+               class="px-4 py-2.5 rounded-xl border text-[13px] font-semibold transition-colors"></a>
+        </nav>
 
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 mb-8 animate-[fade-up_.35s_ease_both]">
             <div class="bg-zen-surface border border-zen-border rounded-2xl p-4 flex items-center justify-between gap-4 transition-all hover:shadow-sm hover:-translate-y-0.5 group" th:each="cat : ${categorias}">
@@ -33,7 +40,7 @@
                         </div>
                     </div>
                 </div>
-                <a th:href="@{/app/financeiro/categorias/editar/{id}(id=${cat.id})}" class="w-9 h-9 flex items-center justify-center border border-zen-border rounded-lg text-zen-t3 hover:bg-zen-surface2 hover:border-brand hover:text-brand transition-colors shrink-0" title="Editar">
+                <a th:if="${podeGerenciarCategorias}" th:href="@{/app/financeiro/categorias/editar/{id}(id=${cat.id})}" class="w-9 h-9 flex items-center justify-center border border-zen-border rounded-lg text-zen-t3 hover:bg-zen-surface2 hover:border-brand hover:text-brand transition-colors shrink-0" title="Editar">
                     <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
                         stroke-linejoin="round">
                         <path d="M12 20h9" />

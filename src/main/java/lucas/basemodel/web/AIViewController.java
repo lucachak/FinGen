@@ -53,7 +53,8 @@ public class AIViewController {
         
         model.addAttribute("user", usuarioLogado);
         model.addAttribute("stagingTransactions", staging);
-        model.addAttribute("categorias", categoriaRepository.findAll());
+        model.addAttribute("categorias", categoriaRepository.findByEscopoOrderByNomeAsc(
+                lucas.basemodel.modules.financeiro.enums.EscopoTransacao.PESSOAL));
         model.addAttribute("activeMenu", "ia");
         
         return "ia/revisar";

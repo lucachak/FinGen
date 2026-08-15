@@ -7,6 +7,7 @@ import lombok.Data;
 import lucas.basemodel.modules.financeiro.enums.Frequencia;
 import lucas.basemodel.modules.financeiro.enums.GrupoRecorrencia;
 import lucas.basemodel.modules.financeiro.enums.TipoTransacao;
+import lucas.basemodel.modules.financeiro.enums.EscopoTransacao;
 
 import java.math.BigDecimal;
 
@@ -31,4 +32,7 @@ public class TransacaoRecorrenteRequest {
     private BigDecimal valorBase;
 
     private Long categoriaId;
+
+    @NotNull(message = "O espaço financeiro é obrigatório")
+    private EscopoTransacao escopo = EscopoTransacao.PESSOAL;
 }

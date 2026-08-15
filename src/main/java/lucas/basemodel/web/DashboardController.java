@@ -1,8 +1,11 @@
 package lucas.basemodel.web;
 
 import lucas.basemodel.modules.financeiro.enums.EscopoTransacao;
+import lucas.basemodel.modules.financeiro.enums.SituacaoMoradia;
 import lucas.basemodel.modules.financeiro.enums.TipoTransacao;
 import lucas.basemodel.modules.financeiro.models.Conta;
+import lucas.basemodel.modules.financeiro.models.ConfiguracaoFinanceira;
+import lucas.basemodel.modules.financeiro.repositories.ConfiguracaoFinanceiraRepository;
 import lucas.basemodel.modules.financeiro.repositories.ContaRepository;
 import lucas.basemodel.modules.financeiro.models.Orcamento;
 import lucas.basemodel.modules.financeiro.repositories.OrcamentoRepository;
@@ -14,19 +17,23 @@ import lucas.basemodel.modules.financeiro.repositories.MetaFinanceiraRepository;
 import lucas.basemodel.modules.financeiro.services.AiHealthCacheService;
 import lucas.basemodel.modules.financeiro.services.ContaService;
 import lucas.basemodel.modules.financeiro.services.FinancialHealthService;
+import lucas.basemodel.modules.financeiro.services.PortfolioInsightService;
+import lucas.basemodel.modules.financeiro.services.EspacoFinanceiroService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import java.util.UUID;
 import java.math.BigDecimal;
 import java.security.Principal;
+import java.time.LocalDate;
 import java.time.YearMonth;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -45,6 +52,9 @@ public class DashboardController {
     private final ContaService contaService;
     private final MetaFinanceiraRepository metaRepository;
     private final FinancialHealthService financialHealthService;
+    private final PortfolioInsightService portfolioInsightService;
+    private final ConfiguracaoFinanceiraRepository configuracaoFinanceiraRepository;
+    private final EspacoFinanceiroService espacoFinanceiroService;
 
     public DashboardController(ContaRepository contaRepository, UsuarioRepository usuarioRepository,
             OrcamentoRepository orcamentoRepository,
@@ -52,7 +62,10 @@ public class DashboardController {
             AiHealthCacheService aiHealthCacheService,
             ObjectMapper objectMapper, ContaService contaService,
             MetaFinanceiraRepository metaRepository,
-            FinancialHealthService financialHealthService) {
+            FinancialHealthService financialHealthService,
+            PortfolioInsightService portfolioInsightService,
+            ConfiguracaoFinanceiraRepository configuracaoFinanceiraRepository,
+            EspacoFinanceiroService espacoFinanceiroService) {
         this.contaRepository = contaRepository;
         this.usuarioRepository = usuarioRepository;
         this.orcamentoRepository = orcamentoRepository;
@@ -62,6 +75,9 @@ public class DashboardController {
         this.contaService = contaService;
         this.metaRepository = metaRepository;
         this.financialHealthService = financialHealthService;
+        this.portfolioInsightService = portfolioInsightService;
+        this.configuracaoFinanceiraRepository = configuracaoFinanceiraRepository;
+        this.espacoFinanceiroService = espacoFinanceiroService;
     }
 
     @GetMapping
@@ -78,6 +94,18 @@ public class DashboardController {
 
         model.addAttribute("activeMenu", "dashboard");
         model.addAttribute("user", usuarioLogado);
+
+        // --- CONFIGURAÇÃO FINANCEIRA (escopo / perfil do usuário) ---
+        Optional<ConfiguracaoFinanceira> configOpt = configuracaoFinanceiraRepository.findByUser(usuarioLogado);
+        ConfiguracaoFinanceira configuracaoFinanceira = configOpt.orElse(null);
+        model.addAttribute("configuracaoFinanceira", configuracaoFinanceira);
+
+        // Flags para renderização condicional das tabs
+        boolean moraCom = configuracaoFinanceira != null
+                && configuracaoFinanceira.getSituacaoMoradia() == SituacaoMoradia.COM_OS_PAIS;
+        boolean possuiNegocio = configuracaoFinanceira != null && configuracaoFinanceira.isPossuiNegocio();
+        model.addAttribute("mostrarTabCasa", !moraCom);
+        model.addAttribute("mostrarTabNegocio", possuiNegocio);
 
         // --- OTIMIZAÇÃO: 1 query unificada por escopo ---
         // Todos os escopos em uma única query, filtrado em memória
@@ -138,16 +166,6 @@ public class DashboardController {
         WealthSnapshot latest = wealthSnapshotCacheService.getSnapshot(usuarioLogado);
         model.addAttribute("patrimonioTotal", latest != null ? latest.getTotalNetWorth() : BigDecimal.ZERO);
 
-        List<lucas.basemodel.modules.wealth.models.WealthSnapshot> history = latest != null ? List.of(latest)
-                : List.of();
-        try {
-            history = lucas.basemodel.modules.wealth.services.WealthService.class.getDeclaredMethod("getHistory",
-                    java.util.UUID.class) != null
-                            ? List.of()
-                            : List.of();
-        } catch (Exception ignored) {
-        }
-
         // Historia via snapshot repository direto — evita recalcular
         List<lucas.basemodel.modules.wealth.models.WealthSnapshot> historyFull = wealthSnapshotCacheService
                 .getSnapshotHistory(usuarioLogado.getId(), 12);
@@ -161,6 +179,18 @@ public class DashboardController {
         }
         model.addAttribute("labelsHistoricoPatrimonio", mesesHistorico);
         model.addAttribute("valoresHistoricoPatrimonio", valoresHistorico);
+        model.addAttribute("snapshotAtualizadoEm", latest != null ? latest.getCreatedAt() : null);
+        BigDecimal variacaoPatrimonio = null;
+        if (historyFull.size() >= 2) {
+            BigDecimal anterior = historyFull.get(historyFull.size() - 2).getTotalNetWorth();
+            BigDecimal atual = historyFull.get(historyFull.size() - 1).getTotalNetWorth();
+            if (anterior != null && anterior.compareTo(BigDecimal.ZERO) != 0 && atual != null) {
+                variacaoPatrimonio = atual.subtract(anterior)
+                        .multiply(new BigDecimal("100"))
+                        .divide(anterior.abs(), 1, java.math.RoundingMode.HALF_UP);
+            }
+        }
+        model.addAttribute("variacaoPatrimonio", variacaoPatrimonio);
         model.addAttribute("suggestions", wealthSnapshotCacheService.getSuggestions(usuarioLogado.getId()));
 
         if (latest != null && latest.getBreakdownJson() != null) {
@@ -174,7 +204,9 @@ public class DashboardController {
         }
 
         // --- ALERTA ORÇAMENTOS (batch query — anti N+1) ---
-        List<Orcamento> orcamentos = orcamentoRepository.findByResponsavel(usuarioLogado);
+        List<Orcamento> orcamentos = orcamentoRepository.findByResponsavel(usuarioLogado).stream()
+                .filter(o -> o.getCategoria() != null && o.getCategoria().getEscopo() == EscopoTransacao.PESSOAL)
+                .toList();
         List<Long> catIds = orcamentos.stream()
                 .filter(o -> o.getCategoria() != null)
                 .map(o -> o.getCategoria().getId())
@@ -213,30 +245,45 @@ public class DashboardController {
         model.addAttribute("orcamentosAlerta", orcamentosAlerta);
 
         // --- FREE CASH FLOW ---
-        BigDecimal receitaCasa = calcularTotal(contasCasa, TipoTransacao.RECEITA, mesAtual);
-        BigDecimal receitaNegocio = calcularTotal(contasNegocio, TipoTransacao.RECEITA, mesAtual);
-        BigDecimal receitaTotalMes = receitaPessoal.add(receitaCasa).add(receitaNegocio);
+        // Os indicadores exibidos dentro da aba Pessoal usam apenas esse espaço.
+        BigDecimal receitaTotalMes = receitaPessoal;
         model.addAttribute("receitaTotalMes", receitaTotalMes);
 
-        BigDecimal totalPassivos = despesaPessoal.add(pendentePessoal)
-                .add(calcularTotal(contasCasa, TipoTransacao.DESPESA, mesAtual))
-                .add(calcularPendente(contasCasa, TipoTransacao.DESPESA, mesAtual))
-                .add(calcularTotal(contasNegocio, TipoTransacao.DESPESA, mesAtual))
-                .add(calcularPendente(contasNegocio, TipoTransacao.DESPESA, mesAtual));
+        BigDecimal totalPassivos = despesaPessoal.add(pendentePessoal);
 
         BigDecimal freeCashFlow = receitaTotalMes.subtract(totalPassivos);
         model.addAttribute("totalAtivos", receitaTotalMes);
         model.addAttribute("totalPassivos", totalPassivos);
         model.addAttribute("freeCashFlow", freeCashFlow);
 
+        PortfolioInsightService.PortfolioOverview portfolio = portfolioInsightService.build(
+                usuarioLogado, freeCashFlow.max(BigDecimal.ZERO));
+        model.addAttribute("portfolio", portfolio);
+        model.addAttribute("portfolioAllocationLabels", portfolio.allocations().stream()
+                .filter(allocation -> allocation.value().compareTo(BigDecimal.ZERO) > 0)
+                .map(PortfolioInsightService.Allocation::label)
+                .toList());
+        model.addAttribute("portfolioAllocationValues", portfolio.allocations().stream()
+                .filter(allocation -> allocation.value().compareTo(BigDecimal.ZERO) > 0)
+                .map(PortfolioInsightService.Allocation::value)
+                .toList());
+        model.addAttribute("portfolioAllocationColors", portfolio.allocations().stream()
+                .filter(allocation -> allocation.value().compareTo(BigDecimal.ZERO) > 0)
+                .map(PortfolioInsightService.Allocation::color)
+                .toList());
+
         // --- MODELO FINANCEIRO RIGOROSO (FinancialHealthService) ---
-        FinancialHealthService.HealthReport healthReport = financialHealthService.calcular(usuarioLogado, todasContas,
+        FinancialHealthService.HealthReport healthReport = financialHealthService.calcular(usuarioLogado, contasPessoais,
                 orcamentos);
         model.addAttribute("scoreSaude", healthReport.scoreSaude());
         model.addAttribute("taxaPoupancaEfetiva", healthReport.taxaPoupancaEfetiva());
         model.addAttribute("comprometimentoRenda", healthReport.comprometimentoRenda());
         model.addAttribute("classificacaoSaude", healthReport.classificacao());
         model.addAttribute("projecao3Meses", healthReport.projecao3Meses());
+        model.addAttribute("comprometimentoVisual", healthReport.comprometimentoRenda()
+                .max(BigDecimal.ZERO).min(new BigDecimal("100")));
+        model.addAttribute("poupancaVisual", healthReport.taxaPoupancaEfetiva()
+                .max(BigDecimal.ZERO).min(new BigDecimal("100")));
 
         // --- GESTOR AI DATA (lazy via HTMX — não bloqueia o render inicial) ---
         // aiOnline usa cache — nunca faz HTTP no request thread
@@ -244,15 +291,40 @@ public class DashboardController {
 
         // --- OTHER DATA ---
         model.addAttribute("metas", metaRepository.findByResponsavel(usuarioLogado));
-        model.addAttribute("recentTransactions", todasContas.stream()
+        List<Conta> recentTransactions = contasPessoais.stream()
                 .filter(Conta::isPaga)
                 .filter(c -> c.getDataPagamento() != null)
                 .sorted(java.util.Comparator.comparing(Conta::getDataPagamento, java.util.Comparator.reverseOrder()))
                 .limit(5)
-                .toList());
-        model.addAttribute("upcomingBills", todasContas.stream()
-                .filter(c -> !c.isPaga())
-                .toList());
+                .toList();
+        model.addAttribute("recentTransactions", recentTransactions);
+
+        LocalDate hoje = LocalDate.now();
+        List<Conta> contasPendentes = contasPessoais.stream()
+                .filter(c -> c.getTipo() == TipoTransacao.DESPESA && !c.isPaga())
+                .filter(c -> c.getDataVencimento() != null)
+                .toList();
+        List<Conta> contasAtrasadas = contasPendentes.stream()
+                .filter(c -> c.getDataVencimento().isBefore(hoje))
+                .sorted(java.util.Comparator.comparing(Conta::getDataVencimento))
+                .toList();
+        List<Conta> vencendoEmSeteDias = contasPendentes.stream()
+                .filter(c -> !c.getDataVencimento().isBefore(hoje))
+                .filter(c -> !c.getDataVencimento().isAfter(hoje.plusDays(7)))
+                .sorted(java.util.Comparator.comparing(Conta::getDataVencimento))
+                .toList();
+        List<Conta> proximosVencimentos = contasPendentes.stream()
+                .filter(c -> !c.getDataVencimento().isBefore(hoje))
+                .sorted(java.util.Comparator.comparing(Conta::getDataVencimento))
+                .limit(5)
+                .toList();
+
+        model.addAttribute("upcomingBills", proximosVencimentos);
+        model.addAttribute("quantidadeAtrasadas", contasAtrasadas.size());
+        model.addAttribute("totalAtrasado", somarValores(contasAtrasadas));
+        model.addAttribute("quantidadeVencendo7Dias", vencendoEmSeteDias.size());
+        model.addAttribute("totalVencendo7Dias", somarValores(vencendoEmSeteDias));
+        model.addAttribute("temDadosFinanceiros", !contasPessoais.isEmpty());
 
         return "dashboard/index";
     }
@@ -263,12 +335,15 @@ public class DashboardController {
      */
     @GetMapping(value = "/chart-data", produces = "application/json")
     @ResponseBody
-    public Map<String, Object> chartData(Principal principal) {
+    public Map<String, Object> chartData(@RequestParam(defaultValue = "PESSOAL") EscopoTransacao escopo,
+                                         Principal principal) {
         User usuarioLogado = usuarioRepository.findByEmail(principal.getName())
                 .orElseThrow(() -> new IllegalArgumentException("Registo não encontrado."));
+        espacoFinanceiroService.validarAcesso(usuarioLogado, escopo);
         Map<String, Object> data = new HashMap<>();
-        data.put("dadosCategoria", contaService.obterGastosPorCategoriaMesAtual(usuarioLogado));
-        data.put("dadosFluxo", contaService.obterFluxoCaixaUltimos6Meses(usuarioLogado));
+        data.put("escopo", escopo);
+        data.put("dadosCategoria", contaService.obterGastosPorCategoriaMesAtual(usuarioLogado, escopo));
+        data.put("dadosFluxo", contaService.obterFluxoCaixaUltimos6Meses(usuarioLogado, escopo));
         return data;
     }
 
@@ -287,6 +362,13 @@ public class DashboardController {
                 .filter(c -> !c.isPaga())
                 .filter(c -> c.getDataVencimento() != null && YearMonth.from(c.getDataVencimento()).equals(mes))
                 .map(Conta::getValor)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+    }
+
+    private BigDecimal somarValores(List<Conta> contas) {
+        return contas.stream()
+                .map(Conta::getValor)
+                .filter(java.util.Objects::nonNull)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 }

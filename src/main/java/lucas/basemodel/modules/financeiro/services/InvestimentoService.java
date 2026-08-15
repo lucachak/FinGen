@@ -35,10 +35,12 @@ public class InvestimentoService {
 
         BigDecimal totalAportado = investimentos.stream()
                 .map(Investimento::getValorAportado)
+                .filter(java.util.Objects::nonNull)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
         BigDecimal totalAtual = investimentos.stream()
                 .map(Investimento::getValorAtual)
+                .filter(java.util.Objects::nonNull)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
         BigDecimal roiTotal = totalAtual.subtract(totalAportado);
@@ -62,6 +64,7 @@ public class InvestimentoService {
         inv.setValorAportado(request.getValorAportado());
         inv.setValorAtual(request.getValorAtual() != null ? request.getValorAtual() : request.getValorAportado());
         inv.setTicker(request.getTicker());
+        inv.setQuantidade(request.getQuantidade());
         inv.setResponsavel(user);
         
         return toResponse(investimentoRepository.save(inv));
@@ -69,28 +72,24 @@ public class InvestimentoService {
 
     public InvestimentoResponse atualizar(UUID id, InvestimentoRequest request, String email) {
         User user = findUser(email);
-        Investimento inv = investimentoRepository.findById(id)
+        Investimento inv = investimentoRepository.findByIdAndResponsavelId(id, user.getId())
                 .orElseThrow(() -> new ResourceNotFoundException("Investimento não encontrado"));
-        
-        if (!inv.getResponsavel().getId().equals(user.getId())) {
-            throw new RuntimeException("Acesso negado");
-        }
 
         inv.setNome(request.getNome());
         inv.setTipo(request.getTipo());
         inv.setValorAportado(request.getValorAportado());
         inv.setValorAtual(request.getValorAtual());
         inv.setTicker(request.getTicker());
+        inv.setQuantidade(request.getQuantidade());
 
         return toResponse(investimentoRepository.save(inv));
     }
 
     public void excluir(UUID id, String email) {
         User user = findUser(email);
-        Investimento inv = investimentoRepository.findById(id).orElseThrow();
-        if (inv.getResponsavel().getId().equals(user.getId())) {
-            investimentoRepository.delete(inv);
-        }
+        Investimento inv = investimentoRepository.findByIdAndResponsavelId(id, user.getId())
+                .orElseThrow(() -> new ResourceNotFoundException("Investimento não encontrado"));
+        investimentoRepository.delete(inv);
     }
 
     public void syncCotacoes(String email) {
@@ -105,13 +104,15 @@ public class InvestimentoService {
                 .valorAportado(i.getValorAportado())
                 .valorAtual(i.getValorAtual())
                 .rentabilidade(i.getRentabilidade())
+                .quantidade(i.getQuantidade())
+                .precoAtual(i.getPrecoAtual())
                 .ticker(i.getTicker())
                 .dataAtualizacao(i.getDataAtualizacao())
                 .build();
     }
 
     private User findUser(String email) {
-        return usuarioRepository.findByEmail(email)
+        return usuarioRepository.findByEmailIgnoreCase(email)
                 .orElseThrow(() -> new ResourceNotFoundException("Usuário não encontrado"));
     }
 }

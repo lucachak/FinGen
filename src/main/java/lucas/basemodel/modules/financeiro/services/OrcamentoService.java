@@ -5,6 +5,7 @@ import lucas.basemodel.core.exceptions.ResourceNotFoundException;
 import lucas.basemodel.modules.financeiro.dto.OrcamentoRequest;
 import lucas.basemodel.modules.financeiro.dto.OrcamentoResponse;
 import lucas.basemodel.modules.financeiro.enums.TipoTransacao;
+import lucas.basemodel.modules.financeiro.enums.EscopoTransacao;
 import lucas.basemodel.modules.financeiro.models.Categoria;
 import lucas.basemodel.modules.financeiro.models.Conta;
 import lucas.basemodel.modules.financeiro.models.Orcamento;
@@ -33,10 +34,15 @@ public class OrcamentoService {
     private final ContaRepository contaRepository;
     private final CategoriaRepository categoriaRepository;
     private final UsuarioRepository usuarioRepository;
+    private final CategoriaService categoriaService;
+    private final EspacoFinanceiroService espacoFinanceiroService;
 
-    public List<OrcamentoResponse> listarComConsumo(String email) {
+    public List<OrcamentoResponse> listarComConsumo(String email, EscopoTransacao escopo) {
         User user = findUser(email);
-        List<Orcamento> orcamentos = orcamentoRepository.findByResponsavel(user);
+        espacoFinanceiroService.validarAcesso(user, escopo);
+        List<Orcamento> orcamentos = orcamentoRepository.findByResponsavel(user).stream()
+                .filter(o -> o.getCategoria() != null && o.getCategoria().getEscopo() == escopo)
+                .toList();
         int mes = LocalDate.now().getMonthValue();
         int ano = LocalDate.now().getYear();
 
@@ -63,6 +69,8 @@ public class OrcamentoService {
         User user = findUser(email);
         Categoria categoria = categoriaRepository.findById(request.getCategoriaId())
                 .orElseThrow(() -> new ResourceNotFoundException("Categoria não encontrada"));
+        espacoFinanceiroService.validarAcesso(user, categoria.getEscopo());
+        categoriaService.validarNoEscopo(categoria, categoria.getEscopo());
         Orcamento orc = Orcamento.builder()
                 .categoria(categoria)
                 .limiteMensal(request.getLimiteMensal())
@@ -71,29 +79,33 @@ public class OrcamentoService {
         return toResponse(orcamentoRepository.save(orc), BigDecimal.ZERO, 0.0);
     }
 
-    public OrcamentoResponse atualizar(Long id, OrcamentoRequest request, String email) {
+    public OrcamentoResponse atualizar(UUID id, OrcamentoRequest request, String email) {
         User user = findUser(email);
-        Orcamento orc = orcamentoRepository.findByResponsavel(user).stream()
-                .filter(o -> o.getId().equals(UUID.fromString(id.toString())))
-                .findFirst()
+        Orcamento orc = orcamentoRepository.findByIdAndResponsavelId(id, user.getId())
                 .orElseThrow(() -> new ResourceNotFoundException("Orçamento não encontrado"));
         Categoria categoria = categoriaRepository.findById(request.getCategoriaId())
                 .orElseThrow(() -> new ResourceNotFoundException("Categoria não encontrada"));
+        espacoFinanceiroService.validarAcesso(user, categoria.getEscopo());
+        categoriaService.validarNoEscopo(categoria, categoria.getEscopo());
         orc.setCategoria(categoria);
         orc.setLimiteMensal(request.getLimiteMensal());
         return toResponse(orcamentoRepository.save(orc), BigDecimal.ZERO, 0.0);
     }
 
-    public void excluir(Long id, String email) {
-        orcamentoRepository.deleteById(UUID.fromString(id.toString()));
+    public void excluir(UUID id, String email) {
+        User user = findUser(email);
+        Orcamento orcamento = orcamentoRepository.findByIdAndResponsavelId(id, user.getId())
+                .orElseThrow(() -> new ResourceNotFoundException("Orçamento não encontrado"));
+        orcamentoRepository.delete(orcamento);
     }
 
-    public List<OrcamentoResponse> gerarAutomatico(String email) {
+    public List<OrcamentoResponse> gerarAutomatico(String email, EscopoTransacao escopo) {
         User user = findUser(email);
+        espacoFinanceiroService.validarAcesso(user, escopo);
         LocalDate tresMesesAtras = LocalDate.now().minusMonths(3);
-        List<Conta> contas = contaRepository.findAll().stream()
-                .filter(c -> c.getResponsavel() != null && c.getResponsavel().getId().equals(user.getId()))
+        List<Conta> contas = contaRepository.findByResponsavelAndPeriodo(user, tresMesesAtras, LocalDate.now()).stream()
                 .filter(c -> c.getTipo() == TipoTransacao.DESPESA)
+                .filter(c -> c.getEscopo() == escopo)
                 .filter(c -> c.getDataVencimento() != null && c.getDataVencimento().isAfter(tresMesesAtras))
                 .collect(Collectors.toList());
 

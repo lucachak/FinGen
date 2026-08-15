@@ -3,9 +3,11 @@ package lucas.basemodel.web;
 import lucas.basemodel.modules.financeiro.enums.Frequencia;
 import lucas.basemodel.modules.financeiro.enums.GrupoRecorrencia;
 import lucas.basemodel.modules.financeiro.enums.TipoTransacao;
+import lucas.basemodel.modules.financeiro.enums.EscopoTransacao;
 import lucas.basemodel.modules.financeiro.models.TransacaoRecorrente;
 import lucas.basemodel.modules.financeiro.services.CategoriaService;
 import lucas.basemodel.modules.financeiro.services.TransacaoRecorrenteService;
+import lucas.basemodel.modules.financeiro.services.EspacoFinanceiroService;
 import lucas.basemodel.modules.user.User;
 import lucas.basemodel.modules.user.UsuarioRepository;
 import org.springframework.stereotype.Controller;
@@ -22,11 +24,14 @@ public class TransacaoRecorrenteController {
     private final TransacaoRecorrenteService recorrenteService;
     private final CategoriaService categoriaService;
     private final UsuarioRepository usuarioRepository;
+    private final EspacoFinanceiroService espacoFinanceiroService;
 
-    public TransacaoRecorrenteController(TransacaoRecorrenteService recorrenteService, CategoriaService categoriaService, UsuarioRepository usuarioRepository) {
+    public TransacaoRecorrenteController(TransacaoRecorrenteService recorrenteService, CategoriaService categoriaService,
+                                         UsuarioRepository usuarioRepository, EspacoFinanceiroService espacoFinanceiroService) {
         this.recorrenteService = recorrenteService;
         this.categoriaService = categoriaService;
         this.usuarioRepository = usuarioRepository;
+        this.espacoFinanceiroService = espacoFinanceiroService;
     }
 
     @GetMapping({"", "/"})
@@ -38,13 +43,18 @@ public class TransacaoRecorrenteController {
     }
 
     @GetMapping("/nova")
-    public String novaRecorrente(Model model) {
+    public String novaRecorrente(@RequestParam(defaultValue = "PESSOAL") EscopoTransacao escopo, Model model, Principal principal) {
+        User usuarioLogado = usuarioRepository.findByEmail(principal.getName()).orElseThrow();
+        espacoFinanceiroService.validarAcesso(usuarioLogado, escopo);
         model.addAttribute("activeMenu", "automacao");
-        model.addAttribute("recorrente", new TransacaoRecorrente());
-        model.addAttribute("categorias", categoriaService.listarTodas());
+        TransacaoRecorrente recorrente = new TransacaoRecorrente();
+        recorrente.setEscopo(escopo);
+        model.addAttribute("recorrente", recorrente);
+        model.addAttribute("categorias", categoriaService.listarPorEscopo(escopo));
         model.addAttribute("tipos", TipoTransacao.values());
         model.addAttribute("grupos", GrupoRecorrencia.values());
         model.addAttribute("frequencias", Frequencia.values());
+        model.addAttribute("escopos", espacoFinanceiroService.listarPermitidos(usuarioLogado));
         return "recorrentes/form";
     }
 
@@ -54,20 +64,21 @@ public class TransacaoRecorrenteController {
         User usuarioLogado = usuarioRepository.findByEmail(principal.getName()).orElseThrow(() -> new IllegalArgumentException("Registo não encontrado."));
         TransacaoRecorrente recorrente = recorrenteService.buscarPorId(id, usuarioLogado);
         if (recorrente == null) return "redirect:/app/financeiro/recorrentes";
+        espacoFinanceiroService.validarAcesso(usuarioLogado, recorrente.getEscopo());
 
         model.addAttribute("recorrente", recorrente);
-        model.addAttribute("categorias", categoriaService.listarTodas());
+        model.addAttribute("categorias", categoriaService.listarPorEscopo(recorrente.getEscopo()));
         model.addAttribute("tipos", TipoTransacao.values());
         model.addAttribute("grupos", GrupoRecorrencia.values());
         model.addAttribute("frequencias", Frequencia.values());
+        model.addAttribute("escopos", espacoFinanceiroService.listarPermitidos(usuarioLogado));
         return "recorrentes/form";
     }
 
     @PostMapping("/salvar")
     public String salvarRecorrente(@ModelAttribute("recorrente") TransacaoRecorrente recorrente, Principal principal) {
         User usuarioLogado = usuarioRepository.findByEmail(principal.getName()).orElseThrow(() -> new IllegalArgumentException("Registo não encontrado."));
-        recorrente.setUsuario(usuarioLogado);
-        recorrenteService.salvar(recorrente);
+        recorrenteService.salvarParaUsuario(recorrente, usuarioLogado);
         return "redirect:/app/financeiro/recorrentes";
     }
 

@@ -10,6 +10,8 @@ import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
 import java.util.List;
+import java.util.UUID;
+import lucas.basemodel.modules.financeiro.enums.EscopoTransacao;
 
 /**
  * REST API for Orçamentos (category budgets).
@@ -24,8 +26,9 @@ class OrcamentoApiController {
 
     /** GET /api/v1/orcamentos — all budgets with current consumption % */
     @GetMapping
-    public ResponseEntity<List<OrcamentoResponse>> listar(Principal principal) {
-        return ResponseEntity.ok(orcamentoService.listarComConsumo(principal.getName()));
+    public ResponseEntity<List<OrcamentoResponse>> listar(
+            @RequestParam(defaultValue = "PESSOAL") EscopoTransacao escopo, Principal principal) {
+        return ResponseEntity.ok(orcamentoService.listarComConsumo(principal.getName(), escopo));
     }
 
     /** POST /api/v1/orcamentos — create budget */
@@ -38,7 +41,7 @@ class OrcamentoApiController {
     /** PUT /api/v1/orcamentos/{id} — update budget */
     @PutMapping("/{id}")
     public ResponseEntity<OrcamentoResponse> atualizar(
-            @PathVariable Long id,
+            @PathVariable UUID id,
             @Valid @RequestBody OrcamentoRequest request,
             Principal principal) {
         return ResponseEntity.ok(orcamentoService.atualizar(id, request, principal.getName()));
@@ -46,7 +49,7 @@ class OrcamentoApiController {
 
     /** DELETE /api/v1/orcamentos/{id} */
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> excluir(@PathVariable Long id, Principal principal) {
+    public ResponseEntity<Void> excluir(@PathVariable UUID id, Principal principal) {
         orcamentoService.excluir(id, principal.getName());
         return ResponseEntity.noContent().build();
     }
@@ -57,7 +60,8 @@ class OrcamentoApiController {
      * Mirrors POST /app/financeiro/orcamentos/gerar-automatico
      */
     @PostMapping("/gerar-automatico")
-    public ResponseEntity<List<OrcamentoResponse>> gerarAutomatico(Principal principal) {
-        return ResponseEntity.ok(orcamentoService.gerarAutomatico(principal.getName()));
+    public ResponseEntity<List<OrcamentoResponse>> gerarAutomatico(
+            @RequestParam(defaultValue = "PESSOAL") EscopoTransacao escopo, Principal principal) {
+        return ResponseEntity.ok(orcamentoService.gerarAutomatico(principal.getName(), escopo));
     }
 }

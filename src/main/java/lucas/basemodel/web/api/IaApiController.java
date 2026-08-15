@@ -10,6 +10,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.security.Principal;
 import java.util.List;
+import lucas.basemodel.modules.financeiro.enums.EscopoTransacao;
 
 /**
  * REST API for AI features.
@@ -83,8 +84,9 @@ public class IaApiController {
      * Returns pure JSON for mobile.
      */
     @GetMapping("/analisar-anomalias")
-    public ResponseEntity<?> analisarAnomalias(Principal principal) {
-        return ResponseEntity.ok(aiService.analisarAnomalias(principal.getName()));
+    public ResponseEntity<?> analisarAnomalias(
+            @RequestParam(defaultValue = "PESSOAL") EscopoTransacao escopo, Principal principal) {
+        return ResponseEntity.ok(aiService.analisarAnomalias(principal.getName(), escopo));
     }
 
     /**

@@ -37,6 +37,16 @@ public class ConfiguracaoFinanceira {
     @Column(precision = 15, scale = 2)
     private BigDecimal valorMoradia;
 
+    /** Valor mensal que o usuário contribui para a família (quando mora COM_OS_PAIS) */
+    @Column(precision = 15, scale = 2)
+    @Builder.Default
+    private BigDecimal ajudaFamiliar = BigDecimal.ZERO;
+
+    /** Gasto médio mensal com alimentação (supermercado + restaurantes) */
+    @Column(precision = 15, scale = 2)
+    @Builder.Default
+    private BigDecimal gastoAlimentacao = BigDecimal.ZERO;
+
     @Enumerated(EnumType.STRING)
     private TransportePrincipal transportePrincipal;
 
@@ -48,4 +58,11 @@ public class ConfiguracaoFinanceira {
 
     @Builder.Default
     private int numeroDependentes = 0;
+
+    /** Usuário declarou ter negócio / CNPJ / MEI */
+    @Builder.Default
+    private boolean possuiNegocio = false;
+
+    /** Nome do negócio / razão social (opcional) */
+    private String nomeNegocio;
 }

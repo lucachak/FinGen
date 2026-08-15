@@ -42,6 +42,12 @@
 
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
             <div class="flex flex-col gap-2">
+              <label class="text-[12px] font-semibold text-zen-t2 uppercase tracking-widest ml-1">Espaço financeiro</label>
+              <select th:field="*{escopo}" id="inputEscopo" class="w-full px-4 py-3 border border-zen-border rounded-xl bg-zen-surface2 text-[14.5px] text-zen-t1 focus:bg-zen-surface focus:border-brand focus:ring-2 focus:ring-brand/20 transition-all outline-none form-select" required>
+                <option th:each="esp : ${escopos}" th:value="${esp}" th:text="${esp.descricao}"></option>
+              </select>
+            </div>
+            <div class="flex flex-col gap-2">
               <label class="text-[12px] font-semibold text-zen-t2 uppercase tracking-widest ml-1">Grupo (IA vs Fixo)</label>
               <select th:field="*{grupo}" class="w-full px-4 py-3 border border-zen-border rounded-xl bg-zen-surface2 text-[14.5px] text-zen-t1 focus:bg-zen-surface focus:border-brand focus:ring-2 focus:ring-brand/20 transition-all outline-none form-select" required>
                 <option value="FIXA">Fixo (Aluguel, Streaming)</option>
@@ -76,9 +82,9 @@
             </div>
             <div class="flex flex-col gap-2">
               <label class="text-[12px] font-semibold text-zen-t2 uppercase tracking-widest ml-1">Categoria</label>
-              <select th:field="*{categoria.id}" class="w-full px-4 py-3 border border-zen-border rounded-xl bg-zen-surface2 text-[14.5px] text-zen-t1 focus:bg-zen-surface focus:border-brand focus:ring-2 focus:ring-brand/20 transition-all outline-none form-select">
+              <select th:field="*{categoria.id}" id="inputCategoria" class="w-full px-4 py-3 border border-zen-border rounded-xl bg-zen-surface2 text-[14.5px] text-zen-t1 focus:bg-zen-surface focus:border-brand focus:ring-2 focus:ring-brand/20 transition-all outline-none form-select">
                 <option value="">-- Sem Categoria --</option>
-                <option th:each="c : ${categorias}" th:value="${c.id}" th:text="${c.nome}"></option>
+                <option th:each="c : ${categorias}" th:value="${c.id}" th:text="${c.nome}" th:attr="data-escopo=${c.escopo}"></option>
               </select>
             </div>
           </div>
@@ -102,6 +108,24 @@
       </div>
     </div>
   </main>
-  <script th:fragment="script"></script>
+  <script th:fragment="script">
+    document.addEventListener('DOMContentLoaded', () => {
+      const escopo = document.getElementById('inputEscopo');
+      const categoria = document.getElementById('inputCategoria');
+      const filtrar = () => {
+        let valida = !categoria.value;
+        Array.from(categoria.options).forEach(opt => {
+          if (!opt.value) return;
+          const exibir = opt.dataset.escopo === escopo.value;
+          opt.hidden = !exibir;
+          opt.disabled = !exibir;
+          if (exibir && opt.selected) valida = true;
+        });
+        if (!valida) categoria.value = '';
+      };
+      escopo.addEventListener('change', filtrar);
+      filtrar();
+    });
+  </script>
 </body>
 </html>

@@ -7,6 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
+import lucas.basemodel.modules.financeiro.enums.EscopoTransacao;
 
 /**
  * REST API for dashboard data.
@@ -35,8 +36,9 @@ public class DashboardApiController {
      * }
      */
     @GetMapping("/summary")
-    public ResponseEntity<DashboardSummaryResponse> getSummary(Principal principal) {
-        return ResponseEntity.ok(dashboardService.getSummary(principal.getName()));
+    public ResponseEntity<DashboardSummaryResponse> getSummary(
+            @RequestParam(defaultValue = "PESSOAL") EscopoTransacao escopo, Principal principal) {
+        return ResponseEntity.ok(dashboardService.getSummary(principal.getName(), escopo));
     }
 
     /**
@@ -57,8 +59,9 @@ public class DashboardApiController {
      * }
      */
     @GetMapping("/chart-data")
-    public ResponseEntity<?> getChartData(Principal principal) {
-        return ResponseEntity.ok(dashboardService.getChartData(principal.getName()));
+    public ResponseEntity<?> getChartData(
+            @RequestParam(defaultValue = "PESSOAL") EscopoTransacao escopo, Principal principal) {
+        return ResponseEntity.ok(dashboardService.getChartData(principal.getName(), escopo));
     }
 
     /**
@@ -66,8 +69,9 @@ public class DashboardApiController {
      * Returns the next upcoming pending bills.
      */
     @GetMapping("/proximas-contas")
-    public ResponseEntity<?> getProximasContas(Principal principal) {
-        return ResponseEntity.ok(dashboardService.getProximasContas(principal.getName()));
+    public ResponseEntity<?> getProximasContas(
+            @RequestParam(defaultValue = "PESSOAL") EscopoTransacao escopo, Principal principal) {
+        return ResponseEntity.ok(dashboardService.getProximasContas(principal.getName(), escopo));
     }
 
     /**
@@ -75,7 +79,8 @@ public class DashboardApiController {
      * Returns the last 5 paid transactions.
      */
     @GetMapping("/transacoes-recentes")
-    public ResponseEntity<?> getTransacoesRecentes(Principal principal) {
-        return ResponseEntity.ok(dashboardService.getTransacoesRecentes(principal.getName()));
+    public ResponseEntity<?> getTransacoesRecentes(
+            @RequestParam(defaultValue = "PESSOAL") EscopoTransacao escopo, Principal principal) {
+        return ResponseEntity.ok(dashboardService.getTransacoesRecentes(principal.getName(), escopo));
     }
 }

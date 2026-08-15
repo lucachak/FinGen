@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/v1/recorrentes")
@@ -39,7 +40,7 @@ public class TransacaoRecorrenteApiController {
     /** PUT /api/v1/recorrentes/{id} */
     @PutMapping("/{id}")
     public ResponseEntity<TransacaoRecorrenteResponse> atualizar(
-            @PathVariable Long id,
+            @PathVariable UUID id,
             @Valid @RequestBody TransacaoRecorrenteRequest request,
             Principal principal) {
         return ResponseEntity.ok(recorrenteService.atualizar(id, request, principal.getName()));
@@ -47,7 +48,7 @@ public class TransacaoRecorrenteApiController {
 
     /** DELETE /api/v1/recorrentes/{id} */
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> excluir(@PathVariable Long id, Principal principal) {
+    public ResponseEntity<Void> excluir(@PathVariable UUID id, Principal principal) {
         recorrenteService.excluir(id, principal.getName());
         return ResponseEntity.noContent().build();
     }

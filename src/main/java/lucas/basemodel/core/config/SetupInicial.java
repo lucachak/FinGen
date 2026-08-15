@@ -8,6 +8,7 @@ import lucas.basemodel.modules.financeiro.models.Conta;
 import lucas.basemodel.modules.financeiro.enums.Prioridade;
 import lucas.basemodel.modules.financeiro.enums.TipoTransacao;
 import lucas.basemodel.modules.financeiro.enums.NaturezaCategoria;
+import lucas.basemodel.modules.financeiro.enums.EscopoTransacao;
 import lucas.basemodel.modules.financeiro.repositories.CategoriaRepository;
 import lucas.basemodel.modules.financeiro.repositories.ContaRepository;
 import org.springframework.boot.CommandLineRunner;
@@ -71,44 +72,60 @@ public class SetupInicial implements CommandLineRunner {
             repository.save(demo);
         }
 
-        // 2. Setup das Categorias (Agora mapeadas automaticamente para a sua Natureza)
-        if (categoriaRepository.count() == 0) {
-            System.out.println("Criando categorias da casa com suas naturezas...");
+        configurarCategoriasPorEspaco();
+    }
 
-            Map<NaturezaCategoria, List<String>> categoriasPorNatureza = Map.of(
-                    NaturezaCategoria.ESSENCIAL, Arrays.asList(
-                            "MORADIA", "CONDOMINIO", "SUPERMERCADO", "TRANSPORTE", "FARMACIA",
-                            "SALARIO_ESTAGIO", "NEGOCIO_EBIKE", "FREELANCE_DEV"
-                    ),
-                    NaturezaCategoria.ESTILO_VIDA, Arrays.asList(
-                            "DELIVERY", "MANUTENCAO_MOTO", "ESTUDOS", "ACADEMIA", "CUIDADOS_PESSOAIS", "LAZER", "CINEMA"
-                    ),
-                    NaturezaCategoria.INVESTIMENTO, Arrays.asList(
-                            "INVESTIMENTOS", "RENDIMENTOS"
-                    )
-            );
+    private void configurarCategoriasPorEspaco() {
+        Map<String, EscopoTransacao> categoriasLegadas = Map.ofEntries(
+                Map.entry("Moradia", EscopoTransacao.CASA),
+                Map.entry("Condominio", EscopoTransacao.CASA),
+                Map.entry("Supermercado", EscopoTransacao.CASA),
+                Map.entry("Transporte", EscopoTransacao.PESSOAL),
+                Map.entry("Farmacia", EscopoTransacao.PESSOAL),
+                Map.entry("Salario Estagio", EscopoTransacao.PESSOAL),
+                Map.entry("Negocio Ebike", EscopoTransacao.NEGOCIO),
+                Map.entry("Freelance Dev", EscopoTransacao.PESSOAL),
+                Map.entry("Delivery", EscopoTransacao.PESSOAL),
+                Map.entry("Manutencao Moto", EscopoTransacao.PESSOAL),
+                Map.entry("Estudos", EscopoTransacao.PESSOAL),
+                Map.entry("Academia", EscopoTransacao.PESSOAL),
+                Map.entry("Cuidados Pessoais", EscopoTransacao.PESSOAL),
+                Map.entry("Cinema", EscopoTransacao.PESSOAL),
+                Map.entry("Investimentos", EscopoTransacao.PESSOAL),
+                Map.entry("Rendimentos", EscopoTransacao.PESSOAL));
+        categoriasLegadas.forEach((nome, escopo) -> categoriaRepository.findFirstByNomeIgnoreCase(nome).ifPresent(categoria -> {
+            if (categoria.getEscopo() == null) {
+                categoria.setEscopo(escopo);
+                categoriaRepository.save(categoria);
+            }
+        }));
 
-            String[] paleta = {"#2563eb", "#16a34a", "#f59e0b", "#7c3aed", "#dc2626", "#0891b2", "#c026d3", "#ea580c"};
-            int corIndex = 0;
+        Map<EscopoTransacao, Map<NaturezaCategoria, List<String>>> catalogo = Map.of(
+                EscopoTransacao.PESSOAL, Map.of(
+                        NaturezaCategoria.ESSENCIAL, List.of("Compras", "Transporte", "Higiene pessoal", "Saúde", "Educação"),
+                        NaturezaCategoria.ESTILO_VIDA, List.of("Lazer", "Assinaturas", "Alimentação pessoal"),
+                        NaturezaCategoria.INVESTIMENTO, List.of("Investimentos pessoais", "Rendimentos pessoais")),
+                EscopoTransacao.CASA, Map.of(
+                        NaturezaCategoria.ESSENCIAL, List.of("Água", "Energia elétrica", "Gás", "Mercado", "Aluguel ou financiamento", "Condomínio", "Internet residencial"),
+                        NaturezaCategoria.ESTILO_VIDA, List.of("Produtos de limpeza", "Manutenção doméstica")),
+                EscopoTransacao.NEGOCIO, Map.of(
+                        NaturezaCategoria.ESSENCIAL, List.of("Impostos e taxas", "Manutenção empresarial", "Fornecedores", "Folha e pró-labore", "Contabilidade", "Aluguel comercial"),
+                        NaturezaCategoria.ESTILO_VIDA, List.of("Software e serviços", "Marketing", "Logística"))
+        );
 
-            for (Map.Entry<NaturezaCategoria, List<String>> entry : categoriasPorNatureza.entrySet()) {
-                NaturezaCategoria naturezaAtual = entry.getKey();
-                List<String> nomes = entry.getValue();
-
-                for (String nome : nomes) {
-                    Categoria cat = new Categoria();
-
-                    String[] palavras = nome.split("_");
-                    StringBuilder formatado = new StringBuilder();
-                    for (String p : palavras) {
-                        formatado.append(p.substring(0, 1).toUpperCase()).append(p.substring(1).toLowerCase()).append(" ");
+        String[] paleta = {"#2563eb", "#16a34a", "#f59e0b", "#7c3aed", "#dc2626", "#0891b2", "#c026d3", "#ea580c"};
+        int corIndex = 0;
+        for (Map.Entry<EscopoTransacao, Map<NaturezaCategoria, List<String>>> espaco : catalogo.entrySet()) {
+            for (Map.Entry<NaturezaCategoria, List<String>> grupo : espaco.getValue().entrySet()) {
+                for (String nome : grupo.getValue()) {
+                    if (categoriaRepository.findByNomeIgnoreCaseAndEscopo(nome, espaco.getKey()).isEmpty()) {
+                        Categoria categoria = categoriaRepository.findFirstByNomeIgnoreCase(nome).orElseGet(Categoria::new);
+                        categoria.setNome(nome);
+                        categoria.setEscopo(espaco.getKey());
+                        categoria.setNatureza(grupo.getKey());
+                        categoria.setCorHexadecimal(paleta[corIndex % paleta.length]);
+                        categoriaRepository.save(categoria);
                     }
-
-                    cat.setNome(formatado.toString().trim());
-                    cat.setCorHexadecimal(paleta[corIndex % paleta.length]);
-                    cat.setNatureza(naturezaAtual);
-
-                    categoriaRepository.save(cat);
                     corIndex++;
                 }
             }

@@ -21,6 +21,8 @@ public class InvestimentoResponse {
     private BigDecimal valorAportado;
     private BigDecimal valorAtual;
     private BigDecimal rentabilidade;
+    private BigDecimal quantidade;
+    private BigDecimal precoAtual;
     private String ticker;
     private LocalDate dataAtualizacao;
 }

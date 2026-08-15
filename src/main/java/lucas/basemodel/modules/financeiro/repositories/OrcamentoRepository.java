@@ -13,6 +13,7 @@ import java.util.UUID;
 @Repository
 public interface OrcamentoRepository extends JpaRepository<Orcamento, UUID> {
     List<Orcamento> findByResponsavel(User responsavel);
+    Optional<Orcamento> findByIdAndResponsavelId(UUID id, UUID responsavelId);
     Optional<Orcamento> findByCategoriaAndResponsavel(Categoria categoria, User responsavel);
     
     @org.springframework.data.jpa.repository.Modifying

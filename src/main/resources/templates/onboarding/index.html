@@ -2,6 +2,7 @@
 <html xmlns:th="http://www.thymeleaf.org" th:replace="~{layout/layout :: layout('Onboarding FinGen', ~{::section}, ~{::style}, ~{::script})}">
 <head>
     <style>
+        /* ─── Step Transitions ─── */
         .step-transition {
             transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
         }
@@ -19,7 +20,8 @@
             position: relative;
             visibility: visible;
         }
-        
+
+        /* ─── Card Selectors ─── */
         .radio-card-input:checked + .radio-card-label {
             border-color: var(--brand);
             background-color: var(--brand-soft);
@@ -28,37 +30,72 @@
             border-color: var(--brand);
             background-color: var(--brand-soft);
         }
+        .radio-card-input:checked + .radio-card-label .selector-icon {
+            color: var(--brand);
+        }
+
+        /* ─── Toggle Switch ─── */
+        .toggle-switch {
+            position: relative; display: inline-flex; align-items: center;
+            width: 52px; height: 28px; cursor: pointer;
+        }
+        .toggle-switch input { opacity: 0; width: 0; height: 0; }
+        .toggle-track {
+            position: absolute; inset: 0; background: var(--surface-2);
+            border: 1.5px solid var(--border); border-radius: 9999px;
+            transition: background .3s, border-color .3s;
+        }
+        .toggle-thumb {
+            position: absolute; left: 3px; top: 50%; transform: translateY(-50%);
+            width: 20px; height: 20px; border-radius: 50%;
+            background: var(--t3); transition: transform .3s, background .3s;
+        }
+        .toggle-switch input:checked ~ .toggle-track { background: var(--brand); border-color: var(--brand); }
+        .toggle-switch input:checked ~ .toggle-thumb { transform: translateX(24px) translateY(-50%); background: white; }
+
+        /* ─── Negócio expand animation ─── */
+        .negocio-fields { overflow: hidden; transition: max-height 0.4s ease, opacity 0.3s ease; max-height: 0; opacity: 0; }
+        .negocio-fields.open { max-height: 200px; opacity: 1; }
+
+        /* ─── Alimentação value input ─── */
+        .alim-card { transition: border-color .2s, background .2s; }
+        .alim-card.selected { border-color: var(--brand) !important; background-color: var(--brand-soft) !important; }
     </style>
 </head>
 <body>
     <section class="relative min-h-[calc(100vh-80px)] flex items-center justify-center py-10 px-5 overflow-hidden">
-        
+
         <!-- Background Decor -->
         <div class="absolute -top-[10%] -left-[10%] w-[500px] h-[500px] bg-brand/10 rounded-full blur-[100px] pointer-events-none z-0"></div>
         <div class="absolute -bottom-[5%] -right-[5%] w-[400px] h-[400px] bg-emerald-200/20 rounded-full blur-[100px] pointer-events-none z-0"></div>
 
-        <div class="w-full max-w-[720px] relative z-10">
+        <div class="w-full max-w-[740px] relative z-10">
             <!-- Progress Bar -->
             <div class="flex justify-between items-center mb-8 px-4" id="progress-container">
-                <!-- JS will inject progress indicators here -->
+                <!-- JS injects progress indicators here -->
             </div>
 
             <!-- Error Toast -->
-            <div id="validation-error" class="hidden absolute top-4 left-1/2 -translate-x-1/2 z-50 bg-red-50 text-red-600 border border-red-200 px-6 py-3 rounded-xl shadow-lg font-medium flex items-center gap-2 animate-[fade-down_0.4s_ease-out]">
+            <div id="validation-error" class="hidden absolute top-4 left-1/2 -translate-x-1/2 z-50 bg-red-50 text-red-600 border border-red-200 px-6 py-3 rounded-xl shadow-lg font-medium flex items-center gap-2">
                 <i data-lucide="alert-circle" class="w-5 h-5"></i>
                 <span id="error-message">Por favor, preencha o campo.</span>
             </div>
 
             <!-- Wizard Container -->
-            <div class="bg-zen-surface/80 backdrop-blur-xl border border-white/90 rounded-[32px] p-8 md:p-12 shadow-xl-zen relative overflow-hidden min-h-[400px]">
-                
+            <div class="bg-zen-surface/80 backdrop-blur-xl border border-white/90 rounded-[32px] p-8 md:p-12 shadow-xl-zen relative overflow-hidden min-h-[420px]">
+
                 <form id="onboardingForm" onsubmit="return false;">
-                    
-                    <!-- STEP 1: Renda Principal -->
+
+                    <!-- ═══════════════════════════════════════════
+                         STEP 1 — Renda Principal
+                    ════════════════════════════════════════════ -->
                     <div id="step-1" class="step-transition step-active">
                         <div class="text-center mb-10">
-                            <h2 class="font-serif text-[32px] md:text-[36px] text-zen-t1 tracking-tight mb-3">Sua Renda Principal</h2>
-                            <p class="text-zen-t3 text-[15px] max-w-md mx-auto">Para montarmos seu orçamento ideal, precisamos saber sua renda líquida mensal aproximada.</p>
+                            <span class="inline-flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.2em] text-brand mb-4">
+                                <i data-lucide="wallet" class="w-3.5 h-3.5"></i> Sua Base Financeira
+                            </span>
+                            <h2 class="font-serif text-[32px] md:text-[36px] text-zen-t1 tracking-tight mb-3">Qual é a sua renda líquida?</h2>
+                            <p class="text-zen-t3 text-[15px] max-w-md mx-auto">O valor que cai na sua conta todo mês, depois dos descontos.</p>
                         </div>
                         <div class="max-w-md mx-auto">
                             <div class="relative mb-8">
@@ -66,7 +103,9 @@
                                 <div class="absolute inset-y-0 left-0 pl-5 flex items-center pointer-events-none">
                                     <span class="text-zen-t3 font-medium text-lg">R$</span>
                                 </div>
-                                <input type="number" id="rendaLiquida" name="rendaLiquida" step="100" class="w-full bg-zen-surface2/50 border border-zen-border rounded-2xl pl-12 pr-5 py-4 text-zen-t1 text-xl font-mono focus:outline-none focus:ring-2 focus:ring-brand/30 focus:bg-zen-surface transition-all shadow-sm-zen" placeholder="0,00">
+                                <input type="number" id="rendaLiquida" name="rendaLiquida" step="100" min="0"
+                                    class="w-full bg-zen-surface2/50 border border-zen-border rounded-2xl pl-12 pr-5 py-5 text-zen-t1 text-2xl font-mono focus:outline-none focus:ring-2 focus:ring-brand/30 focus:bg-zen-surface transition-all shadow-sm-zen"
+                                    placeholder="0,00">
                             </div>
                             <button type="button" onclick="handleNext(2)" class="w-full btn-primary justify-center py-3.5 text-[15px] rounded-xl">
                                 Avançar <i data-lucide="arrow-right" class="w-4 h-4 ml-1"></i>
@@ -74,113 +113,216 @@
                         </div>
                     </div>
 
-                    <!-- STEP 2: Moradia -->
+                    <!-- ═══════════════════════════════════════════
+                         STEP 2 — Moradia
+                    ════════════════════════════════════════════ -->
                     <div id="step-2" class="step-transition step-hidden">
                         <div class="text-center mb-10">
+                            <span class="inline-flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.2em] text-brand mb-4">
+                                <i data-lucide="home" class="w-3.5 h-3.5"></i> Moradia
+                            </span>
                             <h2 class="font-serif text-[32px] md:text-[36px] text-zen-t1 tracking-tight mb-3">Como você mora hoje?</h2>
-                            <p class="text-zen-t3 text-[15px]">O custo de moradia costuma ser a maior despesa.</p>
+                            <p class="text-zen-t3 text-[15px]">Isso define como vamos organizar suas contas.</p>
                         </div>
-                        
+
                         <div class="grid grid-cols-2 gap-4 mb-6">
                             <div class="relative">
-                                <input type="radio" name="situacaoMoradia" value="ALUGUEL" id="moradia-aluguel" class="radio-card-input hidden peer" onchange="toggleValorMoradia()">
+                                <input type="radio" name="situacaoMoradia" value="ALUGUEL" id="moradia-aluguel" class="radio-card-input hidden" onchange="onMoradiaChange()">
                                 <label for="moradia-aluguel" class="radio-card-label cursor-pointer flex flex-col items-center text-center p-5 border border-zen-border rounded-2xl transition hover:border-brand/50 select-none">
-                                    <i data-lucide="key" class="w-8 h-8 text-zen-t2 mb-3"></i>
+                                    <i data-lucide="key" class="w-8 h-8 text-zen-t2 mb-3 selector-icon"></i>
                                     <span class="font-medium text-[14px]">Aluguel</span>
+                                    <span class="text-[11px] text-zen-t3 mt-1">Pago mensalmente</span>
                                 </label>
                             </div>
                             <div class="relative">
-                                <input type="radio" name="situacaoMoradia" value="FINANCIAMENTO" id="moradia-financiamento" class="radio-card-input hidden peer" onchange="toggleValorMoradia()">
+                                <input type="radio" name="situacaoMoradia" value="FINANCIAMENTO" id="moradia-financiamento" class="radio-card-input hidden" onchange="onMoradiaChange()">
                                 <label for="moradia-financiamento" class="radio-card-label cursor-pointer flex flex-col items-center text-center p-5 border border-zen-border rounded-2xl transition hover:border-brand/50 select-none">
-                                    <i data-lucide="home" class="w-8 h-8 text-zen-t2 mb-3"></i>
+                                    <i data-lucide="home" class="w-8 h-8 text-zen-t2 mb-3 selector-icon"></i>
                                     <span class="font-medium text-[14px]">Financiamento</span>
+                                    <span class="text-[11px] text-zen-t3 mt-1">Prestação mensal</span>
                                 </label>
                             </div>
                             <div class="relative">
-                                <input type="radio" name="situacaoMoradia" value="QUITADO" id="moradia-quitado" class="radio-card-input hidden peer" onchange="toggleValorMoradia()">
+                                <input type="radio" name="situacaoMoradia" value="QUITADO" id="moradia-quitado" class="radio-card-input hidden" onchange="onMoradiaChange()">
                                 <label for="moradia-quitado" class="radio-card-label cursor-pointer flex flex-col items-center text-center p-5 border border-zen-border rounded-2xl transition hover:border-brand/50 select-none">
-                                    <i data-lucide="check-circle-2" class="w-8 h-8 text-zen-t2 mb-3"></i>
+                                    <i data-lucide="check-circle-2" class="w-8 h-8 text-zen-t2 mb-3 selector-icon"></i>
                                     <span class="font-medium text-[14px]">Imóvel Quitado</span>
+                                    <span class="text-[11px] text-zen-t3 mt-1">Sem prestação</span>
                                 </label>
                             </div>
                             <div class="relative">
-                                <input type="radio" name="situacaoMoradia" value="COM_OS_PAIS" id="moradia-pais" class="radio-card-input hidden peer" onchange="toggleValorMoradia()">
+                                <input type="radio" name="situacaoMoradia" value="COM_OS_PAIS" id="moradia-pais" class="radio-card-input hidden" onchange="onMoradiaChange()">
                                 <label for="moradia-pais" class="radio-card-label cursor-pointer flex flex-col items-center text-center p-5 border border-zen-border rounded-2xl transition hover:border-brand/50 select-none">
-                                    <i data-lucide="users" class="w-8 h-8 text-zen-t2 mb-3"></i>
-                                    <span class="font-medium text-[14px]">Com os pais/outros</span>
+                                    <i data-lucide="users" class="w-8 h-8 text-zen-t2 mb-3 selector-icon"></i>
+                                    <span class="font-medium text-[14px]">Com os pais</span>
+                                    <span class="text-[11px] text-zen-t3 mt-1">Ou familiares</span>
                                 </label>
                             </div>
                         </div>
 
-                        <!-- Valor input (hidden by default) -->
-                        <div id="valor-moradia-container" class="hidden animate-fade-in mb-8">
+                        <!-- Valor Moradia (aluguel/financiamento) -->
+                        <div id="valor-moradia-container" class="hidden mb-6">
                             <label class="block text-[12px] font-semibold text-zen-t3 uppercase tracking-widest mb-2 ml-1" for="valorMoradia">Valor Mensal (R$)</label>
-                            <input type="number" id="valorMoradia" name="valorMoradia" step="10" class="w-full bg-zen-surface2/50 border border-zen-border rounded-xl px-4 py-3 text-zen-t1 font-mono focus:outline-none focus:ring-2 focus:ring-brand/30" placeholder="0,00">
+                            <div class="relative">
+                                <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                                    <span class="text-zen-t3 font-medium">R$</span>
+                                </div>
+                                <input type="number" id="valorMoradia" name="valorMoradia" step="10" min="0"
+                                    class="w-full bg-zen-surface2/50 border border-zen-border rounded-xl pl-10 pr-4 py-3.5 text-zen-t1 font-mono focus:outline-none focus:ring-2 focus:ring-brand/30"
+                                    placeholder="0,00">
+                            </div>
+                        </div>
+
+                        <!-- Ajuda Familiar (mora com os pais) -->
+                        <div id="ajuda-familiar-container" class="hidden mb-6">
+                            <div class="bg-brand-soft border border-brand/20 rounded-2xl p-5">
+                                <div class="flex items-start gap-3 mb-4">
+                                    <div class="w-9 h-9 rounded-xl bg-brand/10 flex items-center justify-center shrink-0">
+                                        <i data-lucide="heart-handshake" class="w-4.5 h-4.5 text-brand"></i>
+                                    </div>
+                                    <div>
+                                        <p class="text-[13.5px] font-semibold text-zen-t1">Você contribui financeiramente?</p>
+                                        <p class="text-[12px] text-zen-t3 mt-0.5">Se você ajuda com despesas da casa, informe o valor.</p>
+                                    </div>
+                                </div>
+                                <label class="block text-[12px] font-semibold text-zen-t3 uppercase tracking-widest mb-2 ml-1" for="ajudaFamiliar">Valor de ajuda por mês (opcional)</label>
+                                <div class="relative">
+                                    <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                                        <span class="text-zen-t3 font-medium">R$</span>
+                                    </div>
+                                    <input type="number" id="ajudaFamiliar" name="ajudaFamiliar" step="10" min="0"
+                                        class="w-full bg-zen-surface border border-zen-border rounded-xl pl-10 pr-4 py-3.5 text-zen-t1 font-mono focus:outline-none focus:ring-2 focus:ring-brand/30"
+                                        placeholder="0,00">
+                                </div>
+                            </div>
                         </div>
 
                         <div class="flex justify-between items-center mt-8">
                             <button type="button" onclick="prevStep(1)" class="btn-ghost py-2.5 px-6 rounded-xl text-[14px]">Voltar</button>
-                            <button type="button" onclick="handleNext(3)" class="btn-primary py-2.5 px-8 rounded-xl text-[14px]">Avançar</button>
+                            <button type="button" onclick="handleNextMoradia()" class="btn-primary py-2.5 px-8 rounded-xl text-[14px]">Avançar</button>
                         </div>
                     </div>
 
-                    <!-- STEP 3: Contas Residenciais -->
+                    <!-- ═══════════════════════════════════════════
+                         STEP 3 — Contas Residenciais
+                         (pulado automaticamente se COM_OS_PAIS)
+                    ════════════════════════════════════════════ -->
                     <div id="step-3" class="step-transition step-hidden">
                         <div class="text-center mb-10">
-                            <h2 class="font-serif text-[32px] md:text-[36px] text-zen-t1 tracking-tight mb-3">Despesas da Casa</h2>
-                            <p class="text-zen-t3 text-[15px]">Quais destas contas você costuma pagar todo mês?</p>
+                            <span class="inline-flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.2em] text-brand mb-4">
+                                <i data-lucide="plug-zap" class="w-3.5 h-3.5"></i> Contas da Casa
+                            </span>
+                            <h2 class="font-serif text-[32px] md:text-[36px] text-zen-t1 tracking-tight mb-3">Quais contas você paga?</h2>
+                            <p class="text-zen-t3 text-[15px]">Selecione as contas fixas que você é responsável.</p>
                         </div>
 
-                        <div class="grid grid-cols-2 md:grid-cols-3 gap-4 mb-10">
-                            <!-- Helper template for checkboxes -->
+                        <div class="grid grid-cols-2 md:grid-cols-3 gap-3 mb-10">
                             <div class="relative">
                                 <input type="checkbox" name="contasCasa" value="Luz" id="conta-luz" class="checkbox-card-input hidden">
-                                <label for="conta-luz" class="checkbox-card-label cursor-pointer flex items-center gap-3 p-4 border border-zen-border rounded-xl transition hover:bg-zen-surface2">
-                                    <i data-lucide="zap" class="w-5 h-5 text-amber-500"></i>
+                                <label for="conta-luz" class="checkbox-card-label cursor-pointer flex items-center gap-3 p-4 border border-zen-border rounded-xl transition hover:bg-zen-surface2 select-none">
+                                    <i data-lucide="zap" class="w-5 h-5 text-amber-500 shrink-0"></i>
                                     <span class="font-medium text-[14px]">Energia</span>
                                 </label>
                             </div>
                             <div class="relative">
                                 <input type="checkbox" name="contasCasa" value="Agua" id="conta-agua" class="checkbox-card-input hidden">
-                                <label for="conta-agua" class="checkbox-card-label cursor-pointer flex items-center gap-3 p-4 border border-zen-border rounded-xl transition hover:bg-zen-surface2">
-                                    <i data-lucide="droplet" class="w-5 h-5 text-blue-500"></i>
+                                <label for="conta-agua" class="checkbox-card-label cursor-pointer flex items-center gap-3 p-4 border border-zen-border rounded-xl transition hover:bg-zen-surface2 select-none">
+                                    <i data-lucide="droplet" class="w-5 h-5 text-blue-500 shrink-0"></i>
                                     <span class="font-medium text-[14px]">Água</span>
                                 </label>
                             </div>
                             <div class="relative">
                                 <input type="checkbox" name="contasCasa" value="Internet" id="conta-internet" class="checkbox-card-input hidden">
-                                <label for="conta-internet" class="checkbox-card-label cursor-pointer flex items-center gap-3 p-4 border border-zen-border rounded-xl transition hover:bg-zen-surface2">
-                                    <i data-lucide="wifi" class="w-5 h-5 text-brand"></i>
+                                <label for="conta-internet" class="checkbox-card-label cursor-pointer flex items-center gap-3 p-4 border border-zen-border rounded-xl transition hover:bg-zen-surface2 select-none">
+                                    <i data-lucide="wifi" class="w-5 h-5 text-brand shrink-0"></i>
                                     <span class="font-medium text-[14px]">Internet</span>
                                 </label>
                             </div>
                             <div class="relative">
                                 <input type="checkbox" name="contasCasa" value="Gas" id="conta-gas" class="checkbox-card-input hidden">
-                                <label for="conta-gas" class="checkbox-card-label cursor-pointer flex items-center gap-3 p-4 border border-zen-border rounded-xl transition hover:bg-zen-surface2">
-                                    <i data-lucide="flame" class="w-5 h-5 text-orange-500"></i>
+                                <label for="conta-gas" class="checkbox-card-label cursor-pointer flex items-center gap-3 p-4 border border-zen-border rounded-xl transition hover:bg-zen-surface2 select-none">
+                                    <i data-lucide="flame" class="w-5 h-5 text-orange-500 shrink-0"></i>
                                     <span class="font-medium text-[14px]">Gás</span>
                                 </label>
                             </div>
                             <div class="relative">
                                 <input type="checkbox" name="contasCasa" value="Condominio" id="conta-condo" class="checkbox-card-input hidden">
-                                <label for="conta-condo" class="checkbox-card-label cursor-pointer flex items-center gap-3 p-4 border border-zen-border rounded-xl transition hover:bg-zen-surface2">
-                                    <i data-lucide="building" class="w-5 h-5 text-emerald-600"></i>
+                                <label for="conta-condo" class="checkbox-card-label cursor-pointer flex items-center gap-3 p-4 border border-zen-border rounded-xl transition hover:bg-zen-surface2 select-none">
+                                    <i data-lucide="building" class="w-5 h-5 text-emerald-600 shrink-0"></i>
                                     <span class="font-medium text-[14px]">Condomínio</span>
                                 </label>
                             </div>
                         </div>
+                        <p class="text-[11px] text-zen-t3 text-center -mt-6 mb-8">Pode pular se não pagar nenhuma destas.</p>
 
-                        <div class="flex justify-between items-center mt-8">
+                        <div class="flex justify-between items-center">
                             <button type="button" onclick="prevStep(2)" class="btn-ghost py-2.5 px-6 rounded-xl text-[14px]">Voltar</button>
                             <button type="button" onclick="handleNext(4)" class="btn-primary py-2.5 px-8 rounded-xl text-[14px]">Avançar</button>
                         </div>
                     </div>
 
-                    <!-- STEP 4: Transporte e Estilo de Vida -->
+                    <!-- ═══════════════════════════════════════════
+                         STEP 4 — Alimentação
+                    ════════════════════════════════════════════ -->
                     <div id="step-4" class="step-transition step-hidden">
+                        <div class="text-center mb-10">
+                            <span class="inline-flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.2em] text-brand mb-4">
+                                <i data-lucide="shopping-cart" class="w-3.5 h-3.5"></i> Alimentação
+                            </span>
+                            <h2 class="font-serif text-[32px] md:text-[36px] text-zen-t1 tracking-tight mb-3">Quanto você gasta com comida?</h2>
+                            <p class="text-zen-t3 text-[15px] max-w-md mx-auto">Supermercado + restaurantes + delivery. Estimativa tudo bem.</p>
+                        </div>
+
+                        <!-- Quick-select chips -->
+                        <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
+                            <button type="button" onclick="setAlimentacao(400)" class="alim-card border border-zen-border rounded-2xl p-4 text-center hover:border-brand/50 transition">
+                                <span class="block font-mono text-[17px] font-semibold text-zen-t1">R$ 400</span>
+                                <span class="text-[11px] text-zen-t3">Econômico</span>
+                            </button>
+                            <button type="button" onclick="setAlimentacao(800)" class="alim-card border border-zen-border rounded-2xl p-4 text-center hover:border-brand/50 transition">
+                                <span class="block font-mono text-[17px] font-semibold text-zen-t1">R$ 800</span>
+                                <span class="text-[11px] text-zen-t3">Moderado</span>
+                            </button>
+                            <button type="button" onclick="setAlimentacao(1400)" class="alim-card border border-zen-border rounded-2xl p-4 text-center hover:border-brand/50 transition">
+                                <span class="block font-mono text-[17px] font-semibold text-zen-t1">R$ 1.400</span>
+                                <span class="text-[11px] text-zen-t3">Confortável</span>
+                            </button>
+                            <button type="button" onclick="setAlimentacao(2500)" class="alim-card border border-zen-border rounded-2xl p-4 text-center hover:border-brand/50 transition">
+                                <span class="block font-mono text-[17px] font-semibold text-zen-t1">R$ 2.500</span>
+                                <span class="text-[11px] text-zen-t3">Premium</span>
+                            </button>
+                        </div>
+
+                        <!-- Custom value -->
+                        <div class="max-w-sm mx-auto mb-3">
+                            <label class="block text-[11px] font-semibold text-zen-t3 uppercase tracking-widest mb-2 ml-1" for="gastoAlimentacao">Ou insira um valor personalizado</label>
+                            <div class="relative">
+                                <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                                    <span class="text-zen-t3 font-medium">R$</span>
+                                </div>
+                                <input type="number" id="gastoAlimentacao" name="gastoAlimentacao" step="50" min="0"
+                                    class="w-full bg-zen-surface2/50 border border-zen-border rounded-xl pl-10 pr-4 py-3.5 text-zen-t1 font-mono focus:outline-none focus:ring-2 focus:ring-brand/30"
+                                    placeholder="0,00" oninput="clearAlimCards()">
+                            </div>
+                        </div>
+                        <p class="text-[11px] text-zen-t3 text-center mb-8">Pode pular se preferir não informar agora.</p>
+
+                        <div class="flex justify-between items-center">
+                            <button type="button" onclick="goBackFromStep4()" class="btn-ghost py-2.5 px-6 rounded-xl text-[14px]">Voltar</button>
+                            <button type="button" onclick="handleNext(5)" class="btn-primary py-2.5 px-8 rounded-xl text-[14px]">Avançar</button>
+                        </div>
+                    </div>
+
+                    <!-- ═══════════════════════════════════════════
+                         STEP 5 — Transporte & Assinaturas
+                    ════════════════════════════════════════════ -->
+                    <div id="step-5" class="step-transition step-hidden">
                         <div class="text-center mb-8">
+                            <span class="inline-flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.2em] text-brand mb-4">
+                                <i data-lucide="route" class="w-3.5 h-3.5"></i> Estilo de vida
+                            </span>
                             <h2 class="font-serif text-[32px] md:text-[36px] text-zen-t1 tracking-tight mb-3">Transporte & Assinaturas</h2>
-                            <p class="text-zen-t3 text-[15px]">Só faltam os gastos do dia a dia e streaming.</p>
+                            <p class="text-zen-t3 text-[15px]">Como você se locomove e o que você assina?</p>
                         </div>
 
                         <div class="mb-8">
@@ -188,20 +330,20 @@
                             <div class="grid grid-cols-3 gap-3">
                                 <div class="relative">
                                     <input type="radio" name="transportePrincipal" value="CARRO_MOTO" id="transp-carro" class="radio-card-input hidden">
-                                    <label for="transp-carro" class="radio-card-label cursor-pointer flex flex-col items-center p-3 border border-zen-border rounded-xl hover:border-brand/50">
-                                        <i data-lucide="car" class="w-5 h-5 mb-2"></i><span class="text-[12px] font-medium">Carro/Moto</span>
+                                    <label for="transp-carro" class="radio-card-label cursor-pointer flex flex-col items-center p-4 border border-zen-border rounded-xl hover:border-brand/50 select-none">
+                                        <i data-lucide="car" class="w-6 h-6 mb-2 selector-icon"></i><span class="text-[12px] font-medium">Carro/Moto</span>
                                     </label>
                                 </div>
                                 <div class="relative">
                                     <input type="radio" name="transportePrincipal" value="TRANSPORTE_PUBLICO" id="transp-pub" class="radio-card-input hidden">
-                                    <label for="transp-pub" class="radio-card-label cursor-pointer flex flex-col items-center p-3 border border-zen-border rounded-xl hover:border-brand/50">
-                                        <i data-lucide="bus" class="w-5 h-5 mb-2"></i><span class="text-[12px] font-medium">Público/App</span>
+                                    <label for="transp-pub" class="radio-card-label cursor-pointer flex flex-col items-center p-4 border border-zen-border rounded-xl hover:border-brand/50 select-none">
+                                        <i data-lucide="bus" class="w-6 h-6 mb-2 selector-icon"></i><span class="text-[12px] font-medium">Público/App</span>
                                     </label>
                                 </div>
                                 <div class="relative">
                                     <input type="radio" name="transportePrincipal" value="BICICLETA_A_PE" id="transp-pe" class="radio-card-input hidden">
-                                    <label for="transp-pe" class="radio-card-label cursor-pointer flex flex-col items-center p-3 border border-zen-border rounded-xl hover:border-brand/50">
-                                        <i data-lucide="bike" class="w-5 h-5 mb-2"></i><span class="text-[12px] font-medium">Ativo (Pé/Bike)</span>
+                                    <label for="transp-pe" class="radio-card-label cursor-pointer flex flex-col items-center p-4 border border-zen-border rounded-xl hover:border-brand/50 select-none">
+                                        <i data-lucide="bike" class="w-6 h-6 mb-2 selector-icon"></i><span class="text-[12px] font-medium">Ativo (Pé/Bike)</span>
                                     </label>
                                 </div>
                             </div>
@@ -212,31 +354,93 @@
                             <div class="flex flex-wrap gap-2">
                                 <label class="relative">
                                     <input type="checkbox" name="assinaturas" value="Netflix" class="checkbox-card-input hidden">
-                                    <span class="checkbox-card-label cursor-pointer inline-flex px-4 py-2 border border-zen-border rounded-full text-[13px] font-medium transition hover:bg-zen-surface2">Netflix</span>
+                                    <span class="checkbox-card-label cursor-pointer inline-flex px-4 py-2 border border-zen-border rounded-full text-[13px] font-medium transition hover:bg-zen-surface2 select-none">Netflix</span>
                                 </label>
                                 <label class="relative">
                                     <input type="checkbox" name="assinaturas" value="Spotify" class="checkbox-card-input hidden">
-                                    <span class="checkbox-card-label cursor-pointer inline-flex px-4 py-2 border border-zen-border rounded-full text-[13px] font-medium transition hover:bg-zen-surface2">Spotify</span>
+                                    <span class="checkbox-card-label cursor-pointer inline-flex px-4 py-2 border border-zen-border rounded-full text-[13px] font-medium transition hover:bg-zen-surface2 select-none">Spotify</span>
                                 </label>
                                 <label class="relative">
                                     <input type="checkbox" name="assinaturas" value="Academia" class="checkbox-card-input hidden">
-                                    <span class="checkbox-card-label cursor-pointer inline-flex px-4 py-2 border border-zen-border rounded-full text-[13px] font-medium transition hover:bg-zen-surface2">Academia</span>
+                                    <span class="checkbox-card-label cursor-pointer inline-flex px-4 py-2 border border-zen-border rounded-full text-[13px] font-medium transition hover:bg-zen-surface2 select-none">Academia</span>
                                 </label>
                                 <label class="relative">
                                     <input type="checkbox" name="assinaturas" value="Amazon Prime" class="checkbox-card-input hidden">
-                                    <span class="checkbox-card-label cursor-pointer inline-flex px-4 py-2 border border-zen-border rounded-full text-[13px] font-medium transition hover:bg-zen-surface2">Prime Video</span>
+                                    <span class="checkbox-card-label cursor-pointer inline-flex px-4 py-2 border border-zen-border rounded-full text-[13px] font-medium transition hover:bg-zen-surface2 select-none">Prime Video</span>
+                                </label>
+                                <label class="relative">
+                                    <input type="checkbox" name="assinaturas" value="Disney Plus" class="checkbox-card-input hidden">
+                                    <span class="checkbox-card-label cursor-pointer inline-flex px-4 py-2 border border-zen-border rounded-full text-[13px] font-medium transition hover:bg-zen-surface2 select-none">Disney+</span>
                                 </label>
                             </div>
                         </div>
 
                         <div class="flex justify-between items-center mt-8">
-                            <button type="button" onclick="prevStep(3)" class="btn-ghost py-2.5 px-6 rounded-xl text-[14px]">Voltar</button>
-                            <button type="button" onclick="submitOnboarding()" class="bg-brand text-white font-medium py-3 px-8 rounded-xl text-[14px] shadow-md hover:bg-brand-h transition">Concluir Setup</button>
+                            <button type="button" onclick="prevStep(4)" class="btn-ghost py-2.5 px-6 rounded-xl text-[14px]">Voltar</button>
+                            <button type="button" onclick="handleNext(6)" class="btn-primary py-2.5 px-8 rounded-xl text-[14px]">Avançar</button>
                         </div>
                     </div>
 
-                    <!-- STEP 5: Loading state -->
-                    <div id="step-5" class="step-transition step-hidden flex-col items-center justify-center min-h-[300px]">
+                    <!-- ═══════════════════════════════════════════
+                         STEP 6 — Perfil Business
+                    ════════════════════════════════════════════ -->
+                    <div id="step-6" class="step-transition step-hidden">
+                        <div class="text-center mb-10">
+                            <span class="inline-flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.2em] text-brand mb-4">
+                                <i data-lucide="briefcase" class="w-3.5 h-3.5"></i> Perfil Business
+                            </span>
+                            <h2 class="font-serif text-[32px] md:text-[36px] text-zen-t1 tracking-tight mb-3">Você tem um negócio?</h2>
+                            <p class="text-zen-t3 text-[15px] max-w-md mx-auto">MEI, CNPJ, empresa, autônomo... qualquer atividade empresarial que gera receita ou custos separados.</p>
+                        </div>
+
+                        <div class="max-w-md mx-auto">
+                            <!-- Toggle -->
+                            <div class="flex items-center justify-between bg-zen-surface2/50 border border-zen-border rounded-2xl px-6 py-4 mb-6">
+                                <div>
+                                    <p class="text-[14px] font-semibold text-zen-t1">Possuo negócio / CNPJ</p>
+                                    <p class="text-[12px] text-zen-t3 mt-0.5">Ativa o módulo Business no dashboard</p>
+                                </div>
+                                <label class="toggle-switch" for="possuiNegocio">
+                                    <input type="checkbox" id="possuiNegocio" name="possuiNegocioToggle" onchange="onNegocioToggle(this)">
+                                    <span class="toggle-track"></span>
+                                    <span class="toggle-thumb"></span>
+                                </label>
+                            </div>
+
+                            <!-- Nome do negócio (expand se ativado) -->
+                            <div id="negocio-fields" class="negocio-fields">
+                                <label class="block text-[12px] font-semibold text-zen-t3 uppercase tracking-widest mb-2 ml-1" for="nomeNegocio">
+                                    Nome do negócio / empresa (opcional)
+                                </label>
+                                <input type="text" id="nomeNegocio" name="nomeNegocio" maxlength="100"
+                                    class="w-full bg-zen-surface2/50 border border-zen-border rounded-xl px-4 py-3.5 text-zen-t1 focus:outline-none focus:ring-2 focus:ring-brand/30 mb-4"
+                                    placeholder="Ex: Padaria do João, FreelanceDev, etc.">
+                            </div>
+
+                            <!-- Info card: tabs que serão habilitadas -->
+                            <div id="business-info-card" class="hidden bg-brand-soft border border-brand/20 rounded-2xl p-4 mb-6">
+                                <div class="flex items-center gap-3">
+                                    <i data-lucide="layout-dashboard" class="w-4 h-4 text-brand shrink-0"></i>
+                                    <p class="text-[13px] text-zen-t2">A aba <strong class="text-brand">Business</strong> será habilitada no seu dashboard para separar as finanças do negócio.</p>
+                                </div>
+                            </div>
+
+                            <button type="button" onclick="submitOnboarding()" class="w-full bg-brand text-white font-semibold py-4 px-8 rounded-xl text-[15px] shadow-md hover:bg-brand-h transition flex items-center justify-center gap-2">
+                                <i data-lucide="sparkles" class="w-4 h-4"></i>
+                                Concluir Setup
+                            </button>
+                            <p class="text-[11px] text-zen-t3 text-center mt-3">Você pode atualizar estas informações depois nas configurações.</p>
+                        </div>
+
+                        <div class="flex justify-start items-center mt-4">
+                            <button type="button" onclick="prevStep(5)" class="btn-ghost py-2.5 px-6 rounded-xl text-[14px]">Voltar</button>
+                        </div>
+                    </div>
+
+                    <!-- ═══════════════════════════════════════════
+                         STEP 7 — Loading State
+                    ════════════════════════════════════════════ -->
+                    <div id="step-7" class="step-transition step-hidden flex-col items-center justify-center min-h-[300px]">
                         <div class="w-16 h-16 border-4 border-zen-surface2 border-t-brand rounded-full animate-spin mb-6"></div>
                         <h2 class="font-serif text-[28px] text-zen-t1 mb-2">Preparando sua Base...</h2>
                         <p class="text-zen-t3" id="loading-text">Analisando padrão financeiro</p>
@@ -248,180 +452,223 @@
     </section>
 
     <script>
-        const totalSteps = 4;
+        // ──────────────────────────────────────────────
+        // ESTADO GLOBAL
+        // ──────────────────────────────────────────────
+        const TOTAL_STEPS = 6;
         let currentStep = 1;
+        let moraCom = false; // COM_OS_PAIS
 
-        // Init progress dots
+        // ──────────────────────────────────────────────
+        // PROGRESSO
+        // ──────────────────────────────────────────────
         function initProgress() {
             const container = document.getElementById('progress-container');
             let html = '';
-            for(let i=1; i<=totalSteps; i++) {
-                html += `<div id="dot-${i}" class="w-3.5 h-3.5 rounded-full border-2 transition-all duration-300 ${i===1 ? 'bg-brand border-brand ring-4 ring-brand/15' : 'bg-zen-surface2 border-zen-border'}"></div>`;
-                if(i < totalSteps) {
-                    html += `<div class="flex-1 h-px bg-zen-border mx-2"></div>`;
-                }
+            for (let i = 1; i <= TOTAL_STEPS; i++) {
+                const isActive = i === 1;
+                html += `<div id="dot-${i}" class="w-3.5 h-3.5 rounded-full border-2 transition-all duration-300 ${isActive ? 'bg-brand border-brand ring-4 ring-brand/15' : 'bg-zen-surface2 border-zen-border'}"></div>`;
+                if (i < TOTAL_STEPS) html += `<div class="flex-1 h-px bg-zen-border mx-2"></div>`;
             }
             container.innerHTML = html;
         }
 
         function updateProgress(step) {
-            for(let i=1; i<=totalSteps; i++) {
+            for (let i = 1; i <= TOTAL_STEPS; i++) {
                 const dot = document.getElementById(`dot-${i}`);
-                if (i <= step) {
-                    dot.className = "w-3.5 h-3.5 rounded-full border-2 transition-all duration-300 bg-brand border-brand ring-4 ring-brand/15";
-                } else {
-                    dot.className = "w-3.5 h-3.5 rounded-full border-2 transition-all duration-300 bg-zen-surface2 border-zen-border";
-                }
+                if (!dot) continue;
+                dot.className = i <= step
+                    ? 'w-3.5 h-3.5 rounded-full border-2 transition-all duration-300 bg-brand border-brand ring-4 ring-brand/15'
+                    : 'w-3.5 h-3.5 rounded-full border-2 transition-all duration-300 bg-zen-surface2 border-zen-border';
             }
         }
 
         let ctx;
         document.addEventListener('DOMContentLoaded', () => {
-            ctx = gsap.context(() => {});
+            ctx = gsap?.context ? gsap.context(() => {}) : null;
             initProgress();
-            
-            // Cleanup for HTMX
             document.addEventListener('htmx:beforeSwap', () => ctx && ctx.revert());
         });
 
-        function toggleValorMoradia() {
-            const radios = document.getElementsByName('situacaoMoradia');
-            const container = document.getElementById('valor-moradia-container');
-            let selected = '';
-            for(let i=0; i<radios.length; i++){
-                if(radios[i].checked) selected = radios[i].value;
-            }
-            if(selected === 'ALUGUEL' || selected === 'FINANCIAMENTO') {
-                container.classList.remove('hidden');
-                if (ctx) {
-                    ctx.add(() => {
-                        gsap.fromTo(container, {opacity: 0, y: -10}, {opacity: 1, y: 0, duration: 0.3});
-                    });
-                }
-            } else {
-                container.classList.add('hidden');
-            }
-        }
-
-        function nextStep(step) {
-            document.getElementById(`step-${currentStep}`).classList.remove('step-active');
-            document.getElementById(`step-${currentStep}`).classList.add('step-hidden');
-            
+        // ──────────────────────────────────────────────
+        // NAVEGAÇÃO
+        // ──────────────────────────────────────────────
+        function goToStep(step) {
+            const fromEl = document.getElementById(`step-${currentStep}`);
+            const toEl   = document.getElementById(`step-${step}`);
+            if (fromEl) { fromEl.classList.remove('step-active'); fromEl.classList.add('step-hidden'); }
             currentStep = step;
-            
-            document.getElementById(`step-${currentStep}`).classList.remove('step-hidden');
-            document.getElementById(`step-${currentStep}`).classList.add('step-active');
+            if (toEl) { toEl.classList.remove('step-hidden'); toEl.classList.add('step-active'); }
             updateProgress(currentStep);
+            window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
+        function prevStep(step) { goToStep(step); }
+
+        function handleNext(step) {
+            if (validateStep(currentStep)) goToStep(step);
+        }
+
+        // Moradia → determina se pula step 3
+        function handleNextMoradia() {
+            if (!validateStep(2)) return;
+            const radios = document.getElementsByName('situacaoMoradia');
+            const selected = [...radios].find(r => r.checked);
+            moraCom = selected && selected.value === 'COM_OS_PAIS';
+            // Pula step 3 (Contas da Casa) se mora com os pais
+            goToStep(moraCom ? 4 : 3);
+        }
+
+        // Voltar do step 4 (sabe se deve ir para 3 ou 2)
+        function goBackFromStep4() {
+            goToStep(moraCom ? 2 : 3);
+        }
+
+        // ──────────────────────────────────────────────
+        // MORADIA LOGIC
+        // ──────────────────────────────────────────────
+        function onMoradiaChange() {
+            const radios = document.getElementsByName('situacaoMoradia');
+            const selected = [...radios].find(r => r.checked)?.value;
+
+            const valorContainer = document.getElementById('valor-moradia-container');
+            const ajudaContainer = document.getElementById('ajuda-familiar-container');
+
+            if (selected === 'ALUGUEL' || selected === 'FINANCIAMENTO') {
+                valorContainer.classList.remove('hidden');
+                ajudaContainer.classList.add('hidden');
+            } else if (selected === 'COM_OS_PAIS') {
+                valorContainer.classList.add('hidden');
+                ajudaContainer.classList.remove('hidden');
+            } else {
+                valorContainer.classList.add('hidden');
+                ajudaContainer.classList.add('hidden');
+            }
+        }
+
+        // ──────────────────────────────────────────────
+        // ALIMENTAÇÃO LOGIC
+        // ──────────────────────────────────────────────
+        function setAlimentacao(valor) {
+            document.getElementById('gastoAlimentacao').value = valor;
+            document.querySelectorAll('.alim-card').forEach(c => c.classList.remove('selected'));
+            event.currentTarget.classList.add('selected');
+        }
+
+        function clearAlimCards() {
+            document.querySelectorAll('.alim-card').forEach(c => c.classList.remove('selected'));
+        }
+
+        // ──────────────────────────────────────────────
+        // BUSINESS LOGIC
+        // ──────────────────────────────────────────────
+        function onNegocioToggle(checkbox) {
+            const fields = document.getElementById('negocio-fields');
+            const infoCard = document.getElementById('business-info-card');
+            if (checkbox.checked) {
+                fields.classList.add('open');
+                infoCard.classList.remove('hidden');
+            } else {
+                fields.classList.remove('open');
+                infoCard.classList.add('hidden');
+                document.getElementById('nomeNegocio').value = '';
+            }
+        }
+
+        // ──────────────────────────────────────────────
+        // VALIDAÇÃO
+        // ──────────────────────────────────────────────
         function showError(msg) {
             const error = document.getElementById('validation-error');
-            const msgEl = document.getElementById('error-message');
-            msgEl.innerText = msg;
+            document.getElementById('error-message').innerText = msg;
             error.classList.remove('hidden');
-            setTimeout(() => error.classList.add('hidden'), 3000);
-            
-            // Vibrar dispositivo se suportado (feedback tátil)
-            if (window.navigator && window.navigator.vibrate) {
-                window.navigator.vibrate(50);
-            }
+            setTimeout(() => error.classList.add('hidden'), 3500);
+            if (window.navigator?.vibrate) window.navigator.vibrate(50);
         }
 
         function validateStep(step) {
             if (step === 1) {
                 const val = document.getElementById('rendaLiquida').value;
                 if (!val || parseFloat(val) <= 0) {
-                    showError("Informe sua renda mensal para continuar.");
+                    showError('Informe sua renda mensal para continuar.');
                     return false;
                 }
             }
             if (step === 2) {
                 const radios = document.getElementsByName('situacaoMoradia');
-                let selected = false;
-                for (let r of radios) if (r.checked) selected = true;
-                if (!selected) {
-                    showError("Selecione sua situação de moradia.");
-                    return false;
-                }
-                const radioVal = [...radios].find(r => r.checked).value;
-                if (radioVal === 'ALUGUEL' || radioVal === 'FINANCIAMENTO') {
+                const selected = [...radios].find(r => r.checked);
+                if (!selected) { showError('Selecione sua situação de moradia.'); return false; }
+                if (selected.value === 'ALUGUEL' || selected.value === 'FINANCIAMENTO') {
                     const val = document.getElementById('valorMoradia').value;
                     if (!val || parseFloat(val) <= 0) {
-                        showError("Informe o valor mensal da sua moradia.");
+                        showError('Informe o valor mensal da sua moradia.');
                         return false;
                     }
                 }
             }
-            if (step === 3) {
-                // Opcional, mas vamos encorajar
-                return true;
+            if (step === 5) {
+                const radios = document.getElementsByName('transportePrincipal');
+                if (![...radios].find(r => r.checked)) {
+                    showError('Selecione seu meio de transporte principal.');
+                    return false;
+                }
             }
             return true;
         }
 
-        function handleNext(step) {
-            if (validateStep(currentStep)) {
-                nextStep(step);
-            }
-        }
-
-        function prevStep(step) {
-            nextStep(step);
-        }
-
+        // ──────────────────────────────────────────────
+        // SUBMIT
+        // ──────────────────────────────────────────────
         async function submitOnboarding() {
-            // Validação final do último passo
-            const radios = document.getElementsByName('transportePrincipal');
-            let selected = false;
-            for (let r of radios) if (r.checked) selected = true;
-            if (!selected) {
-                showError("Selecione seu transporte principal.");
-                return;
-            }
-
+            // Mostrar loading
             document.getElementById('progress-container').style.display = 'none';
             document.getElementById(`step-${currentStep}`).classList.remove('step-active');
             document.getElementById(`step-${currentStep}`).classList.add('step-hidden');
-            
-            currentStep = 5;
-            document.getElementById('step-5').classList.remove('step-hidden');
-            document.getElementById('step-5').classList.add('step-active');
-            document.getElementById('step-5').style.display = 'flex';
+            currentStep = 7;
+            const loadingEl = document.getElementById('step-7');
+            loadingEl.classList.remove('step-hidden');
+            loadingEl.classList.add('step-active');
+            loadingEl.style.display = 'flex';
 
-            const texts = ["Analisando padrão...", "Montando Orçamentos...", "Ajustando Metas...", "Quase lá..."];
+            const texts = ['Analisando padrão...', 'Montando Orçamentos...', 'Ajustando Metas...', 'Configurando escopos...', 'Quase lá...'];
             let i = 0;
             const textInterval = setInterval(() => {
                 document.getElementById('loading-text').innerText = texts[i];
                 i = (i + 1) % texts.length;
             }, 800);
 
+            // Coletar dados do form
             const form = document.getElementById('onboardingForm');
             const formData = new FormData(form);
-            
+
             const payload = {
-                rendaLiquida: formData.get('rendaLiquida') ? parseFloat(formData.get('rendaLiquida')) : 0,
-                situacaoMoradia: formData.get('situacaoMoradia'),
-                valorMoradia: formData.get('valorMoradia') ? parseFloat(formData.get('valorMoradia')) : 0,
+                rendaLiquida:        parseFloat(formData.get('rendaLiquida')) || 0,
+                situacaoMoradia:     formData.get('situacaoMoradia'),
+                valorMoradia:        parseFloat(formData.get('valorMoradia')) || 0,
+                ajudaFamiliar:       parseFloat(formData.get('ajudaFamiliar')) || 0,
+                contasCasa:          formData.getAll('contasCasa'),
+                gastoAlimentacao:    parseFloat(formData.get('gastoAlimentacao')) || 0,
                 transportePrincipal: formData.get('transportePrincipal'),
-                contasCasa: formData.getAll('contasCasa'),
-                assinaturas: formData.getAll('assinaturas'),
+                assinaturas:         formData.getAll('assinaturas'),
+                possuiNegocio:       document.getElementById('possuiNegocio').checked,
+                nomeNegocio:         formData.get('nomeNegocio') || '',
                 possuiDividasAtivas: false,
-                possuiDependentes: false,
-                numeroDependentes: 0
+                possuiDependentes:   false,
+                numeroDependentes:   0
             };
 
             try {
-                const csrfElem = document.querySelector('meta[name="_csrf"]');
+                const csrfElem       = document.querySelector('meta[name="_csrf"]');
                 const csrfHeaderElem = document.querySelector('meta[name="_csrf_header"]');
-                const headers = { 'Content-Type': 'application/json' };
+                const headers        = { 'Content-Type': 'application/json' };
                 if (csrfElem && csrfHeaderElem) headers[csrfHeaderElem.content] = csrfElem.content;
 
                 const response = await fetch('/app/onboarding/submit', {
                     method: 'POST',
-                    headers: headers,
+                    headers,
                     body: JSON.stringify(payload)
                 });
-                
+
                 if (!response.ok) throw new Error(`Erro ${response.status}`);
                 const data = await response.json();
                 clearInterval(textInterval);
@@ -429,11 +676,10 @@
                 else throw new Error(data.message);
             } catch (error) {
                 clearInterval(textInterval);
-                document.getElementById('step-5').classList.add('hidden');
-                document.getElementById(`step-${currentStep}`).classList.remove('step-hidden');
-                document.getElementById(`step-${currentStep}`).classList.add('step-active');
+                loadingEl.classList.add('hidden');
+                goToStep(6);
                 document.getElementById('progress-container').style.display = 'flex';
-                alert("Falha: " + error.message);
+                showError('Falha ao salvar: ' + error.message);
             }
         }
     </script>

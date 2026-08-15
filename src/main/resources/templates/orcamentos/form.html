@@ -137,7 +137,7 @@
 <body>
 <main>
   <div class="max-w-4xl mx-auto px-4">
-    <a th:href="@{/app/financeiro/orcamentos}" class="btn-back">
+    <a th:href="@{/app/financeiro/orcamentos(escopo=${escopoSelecionado})}" class="btn-back">
       <i data-lucide="arrow-left" class="w-4 h-4"></i>
       Voltar ao Planejamento
     </a>
@@ -146,6 +146,7 @@
       <div class="form-section">
         <h2 th:text="${orcamento.id == null ? 'Novo Planejamento' : 'Refinar Orçamento'}">Novo Planejamento</h2>
         <p>Defina limites saudáveis para suas categorias de gastos. Nossa IA irá monitorar cada transação para garantir que você permaneça no controle.</p>
+        <div class="mb-5 inline-flex px-3 py-2 rounded-lg bg-teal-50 text-teal-800 text-xs font-bold" th:text="'Espaço: ' + ${escopoSelecionado.descricao}"></div>
         
         <form th:action="@{/app/financeiro/orcamentos/salvar}" th:object="${orcamento}" method="post">
           <input type="hidden" th:field="*{id}" />

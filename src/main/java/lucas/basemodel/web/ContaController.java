@@ -5,6 +5,7 @@ import lucas.basemodel.modules.financeiro.enums.*;
 import java.math.BigDecimal;
 import lucas.basemodel.modules.financeiro.services.ContaService;
 import lucas.basemodel.modules.financeiro.services.CategoriaService;
+import lucas.basemodel.modules.financeiro.services.EspacoFinanceiroService;
 import lucas.basemodel.modules.wealth.services.WealthService;
 import lucas.basemodel.modules.financeiro.dto.ContaStagingForm;
 import lucas.basemodel.modules.financeiro.repositories.ContaRepository;
@@ -38,18 +39,22 @@ public class ContaController {
     private final UsuarioRepository usuarioRepository;
     private final WealthService wealthService;
     private final ContaRepository contaRepository;
+    private final EspacoFinanceiroService espacoFinanceiroService;
 
 
 
     @GetMapping("/nova")
-    public String novaConta(Model model, Principal principal) {
+    public String novaConta(@RequestParam(defaultValue = "PESSOAL") EscopoTransacao escopo, Model model, Principal principal) {
         model.addAttribute("activeMenu", "contas"); // LIMPEZA: Correção do menu ativo
 
         User usuarioLogado = usuarioRepository.findByEmail(principal.getName()).orElseThrow(() -> new IllegalArgumentException("Registo não encontrado."));
+        espacoFinanceiroService.validarAcesso(usuarioLogado, escopo);
 
-        model.addAttribute("conta", new Conta());
-        model.addAttribute("categorias", categoriaService.listarTodas());
-        model.addAttribute("usuarios", usuarioRepository.findAll());
+        Conta novaConta = new Conta();
+        novaConta.setEscopo(escopo);
+        model.addAttribute("conta", novaConta);
+        model.addAttribute("categorias", categoriasPermitidas(usuarioLogado));
+        model.addAttribute("escopos", espacoFinanceiroService.listarPermitidos(usuarioLogado));
         model.addAttribute("assets", wealthService.getUserAssets(usuarioLogado.getId()));
         model.addAttribute("tipos", TipoTransacao.values());
         model.addAttribute("prioridades", Prioridade.values());
@@ -64,14 +69,18 @@ public class ContaController {
         User usuarioLogado = usuarioRepository.findByEmail(principal.getName()).orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
         Conta contaExistente = contaService.buscarPorId(id, usuarioLogado);
 
+        if (contaExistente == null) {
+            return "redirect:/app/financeiro/contas";
+        }
+
         if (contaExistente != null && contaExistente.getResponsavel() != null) {
             // LIMPEZA: Evita erro de 'Lista Imutável' (UnsupportedOperationException) no Thymeleaf
             contaExistente.setResponsaveisRateio(new ArrayList<>(List.of(contaExistente.getResponsavel())));
         }
 
         model.addAttribute("conta", contaExistente);
-        model.addAttribute("categorias", categoriaService.listarTodas());
-        model.addAttribute("usuarios", usuarioRepository.findAll());
+        model.addAttribute("categorias", categoriasPermitidas(usuarioLogado));
+        model.addAttribute("escopos", espacoFinanceiroService.listarPermitidos(usuarioLogado));
         model.addAttribute("assets", wealthService.getUserAssets(usuarioLogado.getId()));
         model.addAttribute("tipos", TipoTransacao.values());
         model.addAttribute("prioridades", Prioridade.values());
@@ -80,16 +89,19 @@ public class ContaController {
     }
 
     @GetMapping({"", "/"})
-    public String listarContas(Model model, Principal principal) {
+    public String listarContas(@RequestParam(defaultValue = "PESSOAL") EscopoTransacao escopo, Model model, Principal principal) {
         model.addAttribute("activeMenu", "contas");
 
         User usuarioLogado = usuarioRepository.findByEmail(principal.getName()).orElseThrow(() -> new IllegalArgumentException("Registo não encontrado."));
+        espacoFinanceiroService.validarAcesso(usuarioLogado, escopo);
 
         // OPTIMIZED: 1 query unificada → filtros em memória (antes: 4 queries separadas)
         java.time.LocalDate hoje = java.time.LocalDate.now();
         java.time.YearMonth mesAtual = java.time.YearMonth.now();
 
-        List<Conta> todasContas = contaRepository.findAllByResponsavelOrderByDataVencimentoAsc(usuarioLogado);
+        List<Conta> todasContas = contaRepository.findAllByResponsavelOrderByDataVencimentoAsc(usuarioLogado).stream()
+                .filter(c -> c.getEscopo() == escopo)
+                .toList();
 
         List<Conta> todasPendentes = todasContas.stream()
                 .filter(c -> !c.isPaga())
@@ -141,6 +153,8 @@ public class ContaController {
         model.addAttribute("todasPendentes", todasPendentes);
         model.addAttribute("contasUrgentes", contasUrgentes);
         model.addAttribute("historicoTransacoes", historico);
+        model.addAttribute("escopoSelecionado", escopo);
+        model.addAttribute("escopos", espacoFinanceiroService.listarPermitidos(usuarioLogado));
 
         return "contas/lista";
     }
@@ -170,7 +184,7 @@ public class ContaController {
                         if (cat != null) novaConta.setCategoria(cat);
                     }
                     
-                    contaService.salvar(novaConta);
+                    contaService.salvarParaUsuario(novaConta, usuarioLogado);
                     salvos++;
                 }
             }
@@ -192,14 +206,9 @@ public class ContaController {
 
         log.info("Salvando conta para o usuário: {} - Descricao: {}", usuarioLogado.getEmail(), conta.getDescricao());
 
-        if (responsaveisIds != null && !responsaveisIds.isEmpty()) {
-            List<lucas.basemodel.modules.user.User> moradores = usuarioRepository.findAllById(responsaveisIds);
-            conta.setResponsaveisRateio(moradores);
-            log.info("Responsáveis por rateio definidos: {}", moradores.size());
-        } else if (conta.getId() == null) {
-            conta.setResponsaveisRateio(new ArrayList<>(List.of(usuarioLogado)));
-            log.info("Responsável padrão (logado) definido para nova conta.");
-        }
+        // O domínio ainda não possui uma relação de membros da casa. Nunca aceite
+        // IDs de usuários enviados pelo cliente como autorização de rateio.
+        conta.setResponsaveisRateio(new ArrayList<>(List.of(usuarioLogado)));
 
         if (arquivo != null && !arquivo.isEmpty()) {
             try {
@@ -217,12 +226,12 @@ public class ContaController {
         }
 
         try {
-            contaService.salvar(conta);
-        } catch (IllegalStateException e) {
+            contaService.salvarParaUsuario(conta, usuarioLogado);
+        } catch (lucas.basemodel.core.exceptions.BadRequestException | IllegalStateException e) {
             redirectAttributes.addFlashAttribute("erroValidacao", e.getMessage());
             return "redirect:/app/financeiro/contas/" + (conta.getId() != null ? "editar/" + conta.getId() : "nova");
         }
-        return "redirect:/app/financeiro/contas";
+        return "redirect:/app/financeiro/contas?escopo=" + conta.getEscopo().name();
     }
 
     @PostMapping("/excluir/{id}")
@@ -247,7 +256,7 @@ public class ContaController {
             conta.setPaga(true);
             conta.setDataPagamento(java.time.LocalDate.now());
             try {
-                contaService.salvar(conta);
+                contaService.salvarParaUsuario(conta, usuarioLogado);
             } catch (IllegalStateException e) {
                 if (htmxRequest != null) return "redirect:/app/financeiro/contas/erro-htmx";
                 redirectAttributes.addFlashAttribute("erroValidacao", e.getMessage());
@@ -265,5 +274,12 @@ public class ContaController {
     @ResponseBody
     public String fragmentoVazio() {
         return "";
+    }
+
+    private List<lucas.basemodel.modules.financeiro.models.Categoria> categoriasPermitidas(User usuario) {
+        var escopos = espacoFinanceiroService.listarPermitidos(usuario);
+        return categoriaService.listarTodas().stream()
+                .filter(categoria -> categoria.getEscopo() != null && escopos.contains(categoria.getEscopo()))
+                .toList();
     }
 }

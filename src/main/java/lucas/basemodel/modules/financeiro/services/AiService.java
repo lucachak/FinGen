@@ -8,6 +8,7 @@ import lucas.basemodel.modules.user.User;
 import lucas.basemodel.modules.user.UsuarioRepository;
 import lucas.basemodel.modules.financeiro.models.Conta;
 import lucas.basemodel.modules.financeiro.repositories.ContaRepository;
+import lucas.basemodel.modules.financeiro.enums.EscopoTransacao;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -23,6 +24,7 @@ public class AiService {
     private final OpenRouterService openRouterService;
     private final UsuarioRepository usuarioRepository;
     private final ContaRepository contaRepository;
+    private final EspacoFinanceiroService espacoFinanceiroService;
 
     public AiChatResponse chat(String message, String email) {
         User user = usuarioRepository.findByEmail(email).orElseThrow();
@@ -71,8 +73,10 @@ public class AiService {
         return geminiService.gerarPlanoInvestimentos(email);
     }
 
-    public String analisarAnomalias(String email) {
-        return geminiService.analisarAnomalias(email);
+    public String analisarAnomalias(String email, EscopoTransacao escopo) {
+        User user = usuarioRepository.findByEmail(email).orElseThrow();
+        espacoFinanceiroService.validarAcesso(user, escopo);
+        return geminiService.analisarAnomalias(email, escopo);
     }
 
     public Map<String, Object> getStatus() {

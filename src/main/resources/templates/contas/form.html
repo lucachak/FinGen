@@ -98,7 +98,7 @@
                                     <label class="form-label" for="inputCat">Categoria</label>
                                     <select th:field="*{categoria}" id="inputCat" class="form-input appearance-none">
                                         <option value="">Sem Categoria</option>
-                                        <option th:each="cat : ${categorias}" th:value="${cat.id}" th:text="${cat.nome}"></option>
+                                        <option th:each="cat : ${categorias}" th:value="${cat.id}" th:text="${cat.nome}" th:attr="data-escopo=${cat.escopo}"></option>
                                     </select>
                                 </div>
                                 <div class="md:col-span-2">
@@ -115,10 +115,9 @@
                                         <select th:field="*{prioridade}" class="form-input" aria-label="Selecionar Prioridade">
                                             <option th:each="p : ${prioridades}" th:value="${p}" th:text="${p.descricao}"></option>
                                         </select>
-                                        <select th:field="*{escopo}" class="form-input" aria-label="Selecionar Escopo">
-                                            <option value="CASA">Despesa Partilhada (Casa)</option>
-                                            <option value="PESSOAL">Finanças Pessoais (Privado)</option>
-                                            <option value="NEGOCIO">Business</option>
+                                        <select th:field="*{escopo}" id="inputEscopo" class="form-input" aria-label="Selecionar Espaço">
+                                            <option th:each="escopo : ${escopos}" th:value="${escopo}"
+                                                    th:text="${escopo.name() == 'NEGOCIO' ? 'Empresa (CNPJ)' : (escopo.name() == 'CASA' ? 'Casa' : 'Pessoal')}"></option>
                                         </select>
                                     </div>
                                 </div>
@@ -232,6 +231,23 @@
 
     <script th:fragment="script">
         document.addEventListener('DOMContentLoaded', () => {
+            const scopeSelect = document.getElementById('inputEscopo');
+            const categorySelect = document.getElementById('inputCat');
+            const syncCategories = () => {
+                const selectedScope = scopeSelect.value;
+                let selectedStillVisible = !categorySelect.value;
+                Array.from(categorySelect.options).forEach(option => {
+                    if (!option.value) return;
+                    const visible = option.dataset.escopo === selectedScope;
+                    option.hidden = !visible;
+                    option.disabled = !visible;
+                    if (visible && option.selected) selectedStillVisible = true;
+                });
+                if (!selectedStillVisible) categorySelect.value = '';
+            };
+            scopeSelect.addEventListener('change', () => { syncCategories(); up(); });
+            syncCategories();
+
             const up = () => {
                 const desc = document.getElementById('inputDesc').value || 'Descrição da Conta';
                 const valor = document.getElementById('inputValor').value || '0,00';
@@ -262,7 +278,7 @@
                     : 'text-[12px] font-bold text-rose-400 uppercase tracking-widest bg-rose-400/10 px-4 py-2 rounded-xl';
             };
 
-            ['inputDesc', 'inputValor', 'inputData', 'inputTipo', 'inputCat', 'inputPaga'].forEach(id => {
+            ['inputDesc', 'inputValor', 'inputData', 'inputTipo', 'inputCat', 'inputPaga', 'inputEscopo'].forEach(id => {
                 const el = document.getElementById(id);
                 if(el) el.addEventListener('input', up);
                 if(el) el.addEventListener('change', up);

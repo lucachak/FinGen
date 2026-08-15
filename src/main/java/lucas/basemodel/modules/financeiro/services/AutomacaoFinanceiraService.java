@@ -88,6 +88,7 @@ public class AutomacaoFinanceiraService {
         Conta novaTransacao = new Conta();
         novaTransacao.setTransacaoRecorrente(template);
         novaTransacao.setCategoria(template.getCategoria());
+        novaTransacao.setEscopo(template.getEscopo());
         novaTransacao.setResponsavel(template.getUsuario());
         novaTransacao.setDescricao(template.getTitulo());
         novaTransacao.setTipo(template.getTipo());

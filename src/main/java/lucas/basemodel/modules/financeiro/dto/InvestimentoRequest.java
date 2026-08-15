@@ -21,5 +21,7 @@ public class InvestimentoRequest {
     private BigDecimal valorAportado;
 
     private BigDecimal valorAtual;
+    @Positive(message = "A quantidade deve ser positiva")
+    private BigDecimal quantidade;
     private String ticker;
 }

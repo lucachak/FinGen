@@ -166,18 +166,25 @@
         <p class="page-subtitle">Monitoramento preditivo de orçamentos por categoria — <span th:text="${mesAtual}"></span>.</p>
       </div>
       <div class="flex gap-2">
-        <form th:action="@{/app/financeiro/orcamentos/gerar-automatico}" method="post" aria-label="Gerar Orçamento Automático">
+        <form th:action="@{/app/financeiro/orcamentos/gerar-automatico(escopo=${escopoSelecionado})}" method="post" aria-label="Gerar Orçamento Automático">
           <button type="submit" class="btn-secondary">
             <i data-lucide="sparkles"></i>
             Gerar Automático
           </button>
         </form>
-        <a th:href="@{/app/financeiro/orcamentos/novo}" class="btn-primary">
+        <a th:href="@{/app/financeiro/orcamentos/novo(escopo=${escopoSelecionado})}" class="btn-primary">
           <i data-lucide="plus"></i>
           Novo Limite
         </a>
       </div>
     </div>
+
+    <nav class="flex flex-wrap gap-2 mb-6" aria-label="Espaços financeiros">
+      <a th:each="esp : ${escopos}" th:href="@{/app/financeiro/orcamentos(escopo=${esp})}"
+         th:text="${esp.descricao}"
+         th:classappend="${esp == escopoSelecionado} ? ' bg-brand text-white border-brand' : ' bg-zen-surface text-zen-t2 border-zen-border hover:border-brand'"
+         class="px-4 py-2.5 rounded-xl border text-[13px] font-semibold transition-colors"></a>
+    </nav>
 
     <!-- Alert Messages -->
     <div th:if="${successMessage}" class="alert-success mb-6" th:text="${successMessage}"></div>
@@ -259,7 +266,7 @@
           <i data-lucide="layout-grid" class="w-12 h-12 text-dim mx-auto mb-4"></i>
           <h2 class="text-xl font-bold mb-2">Nenhum limite definido</h2>
           <p class="text-dim mb-6">Mantenha sua saúde financeira em dia definindo limites por categoria.</p>
-          <a th:href="@{/app/financeiro/orcamentos/novo}" class="btn-primary inline-flex">
+          <a th:href="@{/app/financeiro/orcamentos/novo(escopo=${escopoSelecionado})}" class="btn-primary inline-flex">
             Começar Agora
           </a>
         </div>

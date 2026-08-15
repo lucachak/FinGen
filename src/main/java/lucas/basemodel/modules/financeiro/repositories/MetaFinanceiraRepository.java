@@ -6,11 +6,13 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Repository
 public interface MetaFinanceiraRepository extends JpaRepository<MetaFinanceira, UUID> {
     List<MetaFinanceira> findByResponsavel(User responsavel);
+    Optional<MetaFinanceira> findByIdAndResponsavelId(UUID id, UUID responsavelId);
 
     @org.springframework.data.jpa.repository.Modifying
     @org.springframework.transaction.annotation.Transactional

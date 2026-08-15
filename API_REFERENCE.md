@@ -44,11 +44,11 @@ Authorization: Bearer <jwt_token>
 
 | Method | Endpoint | Notes |
 |--------|----------|-------|
-| `GET`    | `/api/v1/contas` | `?status=PENDENTE&escopo=CASA` + pagination |
+| `GET`    | `/api/v1/contas` | `?status=PENDENTE&escopo=CASA&page=0&size=100` |
 | `GET`    | `/api/v1/contas/{id}` | Single transaction |
 | `POST`   | `/api/v1/contas` | `multipart/form-data` — includes optional `comprovante` file |
 | `PUT`    | `/api/v1/contas/{id}` | `multipart/form-data` |
-| `PATCH`  | `/api/v1/contas/{id}/pagar` | Quick-pay, no body needed |
+| `PATCH`  | `/api/v1/contas/{id}/pagar` | Quick-pay; use `?assetId=<uuid>` if no asset is linked |
 | `DELETE` | `/api/v1/contas/{id}` | — |
 | `POST`   | `/api/v1/contas/lote` | Batch import `[ ContaRequest, ... ]` |
 
@@ -63,9 +63,14 @@ Authorization: Bearer <jwt_token>
   "frequencia": "MENSAL",
   "dataVencimento": "2024-09-10",
   "categoriaId": 2,
-  "responsavelId": "uuid"
+  "assetId": "uuid"
 }
 ```
+
+The list response remains a JSON array for mobile compatibility. Pagination
+metadata is returned in the `X-Total-Count`, `X-Total-Pages`, and
+`X-Page-Number` headers. The maximum page size is 100. Valid list statuses are
+`PENDENTE`, `PAGO`, `ATRASADO`, `PREVISTO_IA`, and `CANCELADO`.
 
 ---
 
@@ -161,7 +166,7 @@ Already REST — these routes exist and are ready:
 }
 ```
 
-HTTP codes used: `200` `201` `204` `400` `401` `403` `404` `500`
+HTTP codes used: `200` `201` `204` `400` `401` `403` `404` `409` `500`
 
 ---
 

@@ -11,6 +11,7 @@ import lucas.basemodel.modules.financeiro.services.OpenRouterService;
 import lucas.basemodel.modules.user.User;
 import lucas.basemodel.modules.user.UsuarioRepository;
 import lucas.basemodel.web.dto.MetaSugestaoDTO;
+import lucas.basemodel.core.exceptions.ResourceNotFoundException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -110,8 +111,10 @@ public class MetaController {
     }
 
     @GetMapping("/editar/{id}")
-    public String editar(@PathVariable UUID id, Model model) {
-        MetaFinanceira meta = metaRepository.findById(id).orElse(null);
+    public String editar(@PathVariable UUID id, Model model, Principal principal) {
+        User user = usuarioRepository.findByEmail(principal.getName()).orElseThrow();
+        MetaFinanceira meta = metaRepository.findByIdAndResponsavelId(id, user.getId())
+                .orElseThrow(() -> new ResourceNotFoundException("Meta não encontrada"));
         model.addAttribute("meta", meta);
         model.addAttribute("naturezas", NaturezaMeta.values());
         model.addAttribute("activeMenu", "metas");
@@ -121,30 +124,48 @@ public class MetaController {
     @PostMapping("/salvar")
     public String salvar(MetaFinanceira meta, Principal principal, RedirectAttributes redirectAttributes) {
         User user = usuarioRepository.findByEmail(principal.getName()).orElse(null);
-        if (meta.getResponsavel() == null) {
-            meta.setResponsavel(user);
+        if (user == null) return "redirect:/auth/login";
+
+        MetaFinanceira alvo;
+        if (meta.getId() == null) {
+            alvo = new MetaFinanceira();
+            alvo.setResponsavel(user);
+        } else {
+            alvo = metaRepository.findByIdAndResponsavelId(meta.getId(), user.getId())
+                    .orElseThrow(() -> new ResourceNotFoundException("Meta não encontrada"));
         }
+        alvo.setTitulo(meta.getTitulo());
+        alvo.setValorAlvo(meta.getValorAlvo());
+        alvo.setValorAtual(meta.getValorAtual());
+        alvo.setNatureza(meta.getNatureza());
+        alvo.setPrazo(meta.getPrazo());
+        alvo.setStatus(meta.getStatus());
         
         if (meta.getIcone() == null || meta.getIcone().equals("target")) {
             switch (meta.getNatureza()) {
-                case VIAGEM -> meta.setIcone("palmtree");
-                case CARRO -> meta.setIcone("car");
-                case CASA -> meta.setIcone("home");
-                case APOSENTADORIA -> meta.setIcone("trending-up");
-                case RESERVA_EMERGENCIA -> meta.setIcone("shield-check");
-                case EDUCACAO -> meta.setIcone("graduation-cap");
-                default -> meta.setIcone("target");
+                case VIAGEM -> alvo.setIcone("palmtree");
+                case CARRO -> alvo.setIcone("car");
+                case CASA -> alvo.setIcone("home");
+                case APOSENTADORIA -> alvo.setIcone("trending-up");
+                case RESERVA_EMERGENCIA -> alvo.setIcone("shield-check");
+                case EDUCACAO -> alvo.setIcone("graduation-cap");
+                default -> alvo.setIcone("target");
             }
+        } else {
+            alvo.setIcone(meta.getIcone());
         }
 
-        metaRepository.save(meta);
+        metaRepository.save(alvo);
         redirectAttributes.addFlashAttribute("successMessage", "Meta salva com sucesso! Continue firme.");
         return "redirect:/app/financeiro/metas";
     }
 
     @PostMapping("/excluir/{id}")
-    public String excluir(@PathVariable UUID id, RedirectAttributes redirectAttributes) {
-        metaRepository.deleteById(id);
+    public String excluir(@PathVariable UUID id, Principal principal, RedirectAttributes redirectAttributes) {
+        User user = usuarioRepository.findByEmail(principal.getName()).orElseThrow();
+        MetaFinanceira meta = metaRepository.findByIdAndResponsavelId(id, user.getId())
+                .orElseThrow(() -> new ResourceNotFoundException("Meta não encontrada"));
+        metaRepository.delete(meta);
         redirectAttributes.addFlashAttribute("successMessage", "Meta removida.");
         return "redirect:/app/financeiro/metas";
     }
@@ -235,4 +256,3 @@ public class MetaController {
         return "redirect:/app/financeiro/metas";
     }
 }
-

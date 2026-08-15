@@ -14,6 +14,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.security.Principal;
 import java.util.List;
+import java.util.UUID;
 
 /**
  * REST API for Contas (bills / transactions).
@@ -38,7 +39,12 @@ public class ContaApiController {
             @RequestParam(required = false) String escopo,
             @PageableDefault(size = 100) Pageable pageable, // Aumentado para pegar mais sem paginação no app
             Principal principal) {
-        return ResponseEntity.ok(contaService.listar(principal.getName(), status, escopo, pageable).getContent());
+        Page<ContaResponse> page = contaService.listar(principal.getName(), status, escopo, pageable);
+        return ResponseEntity.ok()
+                .header("X-Total-Count", String.valueOf(page.getTotalElements()))
+                .header("X-Total-Pages", String.valueOf(page.getTotalPages()))
+                .header("X-Page-Number", String.valueOf(page.getNumber()))
+                .body(page.getContent());
     }
 
     /**
@@ -82,8 +88,11 @@ public class ContaApiController {
      * Mirrors POST /app/financeiro/contas/pagar/{id}
      */
     @PatchMapping("/{id}/pagar")
-    public ResponseEntity<ContaResponse> pagar(@PathVariable Long id, Principal principal) {
-        return ResponseEntity.ok(contaService.pagar(id, principal.getName()));
+    public ResponseEntity<ContaResponse> pagar(
+            @PathVariable Long id,
+            @RequestParam(required = false) UUID assetId,
+            Principal principal) {
+        return ResponseEntity.ok(contaService.pagar(id, assetId, principal.getName()));
     }
 
     /**

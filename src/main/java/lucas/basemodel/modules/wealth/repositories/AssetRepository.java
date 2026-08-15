@@ -6,8 +6,10 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.UUID;
+import java.util.Optional;
 
 @Repository
 public interface AssetRepository extends JpaRepository<Asset, UUID> {
     List<Asset> findByUserId(UUID userId);
+    Optional<Asset> findByIdAndUserId(UUID id, UUID userId);
 }

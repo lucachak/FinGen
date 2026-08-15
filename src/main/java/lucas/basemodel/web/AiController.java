@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import jakarta.servlet.http.HttpSession;
 import lucas.basemodel.modules.financeiro.services.OpenRouterService;
+import lucas.basemodel.modules.financeiro.services.EspacoFinanceiroService;
 import java.security.Principal;
 import java.time.LocalDate;
 import java.util.List;
@@ -40,13 +41,17 @@ public class AiController {
     private final UsuarioRepository usuarioRepository;
     private final CategoriaRepository categoriaRepository;
     private final OpenRouterService openRouterService;
+    private final EspacoFinanceiroService espacoFinanceiroService;
 
-    public AiController(GeminiService geminiService, ContaRepository contaRepository, UsuarioRepository usuarioRepository, CategoriaRepository categoriaRepository, OpenRouterService openRouterService) {
+    public AiController(GeminiService geminiService, ContaRepository contaRepository, UsuarioRepository usuarioRepository,
+                        CategoriaRepository categoriaRepository, OpenRouterService openRouterService,
+                        EspacoFinanceiroService espacoFinanceiroService) {
         this.geminiService = geminiService;
         this.contaRepository = contaRepository;
         this.usuarioRepository = usuarioRepository;
         this.categoriaRepository = categoriaRepository;
         this.openRouterService = openRouterService;
+        this.espacoFinanceiroService = espacoFinanceiroService;
     }
 
     // Solves session limit bloat
@@ -87,7 +92,8 @@ public class AiController {
         List<Conta> staging = stagingCache.get(stagingId);
 
         // Pre-load all categories into a Map to fix the N+1 vulnerability
-        Map<String, lucas.basemodel.modules.financeiro.models.Categoria> categoryCache = categoriaRepository.findAll().stream()
+        Map<String, lucas.basemodel.modules.financeiro.models.Categoria> categoryCache = categoriaRepository
+                .findByEscopoOrderByNomeAsc(lucas.basemodel.modules.financeiro.enums.EscopoTransacao.PESSOAL).stream()
                 .collect(java.util.stream.Collectors.toMap(c -> c.getNome().toLowerCase(), c -> c, (a, b) -> a));
 
         List<Conta> paraSalvar = new ArrayList<>();
@@ -140,8 +146,11 @@ public class AiController {
     // Endpoint para o Micro-Dashboard HTMX
     // ==========================================
     @GetMapping("/analisar-anomalias")
-    public String obterInsightsAnomalias(Model model, Principal principal) {
-        String respostaIA = geminiService.analisarAnomalias(principal.getName());
+    public String obterInsightsAnomalias(@RequestParam(defaultValue = "PESSOAL") EscopoTransacao escopo,
+                                         Model model, Principal principal) {
+        User user = usuarioRepository.findByEmail(principal.getName()).orElseThrow();
+        espacoFinanceiroService.validarAcesso(user, escopo);
+        String respostaIA = geminiService.analisarAnomalias(principal.getName(), escopo);
         model.addAttribute("lastAnalysis", respostaIA);
         return "home/fragmentos :: resultado-ia-premium";
     }

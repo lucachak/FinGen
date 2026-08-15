@@ -12,6 +12,7 @@ import lucas.basemodel.modules.financeiro.enums.TipoTransacao;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.UUID;
 
 @Data
 @Builder
@@ -31,4 +32,5 @@ public class ContaResponse {
     private Prioridade prioridade;
     private String categoriaNome;
     private String comprovante;
+    private UUID assetId;
 }

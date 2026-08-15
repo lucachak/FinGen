@@ -1,6 +1,7 @@
 package lucas.basemodel.modules.financeiro.services;
 
 import lucas.basemodel.core.exceptions.ResourceNotFoundException;
+import lucas.basemodel.core.exceptions.BadRequestException;
 import lucas.basemodel.modules.financeiro.dto.ContaRequest;
 import lucas.basemodel.modules.financeiro.dto.ContaResponse;
 import lucas.basemodel.modules.financeiro.enums.EscopoTransacao;
@@ -16,7 +17,6 @@ import lucas.basemodel.modules.wealth.models.Asset;
 import lucas.basemodel.modules.wealth.models.BankAccountAsset;
 import lucas.basemodel.modules.wealth.repositories.AssetRepository;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -36,19 +36,54 @@ public class ContaService {
     private final AssetRepository assetRepository;
     private final UsuarioRepository usuarioRepository;
     private final CategoriaRepository categoriaRepository;
+    private final CategoriaService categoriaService;
+    private final EspacoFinanceiroService espacoFinanceiroService;
 
     public ContaService(ContaRepository contaRepository, 
                         AssetRepository assetRepository,
                         UsuarioRepository usuarioRepository,
-                        CategoriaRepository categoriaRepository) {
+                        CategoriaRepository categoriaRepository,
+                        CategoriaService categoriaService,
+                        EspacoFinanceiroService espacoFinanceiroService) {
         this.contaRepository = contaRepository;
         this.assetRepository = assetRepository;
         this.usuarioRepository = usuarioRepository;
         this.categoriaRepository = categoriaRepository;
+        this.categoriaService = categoriaService;
+        this.espacoFinanceiroService = espacoFinanceiroService;
+    }
+
+    /**
+     * Entrada segura para os formulários MVC. O proprietário nunca é aceito do
+     * cliente e uma edição só ocorre quando o registro já pertence ao usuário.
+     */
+    @Transactional
+    public Conta salvarParaUsuario(Conta conta, User usuario) {
+        Objects.requireNonNull(usuario, "Usuário autenticado é obrigatório");
+        espacoFinanceiroService.validarAcesso(usuario, conta.getEscopo());
+
+        if (conta.getId() != null) {
+            contaRepository.findByIdAndResponsavelId(conta.getId(), usuario.getId())
+                    .orElseThrow(() -> new ResourceNotFoundException("Transação não encontrada"));
+        }
+
+        if (conta.getCategoria() != null && conta.getCategoria().getId() != null) {
+            conta.setCategoria(categoriaService.validarNoEscopo(conta.getCategoria().getId(), conta.getEscopo()));
+        }
+
+        if (conta.getAsset() != null && conta.getAsset().getId() != null) {
+            conta.setAsset(resolveAsset(conta.getAsset().getId(), usuario));
+        }
+
+        conta.setResponsavel(usuario);
+        conta.setResponsaveisRateio(new ArrayList<>(List.of(usuario)));
+        return salvar(conta);
     }
 
     @Transactional
-    public Conta salvar(Conta conta) {
+    Conta salvar(Conta conta) {
+
+        categoriaService.validarNoEscopo(conta.getCategoria(), conta.getEscopo());
 
         if (conta.getValor() == null) {
             conta.setValor(BigDecimal.ZERO);
@@ -118,6 +153,10 @@ public class ContaService {
                 novaConta.setValor(valorBase);
                 novaConta.setTipo(conta.getTipo());
                 novaConta.setCategoria(conta.getCategoria());
+                novaConta.setEscopo(conta.getEscopo());
+                novaConta.setPrioridade(conta.getPrioridade());
+                novaConta.setFrequencia(conta.getFrequencia());
+                novaConta.setComprovante(conta.getComprovante());
                 novaConta.setResponsavel(responsavelAtual); // Associa o pedaço da conta a esta pessoa
                 novaConta.setDataVencimento(conta.getDataVencimento().plusMonths(i));
 
@@ -218,12 +257,18 @@ public class ContaService {
     // Calcula as entradas e saídas dos últimos 6 meses para o gráfico
     // OPTIMIZED: 1 query de intervalo + agrupamento em memória (antes: 6 queries sequenciais)
     public List<Map<String, Object>> obterFluxoCaixaUltimos6Meses(User responsavel) {
+        return obterFluxoCaixaUltimos6Meses(responsavel, null);
+    }
+
+    public List<Map<String, Object>> obterFluxoCaixaUltimos6Meses(User responsavel, EscopoTransacao escopo) {
         LocalDate hoje = LocalDate.now();
         LocalDate inicio = hoje.minusMonths(5).withDayOfMonth(1);
         LocalDate fim = hoje.withDayOfMonth(hoje.lengthOfMonth());
 
         // Uma única query cobrindo o intervalo de 6 meses
-        List<Conta> todasContas = contaRepository.findByResponsavelAndPeriodo(responsavel, inicio, fim);
+        List<Conta> todasContas = contaRepository.findByResponsavelAndPeriodo(responsavel, inicio, fim).stream()
+                .filter(c -> escopo == null || c.getEscopo() == escopo)
+                .toList();
 
         // Pré-agrupa por YearMonth em memória para acesso O(1) no loop
         Map<java.time.YearMonth, List<Conta>> porMes = todasContas.stream()
@@ -268,7 +313,12 @@ public class ContaService {
     }
 
     public Map<String, BigDecimal> obterGastosPorCategoriaMesAtual(User responsavel) {
+        return obterGastosPorCategoriaMesAtual(responsavel, null);
+    }
+
+    public Map<String, BigDecimal> obterGastosPorCategoriaMesAtual(User responsavel, EscopoTransacao escopo) {
         return listarContasDoMesAtual(responsavel).stream()
+                .filter(c -> escopo == null || c.getEscopo() == escopo)
                 .filter(c -> c.getTipo() == TipoTransacao.DESPESA)
                 .collect(Collectors.groupingBy(
                         c -> c.getCategoria() != null ? c.getCategoria().getNome() : "Sen Categoría",
@@ -278,8 +328,13 @@ public class ContaService {
 
     // Calcula os dados exatos para desenhar o gráfico Donut em SVG
     public Map<String, Object> obterDadosDonutMesAtual(User responsavel) {
+        return obterDadosDonutMesAtual(responsavel, null);
+    }
+
+    public Map<String, Object> obterDadosDonutMesAtual(User responsavel, EscopoTransacao escopo) {
         // Pegamos todas as contas de saída do mês
         List<Conta> contasSaida = listarContasDoMesAtual(responsavel).stream()
+                .filter(c -> escopo == null || c.getEscopo() == escopo)
                 .filter(c -> c.getTipo() == TipoTransacao.DESPESA)
                 .toList();
 
@@ -374,41 +429,30 @@ public class ContaService {
 
     public Page<ContaResponse> listar(String email, String status, String escopo, Pageable pageable) {
         User user = findUser(email);
-        List<Conta> all = contaRepository.findAll().stream()
-                .filter(c -> c.getResponsavel() != null && c.getResponsavel().getId().equals(user.getId()))
-                .filter(c -> status == null || c.getStatus().toString().equalsIgnoreCase(status))
-                .filter(c -> escopo == null || c.getEscopo().toString().equalsIgnoreCase(escopo))
-                .collect(Collectors.toList());
-        
-        int start = (int) pageable.getOffset();
-        int end = Math.min((start + pageable.getPageSize()), all.size());
-        
-        if (start > all.size()) {
-            return new PageImpl<>(new ArrayList<>(), pageable, all.size());
+        EscopoTransacao escopoFilter = parseEnum(EscopoTransacao.class, escopo, "escopo");
+        if (escopoFilter != null) {
+            espacoFinanceiroService.validarAcesso(user, escopoFilter);
         }
-
-        List<ContaResponse> pageContent = all.subList(start, end).stream()
-                .map(this::toResponse)
-                .collect(Collectors.toList());
-                
-        return new PageImpl<>(pageContent, pageable, all.size());
+        if (status != null && "ATRASADO".equalsIgnoreCase(status.trim())) {
+            return contaRepository.findOverdueForApi(user, escopoFilter, LocalDate.now(), pageable)
+                    .map(this::toResponse);
+        }
+        StatusTransacao statusFilter = parseEnum(StatusTransacao.class, status, "status");
+        return contaRepository.findForApi(user, statusFilter, escopoFilter, pageable).map(this::toResponse);
     }
 
     public ContaResponse buscarPorId(Long id, String email) {
         User user = findUser(email);
-        Conta conta = contaRepository.findById(id)
+        Conta conta = contaRepository.findByIdAndResponsavelId(id, user.getId())
                 .orElseThrow(() -> new ResourceNotFoundException("Transação não encontrada"));
-        if (conta.getResponsavel() != null && !conta.getResponsavel().getId().equals(user.getId())) {
-            throw new RuntimeException("Acesso negado");
-        }
         return toResponse(conta);
     }
 
     @Transactional
     public ContaResponse criar(ContaRequest request, MultipartFile comprovante, String email) {
         User user = findUser(email);
-        Categoria categoria = request.getCategoriaId() != null ? 
-                categoriaRepository.findById(request.getCategoriaId()).orElse(null) : null;
+        espacoFinanceiroService.validarAcesso(user, request.getEscopo());
+        Categoria categoria = categoriaService.validarNoEscopo(request.getCategoriaId(), request.getEscopo());
 
         Conta conta = new Conta();
         conta.setDescricao(request.getDescricao());
@@ -420,6 +464,7 @@ public class ContaService {
         conta.setPrioridade(request.getPrioridade());
         conta.setCategoria(categoria);
         conta.setResponsavel(user);
+        conta.setAsset(resolveAsset(request.getAssetId(), user));
         
         return toResponse(salvar(conta));
     }
@@ -427,15 +472,15 @@ public class ContaService {
     @Transactional
     public ContaResponse atualizar(Long id, ContaRequest request, MultipartFile comprovante, String email) {
         User user = findUser(email);
-        Conta conta = contaRepository.findById(id)
+        espacoFinanceiroService.validarAcesso(user, request.getEscopo());
+        Conta conta = contaRepository.findByIdAndResponsavelId(id, user.getId())
                 .orElseThrow(() -> new ResourceNotFoundException("Transação não encontrada"));
-        
-        if (conta.getResponsavel() != null && !conta.getResponsavel().getId().equals(user.getId())) {
-            throw new RuntimeException("Acesso negado");
-        }
 
-        Categoria categoria = request.getCategoriaId() != null ? 
-                categoriaRepository.findById(request.getCategoriaId()).orElse(null) : null;
+        BigDecimal valorAnterior = conta.getValor();
+        TipoTransacao tipoAnterior = conta.getTipo();
+        Asset assetAnterior = conta.getAsset();
+
+        Categoria categoria = categoriaService.validarNoEscopo(request.getCategoriaId(), request.getEscopo());
 
         conta.setDescricao(request.getDescricao());
         conta.setValor(request.getValor());
@@ -445,26 +490,55 @@ public class ContaService {
         conta.setFrequencia(request.getFrequencia());
         conta.setPrioridade(request.getPrioridade());
         conta.setCategoria(categoria);
+        if (request.getAssetId() != null) {
+            conta.setAsset(resolveAsset(request.getAssetId(), user));
+        }
 
-        return toResponse(salvar(conta));
+        if (conta.isPaga()) {
+            if (conta.getAsset() == null) {
+                throw new BadRequestException("Uma transação paga precisa estar vinculada a uma conta ou ativo");
+            }
+            if (assetAnterior != null) {
+                atualizarSaldoAtivo(assetAnterior, valorAnterior, inverter(tipoAnterior));
+            }
+            atualizarSaldoAtivo(conta.getAsset(), conta.getValor(), conta.getTipo());
+        }
+
+        return toResponse(contaRepository.save(conta));
     }
 
     @Transactional
     public ContaResponse pagar(Long id, String email) {
+        return pagar(id, null, email);
+    }
+
+    @Transactional
+    public ContaResponse pagar(Long id, UUID assetId, String email) {
         User user = findUser(email);
-        Conta conta = contaRepository.findById(id).orElseThrow();
-        if (conta.getResponsavel() != null && !conta.getResponsavel().getId().equals(user.getId())) {
-            throw new RuntimeException("Acesso negado");
+        Conta conta = contaRepository.findByIdAndResponsavelId(id, user.getId())
+                .orElseThrow(() -> new ResourceNotFoundException("Transação não encontrada"));
+        if (conta.isPaga()) {
+            return toResponse(conta);
+        }
+        if (assetId != null) {
+            conta.setAsset(resolveAsset(assetId, user));
+        }
+        if (conta.getAsset() == null) {
+            throw new BadRequestException("Informe assetId para registrar o pagamento nesta conta");
         }
         conta.setPaga(true);
         conta.setDataPagamento(LocalDate.now());
         conta.setStatus(StatusTransacao.PAGO);
-        return toResponse(salvar(conta));
+        atualizarSaldoAtivo(conta.getAsset(), conta.getValor(), conta.getTipo());
+        return toResponse(contaRepository.save(conta));
     }
 
+    @Transactional
     public void excluir(Long id, String email) {
         User user = findUser(email);
-        excluir(id, user);
+        Conta conta = contaRepository.findByIdAndResponsavelId(id, user.getId())
+                .orElseThrow(() -> new ResourceNotFoundException("Transação não encontrada"));
+        excluir(conta.getId(), user);
     }
 
     @Transactional
@@ -475,11 +549,34 @@ public class ContaService {
     }
 
     private User findUser(String email) {
-        return usuarioRepository.findByEmail(email)
+        return usuarioRepository.findByEmailIgnoreCase(email)
                 .orElseThrow(() -> new ResourceNotFoundException("Usuário não encontrado"));
     }
 
-    private ContaResponse toResponse(Conta c) {
+    private Asset resolveAsset(UUID assetId, User user) {
+        if (assetId == null) {
+            return null;
+        }
+        return assetRepository.findByIdAndUserId(assetId, user.getId())
+                .orElseThrow(() -> new ResourceNotFoundException("Ativo não encontrado"));
+    }
+
+    private TipoTransacao inverter(TipoTransacao tipo) {
+        return tipo == TipoTransacao.RECEITA ? TipoTransacao.DESPESA : TipoTransacao.RECEITA;
+    }
+
+    private <E extends Enum<E>> E parseEnum(Class<E> type, String value, String field) {
+        if (value == null || value.isBlank()) {
+            return null;
+        }
+        try {
+            return Enum.valueOf(type, value.trim().toUpperCase(Locale.ROOT));
+        } catch (IllegalArgumentException ex) {
+            throw new BadRequestException("Valor inválido para " + field + ": " + value);
+        }
+    }
+
+    public ContaResponse toResponse(Conta c) {
         return ContaResponse.builder()
                 .id(c.getId())
                 .descricao(c.getDescricao())
@@ -494,6 +591,7 @@ public class ContaService {
                 .prioridade(c.getPrioridade())
                 .categoriaNome(c.getCategoria() != null ? c.getCategoria().getNome() : null)
                 .comprovante(c.getComprovante())
+                .assetId(c.getAsset() != null ? c.getAsset().getId() : null)
                 .build();
     }
 }

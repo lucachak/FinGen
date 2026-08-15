@@ -1,9 +1,9 @@
 package lucas.basemodel.modules.financeiro.enums;
 
 public enum EscopoTransacao {
-    CASA("Despesa Partilhada da Casa"),
-    PESSOAL("Finanças Pessoais"),
-    NEGOCIO("Business");
+    CASA("Casa"),
+    PESSOAL("Pessoal"),
+    NEGOCIO("Empresa (CNPJ)");
 
     private final String descricao;
 

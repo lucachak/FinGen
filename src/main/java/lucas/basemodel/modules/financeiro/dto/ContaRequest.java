@@ -11,6 +11,7 @@ import lucas.basemodel.modules.financeiro.enums.TipoTransacao;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.UUID;
 
 @Data
 public class ContaRequest {
@@ -31,4 +32,5 @@ public class ContaRequest {
     private Frequencia frequencia = Frequencia.AVULSA;
     private Prioridade prioridade = Prioridade.MEDIA;
     private Long categoriaId;
+    private UUID assetId;
 }
