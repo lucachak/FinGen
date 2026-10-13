@@ -9,7 +9,6 @@ import lucas.basemodel.modules.financeiro.repositories.MetaFinanceiraRepository;
 import lucas.basemodel.modules.financeiro.repositories.OrcamentoRepository;
 import lucas.basemodel.modules.user.User;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
@@ -20,7 +19,7 @@ public class DistribuidorEstruturaService {
     private final MetaFinanceiraRepository metaFinanceiraRepository;
     private final CategoriaService categoriaService;
 
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    @Transactional
     public void criarEstruturaResiliente(User user, DistribuicaoResult result) {
         // 1. Remove orçamentos e metas antigos gerados pelo sistema
         orcamentoRepository.deleteByResponsavelAndIsGeradoPeloSistemaTrue(user);

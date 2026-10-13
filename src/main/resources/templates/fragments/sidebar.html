@@ -80,10 +80,10 @@
                     class="ml-auto text-[9.5px] font-semibold bg-brand text-white rounded-full px-2 py-0.5 tracking-wide">IA</span>
             </a>
 
-            <span class="text-[10px] font-semibold tracking-widest uppercase text-zen-t3 px-2.5 pt-3.5 pb-1.5">Minha
+            <span th:if="${user != null and user.role == 'ROLE_ADMIN'}" class="text-[10px] font-semibold tracking-widest uppercase text-zen-t3 px-2.5 pt-3.5 pb-1.5">Minha
                 Casa</span>
 
-            <a th:href="@{/app/settings/moradores}"
+            <a th:if="${user != null and user.role == 'ROLE_ADMIN'}" th:href="@{/app/settings/moradores}"
                 class="group flex items-center gap-2.5 px-3 py-2 rounded-md text-[13.5px] transition-colors border border-transparent"
                 th:classappend="${menu == 'moradores'} ? 'bg-brand-soft text-brand font-medium border-brand/15' : 'text-zen-t2 hover:bg-zen-surfaceH hover:text-zen-t1'">
                 <i data-lucide="users" class="w-4 h-4 shrink-0 transition-colors"

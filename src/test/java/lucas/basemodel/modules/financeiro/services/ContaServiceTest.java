@@ -13,6 +13,8 @@ import lucas.basemodel.modules.user.User;
 import lucas.basemodel.modules.user.UsuarioRepository;
 import lucas.basemodel.modules.wealth.models.BankAccountAsset;
 import lucas.basemodel.modules.wealth.repositories.AssetRepository;
+import lucas.basemodel.modules.wealth.repositories.AssetValuationRepository;
+import lucas.basemodel.modules.wealth.services.ContaBancariaInicialService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -41,6 +43,8 @@ class ContaServiceTest {
     @Mock CategoriaRepository categoriaRepository;
     @Mock CategoriaService categoriaService;
     @Mock EspacoFinanceiroService espacoFinanceiroService;
+    @Mock ContaBancariaInicialService contaBancariaInicialService;
+    @Mock AssetValuationRepository assetValuationRepository;
 
     private ContaService service;
     private User user;
@@ -48,7 +52,7 @@ class ContaServiceTest {
     @BeforeEach
     void setUp() {
         service = new ContaService(contaRepository, assetRepository, usuarioRepository, categoriaRepository,
-                categoriaService, espacoFinanceiroService);
+                categoriaService, espacoFinanceiroService, contaBancariaInicialService, assetValuationRepository);
         user = User.builder().id(UUID.randomUUID()).email("user@example.com").role("USER").build();
         lenient().when(usuarioRepository.findByEmailIgnoreCase("user@example.com")).thenReturn(Optional.of(user));
     }
@@ -164,6 +168,32 @@ class ContaServiceTest {
         ArgumentCaptor<Conta> captor = ArgumentCaptor.forClass(Conta.class);
         verify(contaRepository).save(captor.capture());
         assertEquals(user.getId(), captor.getValue().getResponsavel().getId());
+    }
+
+    @Test
+    void salvarPagoUsaContaPrincipalQuandoAtivoNaoFoiInformado() {
+        BankAccountAsset contaPrincipal = BankAccountAsset.builder()
+                .id(UUID.randomUUID())
+                .user(user)
+                .balance(new BigDecimal("100.00"))
+                .estimatedValue(new BigDecimal("100.00"))
+                .currency("BRL")
+                .build();
+        Conta conta = novaConta();
+        conta.setId(null);
+        conta.setPaga(true);
+        conta.setAsset(null);
+        when(contaBancariaInicialService.criarSeAusente(user, BigDecimal.ZERO, null))
+                .thenReturn(contaPrincipal);
+        when(contaRepository.save(any(Conta.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+        service.salvarParaUsuario(conta, user);
+
+        assertEquals(new BigDecimal("75.00"), contaPrincipal.getBalance());
+        verify(assetValuationRepository).save(argThat(valuation ->
+                valuation.getAsset() == contaPrincipal
+                        && valuation.getAmount().compareTo(new BigDecimal("75.00")) == 0
+                        && "TRANSACTION_EXPENSE".equals(valuation.getSource())));
     }
 
     private Conta novaConta() {

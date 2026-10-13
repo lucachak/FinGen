@@ -47,6 +47,7 @@ public class SecurityConfig {
                                                                 "/actuator/health", "/actuator/health/**").permitAll()
                                                 .requestMatchers("/api/v1/auth/**").permitAll()
                                                 .requestMatchers("/admin/**").hasAuthority("ROLE_ADMIN")
+                                                .requestMatchers("/app/settings/moradores/**").hasAuthority("ROLE_ADMIN")
                                                 .requestMatchers("/app/financeiro/categorias/nova",
                                                                 "/app/financeiro/categorias/editar/**",
                                                                 "/app/financeiro/categorias/salvar").hasAuthority("ROLE_ADMIN")
@@ -68,14 +69,21 @@ public class SecurityConfig {
                                                 filterChain.doFilter(request, response);
                                         }
                                 }, CsrfFilter.class)
-                                .exceptionHandling(ex -> ex.authenticationEntryPoint(
-                                                (request, response, authException) -> {
-                                                        if (request.getRequestURI().startsWith("/api/v1/")) {
-                                                                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-                                                                response.setContentType("application/json");
-                                                                response.getWriter().write("{\"error\": \"Unauthorized\"}");
+                                .exceptionHandling(ex -> ex
+                                                .authenticationEntryPoint((request, response, authException) -> {
+                                                        if (expectsJsonResponse(request)) {
+                                                                writeJsonError(response, HttpServletResponse.SC_UNAUTHORIZED,
+                                                                                "Sua sessão expirou. Entre novamente para continuar.");
                                                         } else {
                                                                 response.sendRedirect("/auth/login");
+                                                        }
+                                                })
+                                                .accessDeniedHandler((request, response, accessDeniedException) -> {
+                                                        if (expectsJsonResponse(request)) {
+                                                                writeJsonError(response, HttpServletResponse.SC_FORBIDDEN,
+                                                                                "Não foi possível validar a sessão. Atualize a página e tente novamente.");
+                                                        } else {
+                                                                response.sendError(HttpServletResponse.SC_FORBIDDEN);
                                                         }
                                                 }))
                                 .logout(logout -> logout
@@ -100,5 +108,18 @@ public class SecurityConfig {
         private org.springframework.security.web.csrf.CookieCsrfTokenRepository customCsrfTokenRepository() {
                 var repo = org.springframework.security.web.csrf.CookieCsrfTokenRepository.withHttpOnlyFalse();
                 return repo;
+        }
+
+        private static boolean expectsJsonResponse(HttpServletRequest request) {
+                String uri = request.getRequestURI();
+                return uri.startsWith("/api/v1/") || uri.equals("/app/onboarding/submit");
+        }
+
+        private static void writeJsonError(HttpServletResponse response, int status, String message)
+                        throws IOException {
+                response.setStatus(status);
+                response.setCharacterEncoding("UTF-8");
+                response.setContentType("application/json");
+                response.getWriter().write("{\"status\":\"error\",\"message\":\"" + message + "\"}");
         }
 }

@@ -8,8 +8,11 @@ import lucas.basemodel.modules.financeiro.models.*;
 import lucas.basemodel.modules.financeiro.repositories.*;
 import lucas.basemodel.modules.user.User;
 import lucas.basemodel.modules.user.UsuarioRepository;
+import lucas.basemodel.modules.wealth.services.ContaBancariaInicialService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionSynchronization;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -24,6 +27,7 @@ public class OnboardingService {
     private final TransacaoRecorrenteRepository transacaoRecorrenteRepository;
     private final DistribuicaoOrcamentoService distribuicaoOrcamentoService;
     private final UsuarioRepository usuarioRepository;
+    private final ContaBancariaInicialService contaBancariaInicialService;
 
     @Transactional
     public void processarOnboarding(User user, OnboardingPayloadDTO dto) {
@@ -68,19 +72,41 @@ public class OnboardingService {
 
         // 3. Aplicar Estratégia de Distribuição
         if (dto.getRendaLiquida() != null && dto.getRendaLiquida().compareTo(BigDecimal.ZERO) > 0) {
-            log.info("Aplicando estratégia de distribuição para renda: {}", dto.getRendaLiquida());
-            try {
-                distribuicaoOrcamentoService.aplicarEstrategia(user, dto.getRendaLiquida(), EstrategiaDistribuicao.REGRA_50_30_20);
-                log.info("Estratégia 50/30/20 aplicada com sucesso.");
-            } catch (Exception e) {
-                log.error("Falha ao aplicar estratégia de distribuição automática. O onboarding continuará.", e);
-            }
+            agendarDistribuicaoAposCommit(user, dto.getRendaLiquida());
         }
 
-        // 4. Finalizar
+        // 4. Garantir uma origem/destino para as primeiras movimentações.
+        contaBancariaInicialService.criarSeAusente(
+                user, dto.getSaldoDisponivel(), dto.getNomeConta());
+
+        // 5. Finalizar
         user.setSetupCompleted(true);
         usuarioRepository.save(user);
         log.info("Onboarding concluído com sucesso para: {}", user.getEmail());
+    }
+
+    private void agendarDistribuicaoAposCommit(User user, BigDecimal renda) {
+        Runnable aplicarDistribuicao = () -> {
+            log.info("Aplicando estratégia de distribuição para renda: {}", renda);
+            try {
+                distribuicaoOrcamentoService.aplicarEstrategia(
+                        user, renda, EstrategiaDistribuicao.REGRA_50_30_20);
+                log.info("Estratégia 50/30/20 aplicada com sucesso.");
+            } catch (Exception e) {
+                log.error("Falha ao aplicar estratégia de distribuição automática. O onboarding foi preservado.", e);
+            }
+        };
+
+        if (TransactionSynchronizationManager.isSynchronizationActive()) {
+            TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
+                @Override
+                public void afterCommit() {
+                    aplicarDistribuicao.run();
+                }
+            });
+        } else {
+            aplicarDistribuicao.run();
+        }
     }
 
     /**
@@ -151,6 +177,7 @@ public class OnboardingService {
         // ──────────────────────────────────────────────
         if (!moraCom && dto.getContasCasa() != null) {
             for (String conta : dto.getContasCasa()) {
+                if (conta == null || conta.isBlank()) continue;
                 switch (conta.toLowerCase()) {
                     case "luz" -> transacoes.add(casaBuilder.apply("Energia Elétrica").valorBase(new BigDecimal("150.00")).build());
                     case "agua" -> transacoes.add(casaBuilder.apply("Água e Esgoto").valorBase(new BigDecimal("80.00")).build());
@@ -192,6 +219,7 @@ public class OnboardingService {
         // ──────────────────────────────────────────────
         if (dto.getAssinaturas() != null) {
             for (String sub : dto.getAssinaturas()) {
+                if (sub == null || sub.isBlank()) continue;
                 TransacaoRecorrente.TransacaoRecorrenteBuilder subBuilder =
                         pessoalBuilder.apply(capitalize(sub));
                 switch (sub.toLowerCase()) {

@@ -27,7 +27,7 @@ public class DistribuicaoOrcamentoService {
     private final ConfiguracaoFinanceiraRepository configRepository;
     private final DistribuidorEstruturaService distribuidorEstruturaService;
 
-    @Transactional
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void aplicarEstrategia(User user, BigDecimal renda, EstrategiaDistribuicao estrategia) {
         // 1. Atualiza a configuração financeira do usuário (na transação atual para evitar conflitos)
         ConfiguracaoFinanceira config = configRepository.findByUser(user)
@@ -51,7 +51,7 @@ public class DistribuicaoOrcamentoService {
         // 3. Calcula os novos valores
         DistribuicaoResult result = strategy.calcular(renda);
 
-        // 4. Delega a criação da estrutura para um serviço separado (com REQUIRES_NEW real)
+        // 4. Delega a criação da estrutura, mantendo toda a distribuição atômica.
         distribuidorEstruturaService.criarEstruturaResiliente(user, result);
     }
 }

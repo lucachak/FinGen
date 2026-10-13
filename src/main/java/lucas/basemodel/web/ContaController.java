@@ -7,6 +7,8 @@ import lucas.basemodel.modules.financeiro.services.ContaService;
 import lucas.basemodel.modules.financeiro.services.CategoriaService;
 import lucas.basemodel.modules.financeiro.services.EspacoFinanceiroService;
 import lucas.basemodel.modules.wealth.services.WealthService;
+import lucas.basemodel.modules.wealth.enums.AssetType;
+import lucas.basemodel.modules.wealth.models.Asset;
 import lucas.basemodel.modules.financeiro.dto.ContaStagingForm;
 import lucas.basemodel.modules.financeiro.repositories.ContaRepository;
 import lucas.basemodel.modules.user.UsuarioRepository;
@@ -52,10 +54,15 @@ public class ContaController {
 
         Conta novaConta = new Conta();
         novaConta.setEscopo(escopo);
+        List<Asset> assets = wealthService.getUserAssets(usuarioLogado.getId());
+        assets.stream()
+                .filter(asset -> asset.getType() == AssetType.BANK_ACCOUNT)
+                .findFirst()
+                .ifPresent(novaConta::setAsset);
         model.addAttribute("conta", novaConta);
         model.addAttribute("categorias", categoriasPermitidas(usuarioLogado));
         model.addAttribute("escopos", espacoFinanceiroService.listarPermitidos(usuarioLogado));
-        model.addAttribute("assets", wealthService.getUserAssets(usuarioLogado.getId()));
+        model.addAttribute("assets", assets);
         model.addAttribute("tipos", TipoTransacao.values());
         model.addAttribute("prioridades", Prioridade.values());
 

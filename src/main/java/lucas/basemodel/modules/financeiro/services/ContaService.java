@@ -15,7 +15,10 @@ import lucas.basemodel.modules.user.User;
 import lucas.basemodel.modules.user.UsuarioRepository;
 import lucas.basemodel.modules.wealth.models.Asset;
 import lucas.basemodel.modules.wealth.models.BankAccountAsset;
+import lucas.basemodel.modules.wealth.models.AssetValuation;
 import lucas.basemodel.modules.wealth.repositories.AssetRepository;
+import lucas.basemodel.modules.wealth.repositories.AssetValuationRepository;
+import lucas.basemodel.modules.wealth.services.ContaBancariaInicialService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -38,19 +41,25 @@ public class ContaService {
     private final CategoriaRepository categoriaRepository;
     private final CategoriaService categoriaService;
     private final EspacoFinanceiroService espacoFinanceiroService;
+    private final ContaBancariaInicialService contaBancariaInicialService;
+    private final AssetValuationRepository assetValuationRepository;
 
     public ContaService(ContaRepository contaRepository, 
                         AssetRepository assetRepository,
                         UsuarioRepository usuarioRepository,
                         CategoriaRepository categoriaRepository,
                         CategoriaService categoriaService,
-                        EspacoFinanceiroService espacoFinanceiroService) {
+                        EspacoFinanceiroService espacoFinanceiroService,
+                        ContaBancariaInicialService contaBancariaInicialService,
+                        AssetValuationRepository assetValuationRepository) {
         this.contaRepository = contaRepository;
         this.assetRepository = assetRepository;
         this.usuarioRepository = usuarioRepository;
         this.categoriaRepository = categoriaRepository;
         this.categoriaService = categoriaService;
         this.espacoFinanceiroService = espacoFinanceiroService;
+        this.contaBancariaInicialService = contaBancariaInicialService;
+        this.assetValuationRepository = assetValuationRepository;
     }
 
     /**
@@ -73,6 +82,10 @@ public class ContaService {
 
         if (conta.getAsset() != null && conta.getAsset().getId() != null) {
             conta.setAsset(resolveAsset(conta.getAsset().getId(), usuario));
+        }
+
+        if (conta.isPaga() && conta.getAsset() == null) {
+            conta.setAsset(contaBancariaInicialService.criarSeAusente(usuario, BigDecimal.ZERO, null));
         }
 
         conta.setResponsavel(usuario);
@@ -414,6 +427,12 @@ public class ContaService {
             // Também atualizamos o estimatedValue para manter o snapshot correto
             ba.setEstimatedValue(ba.getBalance());
             assetRepository.save(ba);
+            assetValuationRepository.save(AssetValuation.builder()
+                    .asset(ba)
+                    .amount(ba.getBalance())
+                    .currency(ba.getCurrency() != null ? ba.getCurrency() : "BRL")
+                    .source(tipo == TipoTransacao.RECEITA ? "TRANSACTION_INCOME" : "TRANSACTION_EXPENSE")
+                    .build());
         } else {
             // Outros tipos de ativos podem ter lógica similar ou apenas atualizar o estimatedValue
             BigDecimal valorAtual = asset.getEstimatedValue() != null ? asset.getEstimatedValue() : BigDecimal.ZERO;

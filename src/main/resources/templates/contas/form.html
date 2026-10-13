@@ -104,10 +104,10 @@
                                 <div class="md:col-span-2">
                                     <label class="form-label" for="inputAsset">Conta Bancária / Carteira (Destino/Origem)</label>
                                     <select th:field="*{asset}" id="inputAsset" class="form-input appearance-none">
-                                        <option value="">Nenhuma (Não afeta Patrimônio)</option>
+                                        <option value="">Selecionar conta</option>
                                         <option th:each="a : ${assets}" th:value="${a.id}" th:text="${a.name}"></option>
                                     </select>
-                                    <p class="text-[10px] text-zen-t3 mt-2 ml-1 italic">* Transações pagas vinculadas a uma conta bancária atualizarão o saldo automaticamente.</p>
+                                    <p class="text-[10px] text-zen-t3 mt-2 ml-1 italic">Sua Conta principal já vem selecionada. Entradas somam e despesas descontam do saldo automaticamente.</p>
                                 </div>
                                 <div class="md:col-span-2">
                                     <label class="form-label">Prioridade & Escopo</label>

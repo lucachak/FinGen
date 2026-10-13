@@ -8,6 +8,7 @@ import lucas.basemodel.modules.financeiro.repositories.CategoriaRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class CategoriaService {
@@ -53,13 +54,25 @@ public class CategoriaService {
 
     public Categoria buscarOuCriarPorNome(String nome, EscopoTransacao escopo) {
         return categoriaRepository.findByNomeIgnoreCaseAndEscopo(nome, escopo)
-                .orElseGet(() -> {
-                    Categoria nova = new Categoria();
-                    nova.setNome(nome);
-                    nova.setEscopo(escopo);
-                    nova.setNatureza(lucas.basemodel.modules.financeiro.enums.NaturezaCategoria.DESPESA);
-                    return categoriaRepository.save(nova);
+                .orElseGet(() -> reutilizarCategoriaLegada(nome, escopo)
+                        .orElseGet(() -> criarCategoria(nome, escopo)));
+    }
+
+    private Optional<Categoria> reutilizarCategoriaLegada(String nome, EscopoTransacao escopo) {
+        return categoriaRepository.findFirstByNomeIgnoreCase(nome)
+                .filter(categoria -> categoria.getEscopo() == null)
+                .map(categoria -> {
+                    categoria.setEscopo(escopo);
+                    return categoriaRepository.save(categoria);
                 });
+    }
+
+    private Categoria criarCategoria(String nome, EscopoTransacao escopo) {
+        Categoria nova = new Categoria();
+        nova.setNome(nome);
+        nova.setEscopo(escopo);
+        nova.setNatureza(lucas.basemodel.modules.financeiro.enums.NaturezaCategoria.DESPESA);
+        return categoriaRepository.save(nova);
     }
 
     public Categoria validarNoEscopo(Long categoriaId, EscopoTransacao escopo) {
