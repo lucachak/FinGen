@@ -27,9 +27,13 @@ services:
     ports:
       - "8000:8000"
     environment:
-      GEMINI_TOKEN: ${GEMINI_TOKEN:-}
+      OPENROUTER_API_KEY: ${OPENROUTER_API_KEY:-}
+      AI_MODEL_DEFAULT: ${AI_MODEL_DEFAULT:-openrouter/free}
+      AI_MODEL_FALLBACK: ${AI_MODEL_FALLBACK:-google/gemma-3-27b-it:free}
+      AI_MODEL_VISION: ${AI_MODEL_VISION:-google/gemma-3-27b-it:free}
     volumes:
       - ./main.py:/app/main.py
+      - ./llm.py:/app/llm.py
 
   app:
     build: .
@@ -46,7 +50,10 @@ services:
       SPRING_DATASOURCE_USERNAME: ${COMPOSE_DB_USER:-fingen}
       SPRING_DATASOURCE_PASSWORD: ${COMPOSE_DB_PASSWORD:-fingen-local}
       OPENROUTER_API_KEY: ${OPENROUTER_API_KEY:-}
-      GEMINI_TOKEN: ${GEMINI_TOKEN:-}
+      AI_MODEL_DEFAULT: ${AI_MODEL_DEFAULT:-openrouter/free}
+      AI_MODEL_FALLBACK: ${AI_MODEL_FALLBACK:-google/gemma-3-27b-it:free}
+      AI_MODEL_VISION: ${AI_MODEL_VISION:-google/gemma-3-27b-it:free}
+      AI_ALLOW_PAID_MODELS: ${AI_ALLOW_PAID_MODELS:-false}
       JWT_SECRET: ${JWT_SECRET:-}
       PYTHON_API_URL: http://python-ia:8000
       SPRING_SERVLET_MULTIPART_MAX_FILE_SIZE: ${SPRING_SERVLET_MULTIPART_MAX_FILE_SIZE:-20MB}

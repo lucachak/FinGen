@@ -27,7 +27,7 @@
 
 **FinGen** is a full-stack web application developed to simplify and centralize family and personal financial management. It combines a robust Spring Boot backend with a reactive frontend via HTMX and Thymeleaf, offering a fluid experience without the complexity of a separate SPA.
 
-The platform goes beyond simple expense tracking: it integrates **generative AI** (Google Gemini + OpenRouter) for bank statement analysis, budget goal suggestions, and personalized financial coaching, plus a complete **wealth management** module for tracking assets (real estate, stocks, vehicles, passive income).
+The platform goes beyond simple expense tracking: it integrates **generative AI** (any model on OpenRouter, chosen by the user) for bank statement analysis, budget goal suggestions, and personalized financial coaching, plus a complete **wealth management** module for tracking assets (real estate, stocks, vehicles, passive income).
 
 ---
 
@@ -51,15 +51,25 @@ The platform goes beyond simple expense tracking: it integrates **generative AI*
 - **Recent Transactions** — Last 5 paid transactions.
 - **AI Suggestions** — Automatically generated insights based on your wealth snapshot.
 
-### 🤖 Artificial Intelligence (Dual Stack)
-| Service | Function |
-|---------|--------|
-| **Google Gemini** | Bank statement processing (PDF/Image), expense anomaly analysis, personalized investment planning. |
-| **OpenRouter** | Conversational financial chat, goal suggestions based on user profile. |
+### 🤖 Artificial Intelligence (OpenRouter, model of your choice)
+Every AI feature goes through [OpenRouter](https://openrouter.ai), with a single key and a
+model picker on the AI page (and `GET/POST /api/v1/ia/models` for the mobile app).
+
+| Feature | Where it runs |
+|---------|---------------|
+| Conversational chat, goal suggestions | Java (`OpenRouterService`) |
+| Bank statement import (PDF, CSV, photo), receipt reading, anomaly analysis, investment planning | Python service (`llm.py`) |
+
+**Choosing a model.** The list comes from OpenRouter's public catalogue and shows **free models
+only** by default, because the platform's key pays the bill. Set `AI_ALLOW_PAID_MODELS=true` to
+also list paid ones. The choice is stored per user (`usuarios.modelo_ia`). If the chosen model is
+rate-limited or down, the request is retried once on `AI_MODEL_FALLBACK`. Reading images (receipts,
+photographed statements) needs a model that accepts image input; when the chosen one doesn't, the
+platform uses `AI_MODEL_VISION` for that step.
 
 **Statement Import Workflow:**
 1. Upload bank statement PDF/Image.
-2. Gemini automatically extracts and classifies transactions.
+2. The AI model extracts and classifies transactions.
 3. User reviews, edits, and confirms transactions in staging.
 4. Confirmed transactions are saved to the database.
 
@@ -200,7 +210,7 @@ FinGen
 │   └── Security Layer (Spring Security + JWT)
 │
 ├── Python IA Service (FastAPI)         → Port 8000
-│   └── Gemini API integration (statement processing)
+│   └── OpenRouter client (llm.py): statements, receipts, analysis
 │
 └── Database
     ├── Supabase (Production/Cloud - PostgreSQL)
@@ -269,9 +279,8 @@ lucas.basemodel/
 | **Utilities** | Lombok | 1.18.36 |
 | **Build** | Maven Wrapper (mvnw) | 3.9.6 |
 | **Container** | Docker (multi-stage build) | — |
-| **AI (Java)** | Google Gemini API (via GeminiService) | — |
-| **AI (Chat)** | OpenRouter API (via OpenRouterService) | — |
-| **AI (Python)** | FastAPI + Google Gemini | — |
+| **AI (Java)** | OpenRouter API (via OpenRouterService, AiModelCatalog) | — |
+| **AI (Python)** | FastAPI + OpenRouter (httpx) | — |
 | **Deploy** | Render.com | — |
 
 ---
@@ -298,8 +307,12 @@ SUPABASE_DB_USER=postgres.[project-id]
 SUPABASE_DB_PASS=your_db_password
 
 # AI Integration
-GEMINI_TOKEN=your_gemini_token
 OPENROUTER_API_KEY=your_openrouter_api_key
+# Optional. Defaults shown; any OpenRouter model id works.
+# AI_MODEL_DEFAULT=openrouter/free
+# AI_MODEL_FALLBACK=google/gemma-3-27b-it:free
+# AI_MODEL_VISION=google/gemma-3-27b-it:free
+# AI_ALLOW_PAID_MODELS=false
 PYTHON_API_URL=http://python-ia:8000
 
 # File Upload
@@ -341,8 +354,11 @@ The project uses a `render.yaml` file for automatic deployment on [Render.com](h
 ### Required Environment Variables on Render Panel:
 | Variable | Description |
 |----------|-----------|
-| `OPENROUTER_API_KEY` | OpenRouter API Key for AI chat. |
-| `GEMINI_TOKEN` | Google Gemini API Token. |
+| `OPENROUTER_API_KEY` | OpenRouter API Key, used by every AI feature. |
+| `AI_MODEL_DEFAULT` | Model used when the user hasn't chosen one. |
+| `AI_MODEL_FALLBACK` | Model tried when the chosen one is unavailable. |
+| `AI_MODEL_VISION` | Model used to read images when the chosen one can't. |
+| `AI_ALLOW_PAID_MODELS` | `true` lists paid models in the picker. Default `false`. |
 | `DB_URL` | Supabase Database URL (JDBC). |
 | `DB_USERNAME` | Supabase Pooler Username. |
 | `DB_PASSWORD` | Supabase Database Password. |
@@ -446,7 +462,8 @@ FinGen/
 │   │       ├── static/               # CSS, JS, Images
 │   │       └── application.properties
 │   └── test/                         # Automated Tests
-├── main.py                           # Python Service (Gemini AI)
+├── main.py                           # Python Service (AI routes)
+├── llm.py                            # OpenRouter client (model choice + fallback)
 ├── requirements.txt                  # Python Dependencies
 ├── Dockerfile                        # Java Service Build
 ├── Dockerfile.python                 # Python IA Service Build

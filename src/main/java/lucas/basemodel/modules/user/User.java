@@ -74,6 +74,10 @@ public class User {
     @Column(precision = 5, scale = 2)
     private BigDecimal tetoGastosEssenciais = new BigDecimal("50.00");
 
+    /** Id OpenRouter do modelo de IA preferido. Nulo = usar o padrão da plataforma. */
+    @Column(name = "modelo_ia", length = 120)
+    private String modeloIa;
+
     private LocalDateTime ultimoAcesso;
 
     @CreationTimestamp

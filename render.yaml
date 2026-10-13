@@ -7,10 +7,16 @@ services:
     plan: free
     healthCheckPath: /actuator/health
     envVars:
-      - key: GEMINI_TOKEN
-        sync: false
       - key: OPENROUTER_API_KEY
         sync: false
+      - key: AI_MODEL_DEFAULT
+        value: openrouter/free
+      - key: AI_MODEL_FALLBACK
+        value: google/gemma-3-27b-it:free
+      - key: AI_MODEL_VISION
+        value: google/gemma-3-27b-it:free
+      - key: AI_ALLOW_PAID_MODELS
+        value: false
       - key: PYTHON_API_URL
         value: http://localhost:8000
       - key: DB_URL

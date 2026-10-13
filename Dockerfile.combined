@@ -27,7 +27,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY --from=java-build /app/target/*.jar app.jar
 
 # Copia o código Python
-COPY main.py .
+COPY main.py llm.py ./
 
 # Copia e dá permissão ao script de inicialização
 COPY scripts/start.sh ./start.sh

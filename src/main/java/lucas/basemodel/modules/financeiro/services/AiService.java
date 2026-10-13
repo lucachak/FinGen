@@ -20,7 +20,7 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class AiService {
 
-    private final GeminiService geminiService;
+    private final FinanceAiService financeAi;
     private final OpenRouterService openRouterService;
     private final UsuarioRepository usuarioRepository;
     private final ContaRepository contaRepository;
@@ -42,7 +42,7 @@ public class AiService {
 
     @SuppressWarnings("unchecked")
     public List<ContaResponse> processarExtrato(MultipartFile file, String email) {
-        Map<String, Object> result = geminiService.processarExtratoIA(file, email);
+        Map<String, Object> result = financeAi.processarExtratoIA(file, email);
         if (result == null || "erro".equals(result.get("status"))) {
             return new ArrayList<>();
         }
@@ -70,19 +70,20 @@ public class AiService {
     }
 
     public String gerarPlanoInvestimento(String email) {
-        return geminiService.gerarPlanoInvestimentos(email);
+        return financeAi.gerarPlanoInvestimentos(email);
     }
 
     public String analisarAnomalias(String email, EscopoTransacao escopo) {
         User user = usuarioRepository.findByEmail(email).orElseThrow();
         espacoFinanceiroService.validarAcesso(user, escopo);
-        return geminiService.analisarAnomalias(email, escopo);
+        return financeAi.analisarAnomalias(email, escopo);
     }
 
     public Map<String, Object> getStatus() {
         return Map.of(
-            "gemini", geminiService.isServiceAvailable(),
-            "openRouter", true // Simplified
+            "provider", "openrouter",
+            "pythonService", financeAi.isServiceAvailable(),
+            "openRouter", openRouterService.isConfigured()
         );
     }
 }

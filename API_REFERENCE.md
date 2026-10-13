@@ -132,11 +132,13 @@ metadata is returned in the `X-Total-Count`, `X-Total-Pages`, and
 | Method | Endpoint | Notes |
 |--------|----------|-------|
 | `POST`  | `/api/v1/ia/chat` | `{ "message": "..." }` → OpenRouter chat |
-| `POST`  | `/api/v1/ia/upload-extrato` | `multipart/form-data` PDF/image → Gemini staging |
+| `POST`  | `/api/v1/ia/upload-extrato` | `multipart/form-data` PDF/CSV/image → staging |
 | `POST`  | `/api/v1/ia/confirmar` | Confirm staged transactions |
-| `GET`   | `/api/v1/ia/consultor-pessoal` | Personalized investment plan (Gemini) |
+| `GET`   | `/api/v1/ia/consultor-pessoal` | Personalized investment plan |
 | `GET`   | `/api/v1/ia/analisar-anomalias` | Spending anomaly detection |
-| `GET`   | `/api/v1/ia/status` | Health check for both AI services |
+| `GET`   | `/api/v1/ia/status` | `{ provider, pythonService, openRouter }` |
+| `GET`   | `/api/v1/ia/models` | `{ selected, default, custom, allowPaid, models: [{ id, name, contextLength, free, vision }] }` |
+| `POST`/`PUT` | `/api/v1/ia/model` | `{ "model": "vendor/model:free" }` saves the user's model; `null` or empty resets to the default. `400` if the model isn't in the list |
 
 ---
 

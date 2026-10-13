@@ -9,7 +9,7 @@ COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Agora copia o código
-COPY main.py .
+COPY main.py llm.py ./
 
 EXPOSE 8000
 

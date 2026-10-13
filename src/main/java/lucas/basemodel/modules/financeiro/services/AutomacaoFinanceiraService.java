@@ -25,14 +25,14 @@ public class AutomacaoFinanceiraService {
 
     private final TransacaoRecorrenteRepository transacaoRecorrenteRepository;
     private final ContaRepository contaRepository;
-    private final GeminiService geminiService;
+    private final FinanceAiService financeAi;
 
     public AutomacaoFinanceiraService(TransacaoRecorrenteRepository transacaoRecorrenteRepository,
                                       ContaRepository contaRepository,
-                                      GeminiService geminiService) {
+                                      FinanceAiService financeAi) {
         this.transacaoRecorrenteRepository = transacaoRecorrenteRepository;
         this.contaRepository = contaRepository;
-        this.geminiService = geminiService;
+        this.financeAi = financeAi;
     }
 
     // Cron rodando todo dia à meia noite
@@ -73,7 +73,7 @@ public class AutomacaoFinanceiraService {
 
         List<Conta> historico = contaRepository.findTop6ByTransacaoRecorrenteAndStatusOrderByDataVencimentoDesc(template, StatusTransacao.PAGO);
 
-        BigDecimal valorPrevisto = geminiService.preverVariacao(historico);
+        BigDecimal valorPrevisto = financeAi.preverVariacao(historico);
 
         Conta novaTransacao = criarTransacaoBase(template, dataVencimento);
         novaTransacao.setValorPrevisto(valorPrevisto);

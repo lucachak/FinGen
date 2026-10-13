@@ -2,7 +2,7 @@ package lucas.basemodel.web;
 
 import lucas.basemodel.modules.financeiro.repositories.CategoriaRepository;
 import lucas.basemodel.modules.financeiro.services.ContaService;
-import lucas.basemodel.modules.financeiro.services.GeminiService;
+import lucas.basemodel.modules.financeiro.services.FinanceAiService;
 import lucas.basemodel.modules.user.User;
 import lucas.basemodel.modules.user.UsuarioRepository;
 import org.springframework.stereotype.Controller;
@@ -19,13 +19,13 @@ public class AIViewController {
 
     private final UsuarioRepository usuarioRepository;
     private final ContaService contaService;
-    private final GeminiService geminiService;
+    private final FinanceAiService financeAi;
     private final CategoriaRepository categoriaRepository;
 
-    public AIViewController(UsuarioRepository usuarioRepository, ContaService contaService, GeminiService geminiService, CategoriaRepository categoriaRepository) {
+    public AIViewController(UsuarioRepository usuarioRepository, ContaService contaService, FinanceAiService financeAi, CategoriaRepository categoriaRepository) {
         this.usuarioRepository = usuarioRepository;
         this.contaService = contaService;
-        this.geminiService = geminiService;
+        this.financeAi = financeAi;
         this.categoriaRepository = categoriaRepository;
     }
 
@@ -37,7 +37,7 @@ public class AIViewController {
         model.addAttribute("user", usuarioLogado);
         model.addAttribute("dadosCategoria", contaService.obterGastosPorCategoriaMesAtual(usuarioLogado));
         model.addAttribute("dadosFluxo", contaService.obterFluxoCaixaUltimos6Meses(usuarioLogado));
-        model.addAttribute("aiOnline", geminiService.isServiceAvailable());
+        model.addAttribute("aiOnline", financeAi.isServiceAvailable());
         
         return "ia/index";
     }

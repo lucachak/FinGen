@@ -197,7 +197,7 @@ public class MetaController {
             metasExistentes.forEach(m -> ctx.append(m.getTitulo()).append(" (€").append(m.getValorAlvo()).append("), "));
         }
 
-        String rawJson = openRouterService.suggestGoals(ctx.toString());
+        String rawJson = openRouterService.suggestGoals(ctx.toString(), user);
 
         // Strip markdown fences if the model wrapped the JSON
         rawJson = rawJson.trim();

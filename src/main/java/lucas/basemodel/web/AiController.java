@@ -4,7 +4,7 @@ import lucas.basemodel.modules.financeiro.enums.EscopoTransacao;
 import lucas.basemodel.modules.financeiro.models.Conta;
 import lucas.basemodel.modules.financeiro.repositories.CategoriaRepository;
 import lucas.basemodel.modules.financeiro.repositories.ContaRepository;
-import lucas.basemodel.modules.financeiro.services.GeminiService;
+import lucas.basemodel.modules.financeiro.services.FinanceAiService;
 import lucas.basemodel.modules.user.User;
 import lucas.basemodel.modules.user.UsuarioRepository;
 import org.springframework.stereotype.Controller;
@@ -36,17 +36,17 @@ import lucas.basemodel.modules.financeiro.enums.TipoTransacao;
 @RequestMapping("/api/ia")
 public class AiController {
 
-    private final GeminiService geminiService;
+    private final FinanceAiService financeAi;
     private final ContaRepository contaRepository;
     private final UsuarioRepository usuarioRepository;
     private final CategoriaRepository categoriaRepository;
     private final OpenRouterService openRouterService;
     private final EspacoFinanceiroService espacoFinanceiroService;
 
-    public AiController(GeminiService geminiService, ContaRepository contaRepository, UsuarioRepository usuarioRepository,
+    public AiController(FinanceAiService financeAi, ContaRepository contaRepository, UsuarioRepository usuarioRepository,
                         CategoriaRepository categoriaRepository, OpenRouterService openRouterService,
                         EspacoFinanceiroService espacoFinanceiroService) {
-        this.geminiService = geminiService;
+        this.financeAi = financeAi;
         this.contaRepository = contaRepository;
         this.usuarioRepository = usuarioRepository;
         this.categoriaRepository = categoriaRepository;
@@ -69,7 +69,7 @@ public class AiController {
     @PostMapping("/upload-extrato")
     @ResponseBody
     public java.util.Map<String, Object> uploadExtrato(@RequestParam("file") MultipartFile file, Principal principal, HttpSession session) {
-        Map<String, Object> resultado = geminiService.processarExtratoIA(file, principal.getName());
+        Map<String, Object> resultado = financeAi.processarExtratoIA(file, principal.getName());
         
         if ("sucesso".equals(resultado.get("status"))) {
             // Refactored from session.setAttribute to prevent memory bloat in distributed sessions
@@ -139,7 +139,7 @@ public class AiController {
     @GetMapping("/consultor-pessoal")
     @ResponseBody
     public String consultorPessoal(Principal principal) {
-        return geminiService.gerarPlanoInvestimentos(principal.getName());
+        return financeAi.gerarPlanoInvestimentos(principal.getName());
     }
 
     // ==========================================
@@ -150,7 +150,7 @@ public class AiController {
                                          Model model, Principal principal) {
         User user = usuarioRepository.findByEmail(principal.getName()).orElseThrow();
         espacoFinanceiroService.validarAcesso(user, escopo);
-        String respostaIA = geminiService.analisarAnomalias(principal.getName(), escopo);
+        String respostaIA = financeAi.analisarAnomalias(principal.getName(), escopo);
         model.addAttribute("lastAnalysis", respostaIA);
         return "home/fragmentos :: resultado-ia-premium";
     }
@@ -158,13 +158,13 @@ public class AiController {
     @GetMapping("/extracao-status")
     @ResponseBody
     public String checkExtractionStatus(Principal principal) {
-        return geminiService.getStatus(principal.getName());
+        return financeAi.getStatus(principal.getName());
     }
 
     @GetMapping("/status")
     @ResponseBody
     public java.util.Map<String, Object> checkAiStatus() {
-        boolean online = geminiService.isServiceAvailable();
+        boolean online = financeAi.isServiceAvailable();
         java.util.Map<String, Object> status = new java.util.HashMap<>();
         status.put("online", online);
         status.put("message", online ? "Córtex Ativo" : "Córtex Offline");

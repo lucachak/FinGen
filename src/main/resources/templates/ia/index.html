@@ -550,7 +550,7 @@
                     &bull; AI Powered</span>
                 <h1 class="font-serif text-3xl md:text-4xl text-zen-t1 tracking-tight font-medium">Assistente de
                     Inteligência</h1>
-                <p class="page-subtitle">Poder computacional do Gemini aplicado ao seu patrimônio para insights
+                <p class="page-subtitle">Modelos de IA, à sua escolha, aplicados ao seu patrimônio para insights
                     profundos.</p>
             </div>
         </div>
@@ -656,7 +656,12 @@
                             </div>
                             <div>
                                 <div class="font-semibold text-white text-[14px]">Consultor FinGen</div>
-                                <div class="text-[11px] text-white/80 font-medium">Powered by OpenRouter</div>
+                                <label for="ai-model-select" class="sr-only">Modelo de IA</label>
+                                <select id="ai-model-select" disabled
+                                    class="mt-1 max-w-[230px] truncate text-[11px] font-medium text-white rounded-md px-2 py-1 border border-white/30 focus:outline-none focus:ring-1 focus:ring-white"
+                                    style="background: rgba(255,255,255,0.15);">
+                                    <option>Carregando modelos...</option>
+                                </select>
                             </div>
                         </div>
                     </div>
@@ -719,7 +724,7 @@
                     <div class="sc-row">
                         <div class="sc-name">
                             <span th:style="${aiOnline ? 'background:#60a5fa;' : 'background:#94a3b8;'}"></span>
-                            Gemini 2.5 Flash
+                            <span id="ai-model-name">Modelo de IA</span>
                         </div>
                         <div class="sc-online" th:style="${aiOnline ? 'color:#60a5fa;' : 'color:#94a3b8;'}">
                             <span th:class="${aiOnline ? 'pulse' : ''}"
@@ -977,6 +982,71 @@
                 var box = document.getElementById('plano-resultado');
                 if (box) box.innerHTML = cached;
             }
+
+            /* --- Escolha do modelo de IA --- */
+            (function () {
+                var select = document.getElementById('ai-model-select');
+                var nameLabel = document.getElementById('ai-model-name');
+                if (!select) return;
+
+                function withCsrf(url) {
+                    var el = document.getElementById('csrf-token');
+                    if (!el) return url;
+                    return url + '?' + encodeURIComponent(el.getAttribute('data-name')) +
+                        '=' + encodeURIComponent(el.getAttribute('data-value'));
+                }
+
+                function option(model, selected) {
+                    var o = document.createElement('option');
+                    o.value = model.id;
+                    o.textContent = model.name + (model.vision ? ' (lê imagens)' : '');
+                    o.selected = model.id === selected;
+                    return o;
+                }
+
+                function render(data) {
+                    select.innerHTML = '';
+                    var free = document.createElement('optgroup');
+                    free.label = 'Gratuitos';
+                    var paid = document.createElement('optgroup');
+                    paid.label = 'Pagos';
+                    var current = null;
+                    (data.models || []).forEach(function (m) {
+                        (m.free ? free : paid).appendChild(option(m, data.selected));
+                        if (m.id === data.selected) current = m;
+                    });
+                    if (free.children.length) select.appendChild(free);
+                    if (paid.children.length) select.appendChild(paid);
+                    if (nameLabel) nameLabel.textContent = current ? current.name : data.selected;
+                    select.disabled = false;
+                }
+
+                function load() {
+                    return fetch('/api/ia/models')
+                        .then(function (r) { return r.ok ? r.json() : Promise.reject(r.status); })
+                        .then(render);
+                }
+
+                load().catch(function () {
+                    select.innerHTML = '<option>Modelo padrão</option>';
+                });
+
+                select.addEventListener('change', function () {
+                    var chosen = select.value;
+                    select.disabled = true;
+                    fetch(withCsrf('/api/ia/model'), {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ model: chosen })
+                    })
+                        .then(function (r) { return r.ok ? r.json() : Promise.reject(r.status); })
+                        .then(render)
+                        .catch(function () {
+                            alert('Não foi possível trocar o modelo. Tente novamente.');
+                            load().catch(function () { select.disabled = false; });
+                        });
+                });
+            })();
 
             /* --- Heartbeat IA --- */
             function checkServiceStatus() {

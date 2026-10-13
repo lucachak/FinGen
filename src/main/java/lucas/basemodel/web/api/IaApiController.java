@@ -39,7 +39,7 @@ public class IaApiController {
 
     /**
      * POST /api/v1/ia/upload-extrato
-     * Sends a bank statement PDF/image to Gemini for parsing.
+     * Sends a bank statement PDF/image to the AI service for parsing.
      * Mirrors POST /api/ia/upload-extrato
      *
      * Returns a list of staged transactions (not yet saved).
@@ -68,7 +68,7 @@ public class IaApiController {
 
     /**
      * GET /api/v1/ia/consultor-pessoal
-     * Generates a personalized investment plan via Gemini.
+     * Generates a personalized investment plan via the AI service.
      * Mirrors GET /api/ia/consultor-pessoal
      */
     @GetMapping("/consultor-pessoal")
@@ -91,7 +91,7 @@ public class IaApiController {
 
     /**
      * GET /api/v1/ia/status
-     * Returns health status of both AI services (Gemini + OpenRouter).
+     * Returns health status of the AI services (Python service + OpenRouter).
      */
     @GetMapping("/status")
     public ResponseEntity<?> status() {

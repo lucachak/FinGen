@@ -43,26 +43,27 @@ def check_h2_database():
         print(f"❌ H2 Database file NOT found at {db_path}")
     return False
 
-def check_gemini_api():
-    print("🔍 Checking Gemini API Connectivity...")
+def check_openrouter_api():
+    print("🔍 Checking OpenRouter API Connectivity...")
     try:
-        api_key = config("GEMINI_TOKEN", default=None)
+        api_key = config("OPENROUTER_API_KEY", default=None)
         if not api_key:
-            print("❌ GEMINI_TOKEN not found in .env or environment")
+            print("❌ OPENROUTER_API_KEY not found in .env or environment")
             return False
-            
-        # Lightweight check using google-genai style if possible, 
-        # but here we'll just do a simple request if we want to avoid deep deps
-        # For now, let's assume we use the client if it's installed or just check the token format
-        if len(api_key) > 30 and api_key.startswith("AIza"):
-            print("✅ Gemini Token format looks valid")
-            # We could do a real call here, but let's keep it 
-            # as a connection/config check for now.
+
+        # /auth/key does not spend credits; it only validates the key.
+        import httpx
+        response = httpx.get(
+            "https://openrouter.ai/api/v1/auth/key",
+            headers={"Authorization": f"Bearer {api_key}"},
+            timeout=10,
+        )
+        if response.status_code == 200:
+            print("✅ OpenRouter key is valid")
             return True
-        else:
-            print("❌ Gemini Token format is invalid")
+        print(f"❌ OpenRouter rejected the key (HTTP {response.status_code})")
     except Exception as e:
-        print(f"❌ Error checking Gemini API: {e}")
+        print(f"❌ Error checking OpenRouter API: {e}")
     return False
 
 def check_yfinance():
@@ -89,7 +90,7 @@ def run_all_checks():
         "Java Backend": check_java_backend(),
         "Python ML": check_python_ml(),
         "H2 Database": check_h2_database(),
-        "Gemini API": check_gemini_api(),
+        "OpenRouter API": check_openrouter_api(),
         "YFinance": check_yfinance()
     }
     

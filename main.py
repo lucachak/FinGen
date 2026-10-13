@@ -11,13 +11,13 @@ import yfinance as yf
 from decouple import config
 from fastapi import FastAPI, File, Form, Request, UploadFile
 from starlette.concurrency import run_in_threadpool
-from google import genai
-from google.genai import types
 from PIL import Image
 from pypdf import PdfReader
 from sklearn.ensemble import IsolationForest
 from sklearn.linear_model import LinearRegression
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
+
+from llm import LLMError, OpenRouterClient, image_message, text_message
 from enum import Enum 
 
 '''
@@ -74,10 +74,12 @@ class PerfilFinanceiro(BaseModel):
 class AnaliseRequest(BaseModel):
     contas: list[TransacaoDTO]
     perfil: PerfilFinanceiro = Field(default_factory=PerfilFinanceiro)
+    model: str | None = None  # id OpenRouter escolhido pelo usuário
 
 class InvestimentoRequest(BaseModel):
     transacoes: list[TransacaoDTO]
     perfil: PerfilFinanceiro = Field(default_factory=PerfilFinanceiro)
+    model: str | None = None  # id OpenRouter escolhido pelo usuário
 
 class Frequencia(str, Enum):
     AVULSA = "AVULSA"
@@ -98,19 +100,23 @@ class ExtratoResponseSchema(BaseModel):
     transacoes: list[ExtratoTransacaoItem]
     
 class ExtratoAPIResponse(BaseModel):
+    # titular/transacoes têm padrão porque o erro devolve só status e mensagem;
+    # sem isso a validação da resposta transformava todo erro em HTTP 500.
+    model_config = ConfigDict(populate_by_name=True)
+
     status: str
-    titular: str
-    transacoes: list[dict]
-    _debug: dict = {}
+    titular: str = ""
+    transacoes: list[dict] = Field(default_factory=list)
+    debug: dict = Field(default_factory=dict, alias="_debug")
     mensagem: str | None = None
 
 app = FastAPI()
-client = genai.Client(api_key=config("GEMINI_TOKEN"))
+llm = OpenRouterClient.from_env()
 
 # =========================================================
 # 🧪 MODO DE TESTE (MOCK) - ALTERE PARA FALSE PARA USAR A IA REAL
 # =========================================================
-MOCK_API_GEMINI = False
+MOCK_API_IA = False
 
 
 # =========================================================
@@ -336,7 +342,7 @@ def parsear_pdf_tabular(conteudo_bytes: bytes) -> tuple[str, list[dict]]:
     return titular, transacoes
 
 
-async def categorizar_em_lote_via_ia(descricoes: list[str]) -> dict[str, str]:
+async def categorizar_em_lote_via_ia(descricoes: list[str], model: str | None = None) -> dict[str, str]:
     """
     Envia descrições desconhecidas para a IA categorizar em lote.
     Retorna {descricao: categoria}.
@@ -356,16 +362,19 @@ async def categorizar_em_lote_via_ia(descricoes: list[str]) -> dict[str, str]:
     )
 
     t0 = time.perf_counter()
-    resposta = await client.aio.models.generate_content(
-        model="gemini-2.0-exp", 
-        contents=prompt,
-        config=types.GenerateContentConfig(response_mime_type="application/json")
+    texto = await llm.complete(
+        [text_message("user", prompt)],
+        model=model,
+        json_mode=True,
+        temperature=0.0,
     )
     elapsed = time.perf_counter() - t0
-    logger.debug("  IA respondeu em %.2fs: %s", elapsed, resposta.text[:200])
+    logger.debug("  IA respondeu em %.2fs: %s", elapsed, texto[:200])
 
     try:
-        mapa = json.loads(resposta.text)
+        mapa = extrair_json_seguro(texto)
+        if not isinstance(mapa, dict):
+            raise ValueError("a IA não devolveu um objeto")
         logger.info("🏷️  IA categorizou %d itens com sucesso.", len(mapa))
         return mapa
     except Exception as e:
@@ -378,7 +387,7 @@ async def categorizar_em_lote_via_ia(descricoes: list[str]) -> dict[str, str]:
 
 @app.get("/")
 async def root():
-    return {"message": "Api is Running..." }
+    return {"message": "Api is Running...", "provider": "openrouter", "configured": llm.configured}
 
 
 @app.post("/api/ia/analisar")
@@ -429,7 +438,7 @@ async def analisar_financas(request_data: AnaliseRequest):
 
         total_gasto, total_receita, lista_leaks, conselho_crescimento = await run_in_threadpool(ml_sync_task, contas_brutas, request_data.perfil)
         
-        if MOCK_API_GEMINI:
+        if MOCK_API_IA:
             return {"insight": f"<h3>ML Advisor</h3><p>{conselho_crescimento}</p><ul>{''.join([f'<li>{l}</li>' for l in lista_leaks])}</ul>"}
 
         prompt = (
@@ -439,9 +448,12 @@ async def analisar_financas(request_data: AnaliseRequest):
             f"Conselho de Crescimento: {conselho_crescimento}\n"
             "Gere uma resposta curta (HTML) motivadora focada em eliminar os vazamentos citados e CRESCER o património."
         )
-        resposta = await client.aio.models.generate_content(model="gemini-2.5-flash", contents=prompt)
-        return {"insight": resposta.text}
+        texto = await llm.complete([text_message("user", prompt)], model=request_data.model)
+        return {"insight": texto}
 
+    except LLMError as e:
+        logger.warning("IA indisponível em /api/ia/analisar: %s", e)
+        return {"insight": f"<i>{e}</i>"}
     except Exception as e:
         logger.exception("❌ Erro em /api/ia/analisar")
         return {"insight": f"<i>Erro ao processar: {str(e)}</i>"}
@@ -451,6 +463,8 @@ async def analisar_financas(request_data: AnaliseRequest):
 async def processar_extrato(
     file: UploadFile = File(...),
     historico: str   = Form(default="{}"),
+    model: str | None = Form(default=None),
+    vision_model: str | None = Form(default=None),
 ):
     logger.info("📥 POST /api/ia/extrato — arquivo: '%s'", file.filename)
     t_inicio = time.perf_counter()
@@ -501,8 +515,8 @@ async def processar_extrato(
                     descricoes_desconhecidas.append(desc)
                     transacoes_finais.append(t)
                     
-            if descricoes_desconhecidas and not MOCK_API_GEMINI:
-                mapa_ia = await categorizar_em_lote_via_ia(descricoes_desconhecidas)
+            if descricoes_desconhecidas and not MOCK_API_IA:
+                mapa_ia = await categorizar_em_lote_via_ia(descricoes_desconhecidas, model)
                 for t in transacoes_finais:
                     if t.get("categoria") == "UNKNOWN":
                         t["categoria"] = mapa_ia.get(t.get("descricao", ""), "OUTROS")
@@ -524,45 +538,45 @@ async def processar_extrato(
                     descricoes_desconhecidas.append(desc)
                     transacoes_finais.append(t)
                     
-            if descricoes_desconhecidas and not MOCK_API_GEMINI:
-                mapa_ia = await categorizar_em_lote_via_ia(descricoes_desconhecidas)
+            if descricoes_desconhecidas and not MOCK_API_IA:
+                mapa_ia = await categorizar_em_lote_via_ia(descricoes_desconhecidas, model)
                 for t in transacoes_finais:
                     if t.get("categoria") == "UNKNOWN":
                         t["categoria"] = mapa_ia.get(t.get("descricao", ""), "OUTROS")
                         
         else:
-            logger.info("  Modo Multimodal (Imagem OCR): Enviando foto estruturada nativamente para o Gemini.")
+            logger.info("  Modo Multimodal (Imagem OCR): enviando a foto ao modelo de visão.")
+            if not (mime_type or "").startswith("image/"):
+                return {"status": "erro", "mensagem": "Formato não suportado. Envie PDF, CSV ou uma imagem (PNG/JPG)."}
+
+            schema_json = json.dumps(ExtratoResponseSchema.model_json_schema(), ensure_ascii=False)
             prompt_extracao = (
-                "Você é o poderoso bot financeiro. Analise rigorosamente os dados deste extrato (fotografia ou PDF). "
-                "Extraia a lista de transações com perfeição. Considere que os valores de saída (SAIDA) "
-                "devem ser sempre retornados absolutizados e o sinal interpretado como 'SAIDA'. "
-                "Ignore anúncios ou saldos diários intermédios, foque nas transações puras."
+                "Você é um extrator de dados financeiros. Analise rigorosamente este extrato (fotografia). "
+                "Extraia a lista de transações com perfeição. Os valores devem ser sempre absolutos (positivos) "
+                "e o sinal vira o campo tipo: SAIDA ou ENTRADA. "
+                "Ignore anúncios e saldos diários intermédios, foque nas transações. "
+                "Responda SOMENTE com um objeto JSON válido que siga este JSON Schema, sem markdown:\n"
+                f"{schema_json}"
             )
-            
-            resposta = await client.aio.models.generate_content(
-                model="gemini-2.5-flash",
-                contents=[
-                    types.Part.from_bytes(data=conteudo, mime_type=mime_type),
-                    prompt_extracao
-                ],
-                config=types.GenerateContentConfig(
-                    response_mime_type="application/json",
-                    response_schema=ExtratoResponseSchema,
-                    temperature=0.0
-                )
+
+            texto = await llm.complete(
+                [image_message(prompt_extracao, conteudo, mime_type)],
+                model=vision_model or model,
+                vision=True,
+                json_mode=True,
+                temperature=0.0,
             )
-            
-            dados_str = resposta.text
+
             try:
-                dados_ia = json.loads(dados_str)
-                titular_extraido = dados_ia.get("titular", "Desconhecido")
-                transacoes_finais = dados_ia.get("transacoes", [])
-                logger.info("  IA nativamente parseou %d transações estruturadas", len(transacoes_finais))
+                dados_ia = ExtratoResponseSchema.model_validate(extrair_json_seguro(texto))
+                titular_extraido = dados_ia.titular or "Desconhecido"
+                transacoes_finais = [t.model_dump(mode="json") for t in dados_ia.transacoes]
+                logger.info("  IA parseou %d transações estruturadas", len(transacoes_finais))
             except Exception as jE:
-                logger.error("Falha ao usar JSON gerado estruturado: %s", jE)
-                transacoes_finais = []
-                titular_extraido = "Desconhecido"
-            
+                logger.error("Falha ao validar o JSON do extrato: %s", jE)
+                return {"status": "erro", "mensagem": "A IA não conseguiu ler este extrato. Tente outro modelo ou uma foto mais nítida."}
+
+            transacoes_brutas = transacoes_finais
             descricoes_desconhecidas = []
 
         elapsed = time.perf_counter() - t_inicio
@@ -584,6 +598,9 @@ async def processar_extrato(
             },
         }
 
+    except LLMError as e:
+        logger.warning("IA indisponível em /api/ia/extrato: %s", e)
+        return {"status": "erro", "mensagem": str(e)}
     except Exception as e:
         logger.exception("❌ Erro em /api/ia/extrato")
         return {"status": "erro", "mensagem": str(e)}
@@ -710,7 +727,11 @@ async def prever_gastos_futuros(request_data: AnaliseRequest):
 # ROTA 4: LEITURA DE RECIBO (Multimodal Ocular)
 # =========================================================
 @app.post("/api/ia/recibo")
-async def ler_recibo(file: UploadFile = File(...)):
+async def ler_recibo(
+    file: UploadFile = File(...),
+    model: str | None = Form(default=None),
+    vision_model: str | None = Form(default=None),
+):
     logger.info("📥 POST /api/ia/recibo")
     try:
         conteudo = await file.read()
@@ -723,14 +744,19 @@ async def ler_recibo(file: UploadFile = File(...)):
             "}"
         )
         
-        resposta = await client.aio.models.generate_content(
-            model="gemini-2.5-flash",
-            contents=[image, prompt],
-            config=types.GenerateContentConfig(response_mime_type="application/json")
+        mime_type = file.content_type if (file.content_type or "").startswith("image/") else f"image/{(image.format or 'jpeg').lower()}"
+        texto = await llm.complete(
+            [image_message(prompt, conteudo, mime_type)],
+            model=vision_model or model,
+            vision=True,
+            json_mode=True,
         )
-        
-        dados_ia = json.loads(resposta.text)
+
+        dados_ia = extrair_json_seguro(texto)
         return {"status": "sucesso", "transacao": dados_ia.get("transacao", {})}
+    except LLMError as e:
+        logger.warning("IA indisponível em /api/ia/recibo: %s", e)
+        return {"status": "erro", "mensagem": str(e)}
     except Exception as e:
         logger.exception("❌ Erro em /api/ia/recibo")
         return {"status": "erro", "mensagem": str(e)}
@@ -755,9 +781,12 @@ async def consultor_investimentos(request_data: InvestimentoRequest):
             f"Despesas: R$ {total_despesas:.2f}, FCF: R$ {sobra_caixa:.2f}.\n"
             "Escreva um relatório de aconselhamento em HTML com estratégia de alocação de risco."
         )
-        resposta = await client.aio.models.generate_content(model="gemini-2.5-flash", contents=prompt)
-        return {"relatorio": resposta.text}
+        texto = await llm.complete([text_message("user", prompt)], model=request_data.model)
+        return {"relatorio": texto}
 
+    except LLMError as e:
+        logger.warning("IA indisponível em /api/ia/investimentos: %s", e)
+        return {"relatorio": f"<div style='color: #ef4444;'>{e}</div>"}
     except Exception as e:
         logger.exception("❌ Erro em /api/ia/investimentos")
         return {"relatorio": f"<div style='color: #ef4444;'>Erro: {str(e)}</div>"}

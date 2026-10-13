@@ -28,11 +28,16 @@ import java.util.*;
 
 @Service
 @lombok.extern.slf4j.Slf4j
-public class GeminiService {
+/**
+ * Ponte entre o app Java e o microserviço Python de IA.
+ * Resolve o modelo escolhido pelo usuário e o repassa a cada chamada.
+ */
+public class FinanceAiService {
 
     private final ContaRepository contaRepository;
     private final CategoriaRepository categoriaRepository;
-    private final UsuarioRepository usuarioRepository; // 1. O Novo Injetor
+    private final UsuarioRepository usuarioRepository;
+    private final AiModelCatalog modelCatalog;
     private final RestTemplate restTemplate;
 
     // Progress Tracking for AI Operations
@@ -54,11 +59,12 @@ public class GeminiService {
         }
     }
 
-    public GeminiService(ContaRepository contaRepository, CategoriaRepository categoriaRepository,
-            UsuarioRepository usuarioRepository) {
+    public FinanceAiService(ContaRepository contaRepository, CategoriaRepository categoriaRepository,
+            UsuarioRepository usuarioRepository, AiModelCatalog modelCatalog) {
         this.contaRepository = contaRepository;
         this.categoriaRepository = categoriaRepository;
         this.usuarioRepository = usuarioRepository;
+        this.modelCatalog = modelCatalog;
 
         // Security Fix: Timeouts to prevent thread starvation if Python API hangs
         org.springframework.http.client.SimpleClientHttpRequestFactory factory = new org.springframework.http.client.SimpleClientHttpRequestFactory();
@@ -88,6 +94,7 @@ public class GeminiService {
 
         Map<String, Object> body = new HashMap<>();
         body.put("contas", contasSimplificadas);
+        body.put("model", modelCatalog.selectionFor(responsavelReal).text());
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
@@ -128,8 +135,11 @@ public class GeminiService {
             MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
             body.add("file", file.getResource());
             body.add("historico", historicoJson);
+            AiModelSelection modelo = modelCatalog.selectionFor(responsavelReal);
+            body.add("model", modelo.text());
+            body.add("vision_model", modelo.vision());
 
-            statusMap.put(usernameResponsavel, "Enviando ficheiro para o Motor Gemini...");
+            statusMap.put(usernameResponsavel, "Enviando ficheiro para o motor de IA...");
 
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.MULTIPART_FORM_DATA);
@@ -274,6 +284,9 @@ public class GeminiService {
 
             MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
             body.add("file", file.getResource());
+            AiModelSelection modelo = modelCatalog.selectionFor(responsavelReal);
+            body.add("model", modelo.text());
+            body.add("vision_model", modelo.vision());
 
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.MULTIPART_FORM_DATA);
@@ -372,6 +385,7 @@ public class GeminiService {
             Map<String, Object> body = new HashMap<>();
             body.put("transacoes", contasSimplificadas);
             body.put("perfil", perfilMap);
+            body.put("model", modelCatalog.selectionFor(responsavelReal).text());
 
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_JSON);
@@ -444,6 +458,7 @@ public class GeminiService {
             body.put("contas", contasSimplificadas);
             body.put("perfil", perfilMap);
             body.put("escopo", escopo.name());
+            body.put("model", modelCatalog.selectionFor(responsavelReal).text());
 
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_JSON);
@@ -493,7 +508,7 @@ public class GeminiService {
                 return new BigDecimal(responseBody.get("valorCalculado").toString());
             }
         } catch (Exception e) {
-            log.error("Erro de conexão ao prever com Gemini IA. Acionando Fallback Matemático: ", e);
+            log.error("Erro de conexão ao prever. Acionando Fallback Matemático: ", e);
         }
 
         // Fallback: Média aritmética simples
