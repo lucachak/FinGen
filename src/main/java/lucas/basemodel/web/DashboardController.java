@@ -6,7 +6,9 @@ import lucas.basemodel.modules.financeiro.enums.TipoTransacao;
 import lucas.basemodel.modules.financeiro.models.Conta;
 import lucas.basemodel.modules.financeiro.models.ConfiguracaoFinanceira;
 import lucas.basemodel.modules.financeiro.repositories.ConfiguracaoFinanceiraRepository;
-import lucas.basemodel.modules.financeiro.repositories.ContaRepository;
+import lucas.basemodel.modules.financeiro.services.DashboardQueryService;
+import lucas.basemodel.modules.financeiro.services.DashboardQueryService.ResumoAtraso;
+import lucas.basemodel.modules.financeiro.services.DashboardQueryService.TotaisMes;
 import lucas.basemodel.modules.financeiro.models.Orcamento;
 import lucas.basemodel.modules.financeiro.repositories.OrcamentoRepository;
 import lucas.basemodel.modules.user.User;
@@ -34,7 +36,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -43,7 +44,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 @Slf4j
 public class DashboardController {
 
-    private final ContaRepository contaRepository;
+    private final DashboardQueryService dashboardQuery;
     private final UsuarioRepository usuarioRepository;
     private final OrcamentoRepository orcamentoRepository;
     private final WealthSnapshotCacheService wealthSnapshotCacheService;
@@ -56,7 +57,7 @@ public class DashboardController {
     private final ConfiguracaoFinanceiraRepository configuracaoFinanceiraRepository;
     private final EspacoFinanceiroService espacoFinanceiroService;
 
-    public DashboardController(ContaRepository contaRepository, UsuarioRepository usuarioRepository,
+    public DashboardController(DashboardQueryService dashboardQuery, UsuarioRepository usuarioRepository,
             OrcamentoRepository orcamentoRepository,
             WealthSnapshotCacheService wealthSnapshotCacheService,
             AiHealthCacheService aiHealthCacheService,
@@ -66,7 +67,7 @@ public class DashboardController {
             PortfolioInsightService portfolioInsightService,
             ConfiguracaoFinanceiraRepository configuracaoFinanceiraRepository,
             EspacoFinanceiroService espacoFinanceiroService) {
-        this.contaRepository = contaRepository;
+        this.dashboardQuery = dashboardQuery;
         this.usuarioRepository = usuarioRepository;
         this.orcamentoRepository = orcamentoRepository;
         this.wealthSnapshotCacheService = wealthSnapshotCacheService;
@@ -107,34 +108,28 @@ public class DashboardController {
         model.addAttribute("mostrarTabCasa", !moraCom);
         model.addAttribute("mostrarTabNegocio", possuiNegocio);
 
-        // --- OTIMIZAÇÃO: 1 query unificada por escopo ---
-        // Todos os escopos em uma única query, filtrado em memória
-        List<Conta> todasContas = contaRepository.findAllByResponsavelOrderByDataVencimentoAsc(usuarioLogado);
+        // --- Totais do mês agregados no banco (1 query, em vez de carregar todas as contas) ---
         YearMonth mesAtual = YearMonth.now();
-
-        List<Conta> contasCasa = todasContas.stream().filter(c -> c.getEscopo() == EscopoTransacao.CASA).toList();
-        List<Conta> contasPessoais = todasContas.stream().filter(c -> c.getEscopo() == EscopoTransacao.PESSOAL)
-                .toList();
-        List<Conta> contasNegocio = todasContas.stream().filter(c -> c.getEscopo() == EscopoTransacao.NEGOCIO).toList();
+        LocalDate hoje = LocalDate.now();
+        Map<EscopoTransacao, TotaisMes> totaisDoMes = dashboardQuery.totaisDoMes(usuarioLogado, mesAtual);
+        TotaisMes totaisCasa = totaisDoMes.get(EscopoTransacao.CASA);
+        TotaisMes totaisPessoal = totaisDoMes.get(EscopoTransacao.PESSOAL);
+        TotaisMes totaisNegocio = totaisDoMes.get(EscopoTransacao.NEGOCIO);
 
         // 1. Cálculos Base (Totais Mensais)
-        model.addAttribute("gastoCasaMes", calcularTotal(contasCasa, TipoTransacao.DESPESA, mesAtual));
-        model.addAttribute("pendenteCasaMes", calcularPendente(contasCasa, TipoTransacao.DESPESA, mesAtual));
+        model.addAttribute("gastoCasaMes", totaisCasa.despesaPaga());
+        model.addAttribute("pendenteCasaMes", totaisCasa.despesaPendente());
 
-        BigDecimal despesaPessoal = calcularTotal(contasPessoais, TipoTransacao.DESPESA, mesAtual);
-        BigDecimal pendentePessoal = calcularPendente(contasPessoais, TipoTransacao.DESPESA, mesAtual);
-        BigDecimal receitaPessoalBruta = calcularTotal(contasPessoais, TipoTransacao.RECEITA, mesAtual);
-
-        // Ativos de renda são buscados via filtro na lista já carregada (INCOME assets
-        // tratado via WealthService)
-        // Mantemos a chamada isolada pois é leve (só assets de tipo INCOME)
-        BigDecimal receitaPessoal = receitaPessoalBruta; // wealth income assets adicionados no FinancialHealthService
+        BigDecimal despesaPessoal = totaisPessoal.despesaPaga();
+        BigDecimal pendentePessoal = totaisPessoal.despesaPendente();
+        // wealth income assets são somados depois, no FinancialHealthService
+        BigDecimal receitaPessoal = totaisPessoal.receitaPaga();
 
         model.addAttribute("gastoPessoalMes", despesaPessoal);
         model.addAttribute("pendentePessoalMes", pendentePessoal);
         model.addAttribute("receitaPessoalMes", receitaPessoal);
-        model.addAttribute("gastoNegocioMes", calcularTotal(contasNegocio, TipoTransacao.DESPESA, mesAtual));
-        model.addAttribute("pendenteNegocioMes", calcularPendente(contasNegocio, TipoTransacao.DESPESA, mesAtual));
+        model.addAttribute("gastoNegocioMes", totaisNegocio.despesaPaga());
+        model.addAttribute("pendenteNegocioMes", totaisNegocio.despesaPendente());
 
         // Cálculo de percentual de gasto pessoal
         String percentualGastoTexto = "Sob controle";
@@ -147,12 +142,8 @@ public class DashboardController {
         model.addAttribute("percentualGastoPessoal", percentualGastoTexto);
 
         // 2. Gráfico Doughnut da Casa
-        Map<String, BigDecimal> gastosPorCategoriaCasa = contasCasa.stream()
-                .filter(c -> c.getTipo() == TipoTransacao.DESPESA)
-                .filter(c -> c.getDataVencimento() != null && YearMonth.from(c.getDataVencimento()).equals(mesAtual))
-                .collect(Collectors.groupingBy(
-                        c -> c.getCategoria() != null ? c.getCategoria().getNome() : "Outros",
-                        Collectors.reducing(BigDecimal.ZERO, Conta::getValor, BigDecimal::add)));
+        Map<String, BigDecimal> gastosPorCategoriaCasa = dashboardQuery.despesasPorCategoria(
+                usuarioLogado, EscopoTransacao.CASA, mesAtual);
         model.addAttribute("labelsCategoriaCasa", gastosPorCategoriaCasa.keySet());
         model.addAttribute("valoresCategoriaCasa", gastosPorCategoriaCasa.values());
 
@@ -212,16 +203,7 @@ public class DashboardController {
                 .map(o -> o.getCategoria().getId())
                 .toList();
 
-        Map<Long, BigDecimal> gastosBatch = new HashMap<>();
-        if (!catIds.isEmpty()) {
-            List<Object[]> rows = contaRepository.sumGastosPorCategoriasBatch(usuarioLogado, catIds,
-                    mesAtual.atDay(1), mesAtual.plusMonths(1).atDay(1));
-            for (Object[] row : rows) {
-                Long catId = (Long) row[0];
-                BigDecimal soma = row[1] instanceof BigDecimal bd ? bd : new BigDecimal(row[1].toString());
-                gastosBatch.put(catId, soma);
-            }
-        }
+        Map<Long, BigDecimal> gastosBatch = dashboardQuery.gastosPagosPorCategoria(usuarioLogado, catIds, mesAtual);
 
         List<Map<String, Object>> orcamentosAlerta = new java.util.ArrayList<>();
         for (Orcamento orc : orcamentos) {
@@ -272,8 +254,8 @@ public class DashboardController {
                 .toList());
 
         // --- MODELO FINANCEIRO RIGOROSO (FinancialHealthService) ---
-        FinancialHealthService.HealthReport healthReport = financialHealthService.calcular(usuarioLogado, contasPessoais,
-                orcamentos);
+        FinancialHealthService.HealthReport healthReport = financialHealthService.calcular(usuarioLogado, totaisPessoal,
+                dashboardQuery.atrasadas(usuarioLogado, EscopoTransacao.PESSOAL, hoje), orcamentos);
         model.addAttribute("scoreSaude", healthReport.scoreSaude());
         model.addAttribute("taxaPoupancaEfetiva", healthReport.taxaPoupancaEfetiva());
         model.addAttribute("comprometimentoRenda", healthReport.comprometimentoRenda());
@@ -290,40 +272,20 @@ public class DashboardController {
 
         // --- OTHER DATA ---
         model.addAttribute("metas", metaRepository.findByResponsavel(usuarioLogado));
-        List<Conta> recentTransactions = contasPessoais.stream()
-                .filter(Conta::isPaga)
-                .filter(c -> c.getDataPagamento() != null)
-                .sorted(java.util.Comparator.comparing(Conta::getDataPagamento, java.util.Comparator.reverseOrder()))
-                .limit(5)
-                .toList();
+        List<Conta> recentTransactions = dashboardQuery.pagasRecentes(usuarioLogado, EscopoTransacao.PESSOAL, 5);
         model.addAttribute("recentTransactions", recentTransactions);
 
-        LocalDate hoje = LocalDate.now();
-        List<Conta> contasPendentes = contasPessoais.stream()
-                .filter(c -> c.getTipo() == TipoTransacao.DESPESA && !c.isPaga())
-                .filter(c -> c.getDataVencimento() != null)
-                .toList();
-        List<Conta> contasAtrasadas = contasPendentes.stream()
-                .filter(c -> c.getDataVencimento().isBefore(hoje))
-                .sorted(java.util.Comparator.comparing(Conta::getDataVencimento))
-                .toList();
-        List<Conta> vencendoEmSeteDias = contasPendentes.stream()
-                .filter(c -> !c.getDataVencimento().isBefore(hoje))
-                .filter(c -> !c.getDataVencimento().isAfter(hoje.plusDays(7)))
-                .sorted(java.util.Comparator.comparing(Conta::getDataVencimento))
-                .toList();
-        List<Conta> proximosVencimentos = contasPendentes.stream()
-                .filter(c -> !c.getDataVencimento().isBefore(hoje))
-                .sorted(java.util.Comparator.comparing(Conta::getDataVencimento))
-                .limit(5)
-                .toList();
+        ResumoAtraso atrasadas = dashboardQuery.atrasadas(usuarioLogado, EscopoTransacao.PESSOAL, hoje);
+        ResumoAtraso vencendoEmSeteDias = dashboardQuery.vencendo(usuarioLogado, EscopoTransacao.PESSOAL, hoje, 7);
+        List<Conta> proximosVencimentos = dashboardQuery.proximasPendentes(
+                usuarioLogado, EscopoTransacao.PESSOAL, TipoTransacao.DESPESA, hoje, 5);
 
         model.addAttribute("upcomingBills", proximosVencimentos);
-        model.addAttribute("quantidadeAtrasadas", contasAtrasadas.size());
-        model.addAttribute("totalAtrasado", somarValores(contasAtrasadas));
-        model.addAttribute("quantidadeVencendo7Dias", vencendoEmSeteDias.size());
-        model.addAttribute("totalVencendo7Dias", somarValores(vencendoEmSeteDias));
-        model.addAttribute("temDadosFinanceiros", !contasPessoais.isEmpty());
+        model.addAttribute("quantidadeAtrasadas", atrasadas.quantidade());
+        model.addAttribute("totalAtrasado", atrasadas.total());
+        model.addAttribute("quantidadeVencendo7Dias", vencendoEmSeteDias.quantidade());
+        model.addAttribute("totalVencendo7Dias", vencendoEmSeteDias.total());
+        model.addAttribute("temDadosFinanceiros", dashboardQuery.possuiContas(usuarioLogado, EscopoTransacao.PESSOAL));
 
         return "dashboard/index";
     }
@@ -344,30 +306,5 @@ public class DashboardController {
         data.put("dadosCategoria", contaService.obterGastosPorCategoriaMesAtual(usuarioLogado, escopo));
         data.put("dadosFluxo", contaService.obterFluxoCaixaUltimos6Meses(usuarioLogado, escopo));
         return data;
-    }
-
-    private BigDecimal calcularTotal(List<Conta> contas, TipoTransacao tipo, YearMonth mes) {
-        return contas.stream()
-                .filter(c -> c.getTipo() == tipo)
-                .filter(Conta::isPaga)
-                .filter(c -> c.getDataPagamento() != null && YearMonth.from(c.getDataPagamento()).equals(mes))
-                .map(Conta::getValor)
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
-    }
-
-    private BigDecimal calcularPendente(List<Conta> contas, TipoTransacao tipo, YearMonth mes) {
-        return contas.stream()
-                .filter(c -> c.getTipo() == tipo)
-                .filter(c -> !c.isPaga())
-                .filter(c -> c.getDataVencimento() != null && YearMonth.from(c.getDataVencimento()).equals(mes))
-                .map(Conta::getValor)
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
-    }
-
-    private BigDecimal somarValores(List<Conta> contas) {
-        return contas.stream()
-                .map(Conta::getValor)
-                .filter(java.util.Objects::nonNull)
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 }

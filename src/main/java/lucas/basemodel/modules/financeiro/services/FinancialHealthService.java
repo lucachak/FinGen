@@ -1,8 +1,6 @@
 package lucas.basemodel.modules.financeiro.services;
 
 import lombok.RequiredArgsConstructor;
-import lucas.basemodel.modules.financeiro.enums.TipoTransacao;
-import lucas.basemodel.modules.financeiro.models.Conta;
 import lucas.basemodel.modules.financeiro.models.Orcamento;
 import lucas.basemodel.modules.user.User;
 import lucas.basemodel.modules.wealth.services.WealthService;
@@ -35,16 +33,15 @@ public class FinancialHealthService {
             List<Map<String, Object>> projecao3Meses
     ) {}
 
-    public HealthReport calcular(User user, List<Conta> todasContas, List<Orcamento> orcamentos) {
-        YearMonth mesAtual = YearMonth.now();
-
+    /**
+     * @param totais totais do mês (escopo pessoal) já agregados no banco
+     * @param atraso quantidade e soma das despesas pendentes vencidas
+     */
+    public HealthReport calcular(User user, DashboardQueryService.TotaisMes totais,
+                                 DashboardQueryService.ResumoAtraso atraso, List<Orcamento> orcamentos) {
         // 1. Receita Base (Patrimônio de Renda + Receitas do Mês)
         BigDecimal receitaWealth = wealthService.getMonthlyIncomeAssets(user);
-        BigDecimal receitaMes = todasContas.stream()
-                .filter(c -> c.getTipo() == TipoTransacao.RECEITA && c.isPaga())
-                .filter(c -> c.getDataPagamento() != null && YearMonth.from(c.getDataPagamento()).equals(mesAtual))
-                .map(Conta::getValor)
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
+        BigDecimal receitaMes = totais.receitaPaga();
 
         BigDecimal receitaTotal = receitaWealth.add(receitaMes);
         if (receitaTotal.compareTo(BigDecimal.ZERO) == 0 && user.getOrcamentoMensal() != null) {
@@ -53,26 +50,9 @@ public class FinancialHealthService {
         }
 
         // 2. Despesas
-        BigDecimal despesaMêsRealizada = todasContas.stream()
-                .filter(c -> c.getTipo() == TipoTransacao.DESPESA && c.isPaga())
-                .filter(c -> c.getDataPagamento() != null && YearMonth.from(c.getDataPagamento()).equals(mesAtual))
-                .map(Conta::getValor)
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
-
-        BigDecimal despesasPendentesMes = todasContas.stream()
-                .filter(c -> c.getTipo() == TipoTransacao.DESPESA && !c.isPaga())
-                .filter(c -> c.getDataVencimento() != null && YearMonth.from(c.getDataVencimento()).equals(mesAtual))
-                .map(Conta::getValor)
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
-        
-        List<Conta> contasAtrasadas = todasContas.stream()
-                .filter(c -> c.getTipo() == TipoTransacao.DESPESA && !c.isPaga())
-                .filter(c -> c.getDataVencimento() != null && c.getDataVencimento().isBefore(LocalDate.now()))
-                .toList();
-        
-        BigDecimal totalAtrasado = contasAtrasadas.stream()
-                .map(Conta::getValor)
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
+        BigDecimal despesaMêsRealizada = totais.despesaPaga();
+        BigDecimal despesasPendentesMes = totais.despesaPendente();
+        BigDecimal totalAtrasado = atraso.total();
 
         // 3. Indicadores Base
         BigDecimal taxaPoupanca = BigDecimal.ZERO;
@@ -96,7 +76,7 @@ public class FinancialHealthService {
         }
         
         // Penalidade B: Contas Atrasadas
-        if (!contasAtrasadas.isEmpty()) {
+        if (atraso.quantidade() > 0) {
             score -= 15; // Penalidade fixa
             // E agrava pelo valor atrasado vs receita
             if (receitaTotal.compareTo(BigDecimal.ZERO) > 0) {
