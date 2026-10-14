@@ -36,7 +36,7 @@
                     <div class="w-10 h-10 rounded-xl shrink-0 border border-black/5 shadow-inner" th:style="'background:' + ${cat.corHexadecimal}"></div>
                     <div class="truncate">
                         <div class="text-[14.5px] font-medium text-zen-t1 truncate" th:text="${cat.nome}">Categoria</div>
-                        <div class="text-[11px] font-semibold text-zen-t3 mt-0.5 uppercase tracking-wider" th:if="${cat.natureza != null}" th:text="${cat.natureza.name()}">Tipo
+                        <div class="text-[12px] font-semibold text-zen-t3 mt-0.5" th:if="${cat.natureza != null}" th:text="${cat.natureza.name()}">Tipo
                         </div>
                     </div>
                 </div>

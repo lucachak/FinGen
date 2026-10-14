@@ -105,21 +105,21 @@
     <!-- Summary Metrics -->
     <div class="wealth-grid mb-8 anim-2">
       <div class="summary-card col-span-12 sm:col-span-6 lg:col-span-3">
-        <span class="text-[11px] font-bold uppercase tracking-widest text-zen-t3">Patrimônio Atual</span>
+        <span class="text-[12px] font-bold text-zen-t3">Patrimônio Atual</span>
         <div class="flex items-baseline gap-2">
           <span class="text-2xl font-serif font-bold text-zen-t1" th:text="'R$ ' + ${#numbers.formatDecimal(totalAtual, 1, 'POINT', 2, 'COMMA')}">R$ 0,00</span>
         </div>
-        <p class="text-[11px] text-zen-t3">Valor de mercado em tempo real</p>
+        <p class="text-[12px] text-zen-t3">Valor de mercado em tempo real</p>
       </div>
 
       <div class="summary-card col-span-12 sm:col-span-6 lg:col-span-3">
-        <span class="text-[11px] font-bold uppercase tracking-widest text-zen-t3">Total Aportado</span>
+        <span class="text-[12px] font-bold text-zen-t3">Total Aportado</span>
         <div class="text-2xl font-serif font-bold text-zen-t1" th:text="'R$ ' + ${#numbers.formatDecimal(totalAportado, 1, 'POINT', 2, 'COMMA')}">R$ 0,00</div>
-        <p class="text-[11px] text-zen-t3">Soma histórica de aportes</p>
+        <p class="text-[12px] text-zen-t3">Soma histórica de aportes</p>
       </div>
 
       <div class="summary-card col-span-12 sm:col-span-6 lg:col-span-3">
-        <span class="text-[11px] font-bold uppercase tracking-widest text-zen-t3">Retorno da Carteira</span>
+        <span class="text-[12px] font-bold text-zen-t3">Retorno da Carteira</span>
         <div class="flex items-center gap-3">
           <div class="text-2xl font-serif font-bold" 
                th:classappend="${roiTotal > 0 ? 'text-emerald-600' : (roiTotal < 0 ? 'text-red-600' : 'text-zen-t1')}"
@@ -129,14 +129,14 @@
             Consolidado
           </span>
         </div>
-        <p class="text-[11px] text-zen-t3">Considerando variações de mercado</p>
+        <p class="text-[12px] text-zen-t3">Considerando variações de mercado</p>
       </div>
 
       <div class="summary-card col-span-12 sm:col-span-6 lg:col-span-3">
-        <span class="text-[11px] font-bold uppercase tracking-widest text-zen-t3">Resultado Acumulado</span>
+        <span class="text-[12px] font-bold text-zen-t3">Resultado Acumulado</span>
         <div class="text-2xl font-serif font-bold" th:classappend="${portfolio.totalGain >= 0 ? ' text-emerald-600' : ' text-red-600'}"
              th:text="${(portfolio.totalGain >= 0 ? '+ R$ ' : '- R$ ') + #numbers.formatDecimal(portfolio.totalGain.abs(), 1, 'POINT', 2, 'COMMA')}">R$ 0,00</div>
-        <p class="text-[11px] text-zen-t3">Valor atual menos aportes</p>
+        <p class="text-[12px] text-zen-t3">Valor atual menos aportes</p>
       </div>
     </div>
 
@@ -151,36 +151,36 @@
         <div class="mb-4">
           <h3 class="text-[15px] font-bold text-zen-t1 truncate" th:text="${inv.nome}">Nome</h3>
           <div class="flex items-center gap-2">
-            <span class="text-[10px] uppercase font-mono text-zen-t3 tracking-wider" th:text="${inv.ticker ?: '—'}">TICKER</span>
+            <span class="text-[12px] tabular-nums text-zen-t3" th:text="${inv.ticker ?: '—'}">TICKER</span>
             <span class="w-1 h-1 bg-zen-border rounded-full"></span>
-            <span class="text-[10px] font-semibold text-zen-t2" th:text="${inv.tipo != null ? inv.tipo.descricao : 'Indefinido'}">Tipo</span>
+            <span class="text-[12px] font-semibold text-zen-t2" th:text="${inv.tipo != null ? inv.tipo.descricao : 'Indefinido'}">Tipo</span>
           </div>
         </div>
 
         <div class="space-y-3 mb-6">
           <div class="flex justify-between items-center">
-            <span class="text-[11px] text-zen-t3">Valor Atual</span>
-            <span class="text-[13.5px] font-mono font-bold text-zen-t1" th:text="${'R$ ' + #numbers.formatDecimal(inv.valorAtual, 1, 'POINT', 2, 'COMMA')}">0,00</span>
+            <span class="text-[12px] text-zen-t3">Valor Atual</span>
+            <span class="text-[13.5px] tabular-nums font-bold text-zen-t1" th:text="${'R$ ' + #numbers.formatDecimal(inv.valorAtual, 1, 'POINT', 2, 'COMMA')}">0,00</span>
           </div>
           <div class="flex justify-between items-center" th:if="${inv.quantidade != null}">
-            <span class="text-[11px] text-zen-t3">Quantidade</span>
-            <span class="text-[12px] font-mono text-zen-t2" th:text="${#numbers.formatDecimal(inv.quantidade, 1, 'POINT', 4, 'COMMA')}">0</span>
+            <span class="text-[12px] text-zen-t3">Quantidade</span>
+            <span class="text-[12px] tabular-nums text-zen-t2" th:text="${#numbers.formatDecimal(inv.quantidade, 1, 'POINT', 4, 'COMMA')}">0</span>
           </div>
           <div class="flex justify-between items-center" th:if="${inv.precoAtual != null}">
-            <span class="text-[11px] text-zen-t3">Preço por cota</span>
-            <span class="text-[12px] font-mono text-zen-t2" th:text="${'R$ ' + #numbers.formatDecimal(inv.precoAtual, 1, 'POINT', 2, 'COMMA')}">R$ 0,00</span>
+            <span class="text-[12px] text-zen-t3">Preço por cota</span>
+            <span class="text-[12px] tabular-nums text-zen-t2" th:text="${'R$ ' + #numbers.formatDecimal(inv.precoAtual, 1, 'POINT', 2, 'COMMA')}">R$ 0,00</span>
           </div>
           <div class="flex justify-between items-center">
-            <span class="text-[11px] text-zen-t3">Variação do dia</span>
+            <span class="text-[12px] text-zen-t3">Variação do dia</span>
             <span class="roi-badge" th:if="${inv.rentabilidade != null}"
                   th:classappend="${inv.rentabilidade > 0 ? 'roi-pos' : (inv.rentabilidade < 0 ? 'roi-neg' : 'roi-neu')}"
                   th:text="${(inv.rentabilidade > 0 ? '+' : '') + #numbers.formatDecimal(inv.rentabilidade, 1, 'POINT', 2, 'COMMA') + '%'}">
               0%
             </span>
-            <span th:unless="${inv.rentabilidade != null}" class="text-zen-t3 text-[11px]">Aguardando...</span>
+            <span th:unless="${inv.rentabilidade != null}" class="text-zen-t3 text-[12px]">Aguardando...</span>
           </div>
           <div th:if="${totalAtual > 0}" class="pt-1">
-            <div class="flex justify-between text-[10px] text-zen-t3 mb-1.5"><span>Peso na carteira</span><span th:text="${#numbers.formatDecimal(inv.valorAtual * 100 / totalAtual, 1, 'POINT', 1, 'COMMA') + '%'}">0%</span></div>
+            <div class="flex justify-between text-[12px] text-zen-t3 mb-1.5"><span>Peso na carteira</span><span th:text="${#numbers.formatDecimal(inv.valorAtual * 100 / totalAtual, 1, 'POINT', 1, 'COMMA') + '%'}">0%</span></div>
             <div class="position-track"><span th:style="|width:${inv.valorAtual * 100 / totalAtual}%|"></span></div>
           </div>
         </div>
@@ -194,7 +194,7 @@
       </div>
 
       <!-- Empty State -->
-      <div th:if="${#lists.isEmpty(investimentos)}" class="col-span-12 py-20 text-center bg-zen-surface border border-zen-border rounded-[32px]">
+      <div th:if="${#lists.isEmpty(investimentos)}" class="col-span-12 py-20 text-center bg-zen-surface border border-zen-border rounded-2xl">
         <div class="w-16 h-16 bg-zen-surface2 rounded-full flex items-center justify-center mx-auto mb-4">
           <i data-lucide="layers" class="w-8 h-8 text-zen-t3"></i>
         </div>

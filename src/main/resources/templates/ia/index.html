@@ -306,7 +306,7 @@
             font-size: 10px;
             font-weight: 600;
             color: rgba(255, 255, 255, .35);
-            text-transform: uppercase;
+
             letter-spacing: .08em;
             margin-bottom: 12px;
         }
@@ -546,12 +546,11 @@
 
         <div class="page-header mb-8">
             <div>
-                <span class="text-brand font-mono text-[11px] uppercase tracking-[0.2em] mb-2 block">Córtex Financeiro
+                <span class="text-brand tabular-nums text-[12px] mb-2 block">Córtex Financeiro
                     &bull; AI Powered</span>
                 <h1 class="font-serif text-3xl md:text-4xl text-zen-t1 tracking-tight font-medium">Assistente de
                     Inteligência</h1>
-                <p class="page-subtitle">Modelos de IA, à sua escolha, aplicados ao seu patrimônio para insights
-                    profundos.</p>
+                <p class="page-subtitle">Escolha o modelo de IA que analisa suas contas e seu patrimônio.</p>
             </div>
         </div>
 
@@ -651,14 +650,14 @@
                     <div class="chart-head" style="background: var(--brand); border-bottom:none; padding:18px 20px;">
                         <div class="flex items-center gap-3">
                             <div
-                                class="w-9 h-9 rounded-[10px] bg-zen-surface/20 flex items-center justify-center backdrop-blur-sm">
+                                class="w-9 h-9 rounded-lg bg-zen-surface/20 flex items-center justify-center">
                                 <i data-lucide="bot" class="w-5 h-5 text-white"></i>
                             </div>
                             <div>
                                 <div class="font-semibold text-white text-[14px]">Consultor FinGen</div>
                                 <label for="ai-model-select" class="sr-only">Modelo de IA</label>
                                 <select id="ai-model-select" disabled
-                                    class="mt-1 max-w-[230px] truncate text-[11px] font-medium text-white rounded-md px-2 py-1 border border-white/30 focus:outline-none focus:ring-1 focus:ring-white"
+                                    class="mt-1 max-w-[230px] truncate text-[12px] font-medium text-white rounded-md px-2 py-1 border border-white/30 focus:outline-none focus:ring-1 focus:ring-white"
                                     style="background: rgba(255,255,255,0.15);">
                                     <option>Carregando modelos...</option>
                                 </select>
@@ -800,7 +799,7 @@
                 })
                 .catch(function (err) {
                     document.getElementById('loading-pdf').classList.remove('is-loading');
-                    alert('Erro ao importar ficheiro: ' + err.message);
+                    alert('Erro ao importar arquivo: ' + err.message);
                 });
         }
 
@@ -906,8 +905,8 @@
 
                 var wrapper = document.createElement('div');
                 var innerClass = role === 'user'
-                    ? 'bg-brand text-white self-end rounded-[20px] rounded-tr-sm px-4 py-2.5 text-[13.5px] max-w-[85%] font-medium leading-relaxed shadow-sm'
-                    : 'bg-zen-surface border border-zen-border text-zen-t1 self-start rounded-[20px] rounded-tl-sm px-4 py-3 text-[13px] max-w-[90%] shadow-sm leading-relaxed whitespace-pre-wrap';
+                    ? 'bg-brand text-white self-end rounded-xl rounded-tr-sm px-4 py-2.5 text-[13.5px] max-w-[85%] font-medium leading-relaxed shadow-sm'
+                    : 'bg-zen-surface border border-zen-border text-zen-t1 self-start rounded-xl rounded-tl-sm px-4 py-3 text-[13px] max-w-[90%] shadow-sm leading-relaxed whitespace-pre-wrap';
 
                 wrapper.className = 'flex flex-col ' + (role === 'user' ? 'items-end' : 'items-start');
                 wrapper.innerHTML = `<div id="${id}" class="${innerClass}">${htmlContent}</div>`;

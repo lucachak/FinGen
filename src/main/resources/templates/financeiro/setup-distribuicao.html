@@ -20,7 +20,7 @@
         <div class="absolute -bottom-[5%] -right-[5%] w-[350px] h-[350px] bg-[#EDF2ED] rounded-[53%_47%_40%_60%/60%_40%_60%_40%] blur-[80px] opacity-40 pointer-events-none z-0"></div>
 
         <div class="w-full max-w-[850px] relative z-10 animate-[fade-up_0.6s_ease-out_both]">
-            <div class="bg-zen-surface/80 backdrop-blur-xl border border-white/90 rounded-2xl p-8 sm:p-12 shadow-[0_32px_72px_rgba(15,118,110,0.12)] relative overflow-hidden">
+            <div class="bg-zen-surface/80 border border-white/90 rounded-2xl p-8 sm:p-12 shadow-[0_32px_72px_rgba(15,118,110,0.12)] relative overflow-hidden">
                 <!-- Bamboo Texture Noise -->
                 <div class="absolute inset-0 opacity-[0.02] mix-blend-overlay pointer-events-none bg-[url('data:image/svg+xml,%3Csvg viewBox=%220 0 200 200%22 xmlns=%22http://www.w3.org/2000/svg%22%3E%3Cfilter id=%22noiseFilter%22%3E%3CfeTurbulence type=%22fractalNoise%22 baseFrequency=%220.85%22 numOctaves=%223%22 stitchTiles=%22stitch%22/%3E%3C/filter%3E%3Crect width=%22100%25%22 height=%22100%25%22 filter=%22url(%23noiseFilter)%22/%3E%3C/svg%3E')]"></div>
                 
@@ -36,7 +36,7 @@
                             
                             <!-- Income Input -->
                             <div>
-                                <label class="block text-[11.5px] font-semibold text-zen-t3 uppercase tracking-widest mb-2 ml-1">Sua Renda Mensal Líquida</label>
+                                <label class="block text-[12px] font-semibold text-zen-t3 mb-2 ml-1">Sua Renda Mensal Líquida</label>
                                 <div class="relative group">
                                     <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
                                         <span class="text-brand font-semibold">R$</span>
@@ -49,7 +49,7 @@
 
                             <!-- Strategy Selection -->
                             <div>
-                                <label class="block text-[11.5px] font-semibold text-zen-t3 uppercase tracking-widest mb-3 ml-1">Escolha sua Estratégia</label>
+                                <label class="block text-[12px] font-semibold text-zen-t3 mb-3 ml-1">Escolha sua Estratégia</label>
                                 <div class="grid grid-cols-1 gap-3">
                                     <div class="strategy-card group p-4 cursor-pointer bg-zen-surface2 border border-zen-border rounded-xl transition-all hover:bg-zen-surface hover:border-brand/40 selected" 
                                          onclick="selectStrategy('REGRA_50_30_20', this)">
@@ -92,7 +92,7 @@
                                 </div>
                             </div>
                             
-                            <button type="submit" class="w-full inline-flex items-center justify-center gap-2 px-8 py-4 bg-brand hover:bg-brand-h text-white rounded-xl font-bold transition-all shadow-lg shadow-brand/20 cursor-pointer">
+                            <button type="submit" class="w-full inline-flex items-center justify-center gap-2 px-8 py-4 bg-brand hover:bg-brand-h text-white rounded-xl font-bold transition-all shadow-lg cursor-pointer">
                                 Aplicar Distribuição <i data-lucide="sparkles" class="w-5 h-5"></i>
                             </button>
                         </form>

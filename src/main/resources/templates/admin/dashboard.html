@@ -10,7 +10,7 @@
 <head>
     <style th:fragment="style">
         body { background-color: var(--bg); font-family: var(--font); }
-        .shadow-md-zen { box-shadow: 0 8px 24px rgba(15,118,110,0.09), 0 2px 6px rgba(15,118,110,0.05); }
+        . { box-shadow: 0 8px 24px rgba(15,118,110,0.09), 0 2px 6px rgba(15,118,110,0.05); }
     </style>
 </head>
 <body>
@@ -18,9 +18,9 @@
     <div class="mb-10 animate-[fade-up_0.6s_ease-out]">
         <div class="flex flex-col md:flex-row md:items-end justify-between gap-6">
             <div>
-                <span class="text-brand font-mono text-[11px] uppercase tracking-[0.2em] mb-2 block">Administração do Sistema</span>
+                <span class="text-brand tabular-nums text-[12px] mb-2 block">Administração do Sistema</span>
                 <h1 class="font-serif text-3xl md:text-5xl text-zen-t1 tracking-tight font-medium">
-                    Gestão de Utilizadores
+                    Gestão de Usuários
                 </h1>
             </div>
             
@@ -33,36 +33,36 @@
         </div>
     </div>
 
-    <div class="bg-zen-surface border border-zen-border rounded-[32px] p-8 shadow-md-zen">
+    <div class="bg-zen-surface border border-zen-border rounded-2xl p-8">
         <div class="overflow-x-auto">
             <table class="w-full text-left border-collapse">
                 <thead>
                     <tr class="border-b border-zen-border">
-                        <th class="py-4 px-4 text-[11px] font-bold uppercase tracking-widest text-zen-t3">Nome</th>
-                        <th class="py-4 px-4 text-[11px] font-bold uppercase tracking-widest text-zen-t3">Email</th>
-                        <th class="py-4 px-4 text-[11px] font-bold uppercase tracking-widest text-zen-t3">Papel</th>
-                        <th class="py-4 px-4 text-[11px] font-bold uppercase tracking-widest text-zen-t3">Data Registo</th>
-                        <th class="py-4 px-4 text-[11px] font-bold uppercase tracking-widest text-zen-t3">Status</th>
+                        <th class="py-4 px-4 text-[12px] font-bold text-zen-t3">Nome</th>
+                        <th class="py-4 px-4 text-[12px] font-bold text-zen-t3">Email</th>
+                        <th class="py-4 px-4 text-[12px] font-bold text-zen-t3">Papel</th>
+                        <th class="py-4 px-4 text-[12px] font-bold text-zen-t3">Data Registro</th>
+                        <th class="py-4 px-4 text-[12px] font-bold text-zen-t3">Status</th>
                     </tr>
                 </thead>
                 <tbody>
                     <tr th:each="u : ${users}" class="border-b border-zen-border/50 hover:bg-zen-surface2 transition-colors">
                         <td class="py-4 px-4">
                             <div class="flex items-center gap-3">
-                                <div class="w-8 h-8 rounded-full bg-brand/10 text-brand flex items-center justify-center font-bold text-xs uppercase"
+                                <div class="w-8 h-8 rounded-full bg-brand/10 text-brand flex items-center justify-center font-bold text-xs"
                                      th:text="${#strings.substring(u.username, 0, 1)}">U</div>
                                 <span class="text-[13px] font-semibold text-zen-t1" th:text="${u.nomeCompleto}">Nome</span>
                             </div>
                         </td>
                         <td class="py-4 px-4 text-[13px] text-zen-t2" th:text="${u.email}">email@domain.com</td>
                         <td class="py-4 px-4">
-                            <span class="text-[10px] font-mono px-2 py-1 rounded-full bg-zen-surface2 border border-zen-border text-zen-t2" 
+                            <span class="text-[12px] tabular-nums px-2 py-1 rounded-full bg-zen-surface2 border border-zen-border text-zen-t2" 
                                   th:text="${u.role}">ROLE_USER</span>
                         </td>
-                        <td class="py-4 px-4 text-[12px] text-zen-t3 font-mono" 
+                        <td class="py-4 px-4 text-[12px] text-zen-t3 tabular-nums" 
                             th:text="${#temporals.format(u.criadoEm, 'dd/MM/yyyy HH:mm')}">01/01/2026</td>
                         <td class="py-4 px-4">
-                            <span class="text-[10px] font-bold px-2 py-1 rounded-full"
+                            <span class="text-[12px] font-bold px-2 py-1 rounded-full"
                                   th:classappend="${u.ativo} ? 'bg-emerald-50 text-emerald-600 border border-emerald-100' : 'bg-rose-50 text-rose-600 border border-rose-100'"
                                   th:text="${u.ativo ? 'ATIVO' : 'INATIVO'}">ATIVO</span>
                         </td>

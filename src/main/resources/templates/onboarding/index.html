@@ -82,7 +82,7 @@
             </div>
 
             <!-- Wizard Container -->
-            <div class="bg-zen-surface/80 backdrop-blur-xl border border-white/90 rounded-[32px] p-8 md:p-12 shadow-xl-zen relative overflow-hidden min-h-[420px]">
+            <div class="bg-zen-surface/80 border border-white/90 rounded-2xl p-8 md:p-12 relative overflow-hidden min-h-[420px]">
 
                 <form id="onboardingForm" onsubmit="return false;">
 
@@ -91,7 +91,7 @@
                     ════════════════════════════════════════════ -->
                     <div id="step-1" class="step-transition step-active">
                         <div class="text-center mb-10">
-                            <span class="inline-flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.2em] text-brand mb-4">
+                            <span class="inline-flex items-center gap-2 text-[12px] font-bold text-brand mb-4">
                                 <i data-lucide="wallet" class="w-3.5 h-3.5"></i> Sua Base Financeira
                             </span>
                             <h2 class="font-serif text-[32px] md:text-[36px] text-zen-t1 tracking-tight mb-3">Vamos partir da sua realidade</h2>
@@ -99,24 +99,24 @@
                         </div>
                         <div class="max-w-md mx-auto">
                             <div class="mb-5">
-                                <label for="rendaLiquida" class="block text-xs font-bold uppercase tracking-wider text-zen-t3 mb-2">Renda líquida mensal</label>
+                                <label for="rendaLiquida" class="block text-xs font-bold text-zen-t3 mb-2">Renda líquida mensal</label>
                                 <div class="relative">
                                     <div class="absolute inset-y-0 left-0 pl-5 flex items-center pointer-events-none">
                                         <span class="text-zen-t3 font-medium text-lg">R$</span>
                                     </div>
                                     <input type="number" id="rendaLiquida" name="rendaLiquida" step="0.01" min="0"
-                                        class="w-full bg-zen-surface2/50 border border-zen-border rounded-2xl pl-12 pr-5 py-4 text-zen-t1 text-xl font-mono focus:outline-none focus:ring-2 focus:ring-brand/30 focus:bg-zen-surface transition-all shadow-sm-zen"
+                                        class="w-full bg-zen-surface2/50 border border-zen-border rounded-2xl pl-12 pr-5 py-4 text-zen-t1 text-xl tabular-nums focus:outline-none focus:ring-2 focus:ring-brand/30 focus:bg-zen-surface transition-all"
                                         placeholder="0,00">
                                 </div>
                             </div>
                             <div class="mb-3">
-                                <label for="saldoDisponivel" class="block text-xs font-bold uppercase tracking-wider text-zen-t3 mb-2">Quanto está disponível agora?</label>
+                                <label for="saldoDisponivel" class="block text-xs font-bold text-zen-t3 mb-2">Quanto está disponível agora?</label>
                                 <div class="relative">
                                     <div class="absolute inset-y-0 left-0 pl-5 flex items-center pointer-events-none">
                                         <span class="text-zen-t3 font-medium text-lg">R$</span>
                                     </div>
                                     <input type="number" id="saldoDisponivel" name="saldoDisponivel" step="0.01"
-                                        class="w-full bg-zen-surface2/50 border border-zen-border rounded-2xl pl-12 pr-5 py-4 text-zen-t1 text-xl font-mono focus:outline-none focus:ring-2 focus:ring-brand/30 focus:bg-zen-surface transition-all shadow-sm-zen"
+                                        class="w-full bg-zen-surface2/50 border border-zen-border rounded-2xl pl-12 pr-5 py-4 text-zen-t1 text-xl tabular-nums focus:outline-none focus:ring-2 focus:ring-brand/30 focus:bg-zen-surface transition-all"
                                         placeholder="Pode ser negativo">
                                 </div>
                                 <p class="text-xs text-zen-t3 mt-2">Criaremos sua Conta principal com esse saldo. Se estiver no vermelho, informe um valor negativo.</p>
@@ -137,7 +137,7 @@
                     ════════════════════════════════════════════ -->
                     <div id="step-2" class="step-transition step-hidden">
                         <div class="text-center mb-10">
-                            <span class="inline-flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.2em] text-brand mb-4">
+                            <span class="inline-flex items-center gap-2 text-[12px] font-bold text-brand mb-4">
                                 <i data-lucide="home" class="w-3.5 h-3.5"></i> Moradia
                             </span>
                             <h2 class="font-serif text-[32px] md:text-[36px] text-zen-t1 tracking-tight mb-3">Como você mora hoje?</h2>
@@ -150,7 +150,7 @@
                                 <label for="moradia-aluguel" class="radio-card-label cursor-pointer flex flex-col items-center text-center p-5 border border-zen-border rounded-2xl transition hover:border-brand/50 select-none">
                                     <i data-lucide="key" class="w-8 h-8 text-zen-t2 mb-3 selector-icon"></i>
                                     <span class="font-medium text-[14px]">Aluguel</span>
-                                    <span class="text-[11px] text-zen-t3 mt-1">Pago mensalmente</span>
+                                    <span class="text-[12px] text-zen-t3 mt-1">Pago mensalmente</span>
                                 </label>
                             </div>
                             <div class="relative">
@@ -158,7 +158,7 @@
                                 <label for="moradia-financiamento" class="radio-card-label cursor-pointer flex flex-col items-center text-center p-5 border border-zen-border rounded-2xl transition hover:border-brand/50 select-none">
                                     <i data-lucide="home" class="w-8 h-8 text-zen-t2 mb-3 selector-icon"></i>
                                     <span class="font-medium text-[14px]">Financiamento</span>
-                                    <span class="text-[11px] text-zen-t3 mt-1">Prestação mensal</span>
+                                    <span class="text-[12px] text-zen-t3 mt-1">Prestação mensal</span>
                                 </label>
                             </div>
                             <div class="relative">
@@ -166,7 +166,7 @@
                                 <label for="moradia-quitado" class="radio-card-label cursor-pointer flex flex-col items-center text-center p-5 border border-zen-border rounded-2xl transition hover:border-brand/50 select-none">
                                     <i data-lucide="check-circle-2" class="w-8 h-8 text-zen-t2 mb-3 selector-icon"></i>
                                     <span class="font-medium text-[14px]">Imóvel Quitado</span>
-                                    <span class="text-[11px] text-zen-t3 mt-1">Sem prestação</span>
+                                    <span class="text-[12px] text-zen-t3 mt-1">Sem prestação</span>
                                 </label>
                             </div>
                             <div class="relative">
@@ -174,20 +174,20 @@
                                 <label for="moradia-pais" class="radio-card-label cursor-pointer flex flex-col items-center text-center p-5 border border-zen-border rounded-2xl transition hover:border-brand/50 select-none">
                                     <i data-lucide="users" class="w-8 h-8 text-zen-t2 mb-3 selector-icon"></i>
                                     <span class="font-medium text-[14px]">Com os pais</span>
-                                    <span class="text-[11px] text-zen-t3 mt-1">Ou familiares</span>
+                                    <span class="text-[12px] text-zen-t3 mt-1">Ou familiares</span>
                                 </label>
                             </div>
                         </div>
 
                         <!-- Valor Moradia (aluguel/financiamento) -->
                         <div id="valor-moradia-container" class="hidden mb-6">
-                            <label class="block text-[12px] font-semibold text-zen-t3 uppercase tracking-widest mb-2 ml-1" for="valorMoradia">Valor Mensal (R$)</label>
+                            <label class="block text-[12px] font-semibold text-zen-t3 mb-2 ml-1" for="valorMoradia">Valor Mensal (R$)</label>
                             <div class="relative">
                                 <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
                                     <span class="text-zen-t3 font-medium">R$</span>
                                 </div>
                                 <input type="number" id="valorMoradia" name="valorMoradia" step="10" min="0"
-                                    class="w-full bg-zen-surface2/50 border border-zen-border rounded-xl pl-10 pr-4 py-3.5 text-zen-t1 font-mono focus:outline-none focus:ring-2 focus:ring-brand/30"
+                                    class="w-full bg-zen-surface2/50 border border-zen-border rounded-xl pl-10 pr-4 py-3.5 text-zen-t1 tabular-nums focus:outline-none focus:ring-2 focus:ring-brand/30"
                                     placeholder="0,00">
                             </div>
                         </div>
@@ -204,13 +204,13 @@
                                         <p class="text-[12px] text-zen-t3 mt-0.5">Se você ajuda com despesas da casa, informe o valor.</p>
                                     </div>
                                 </div>
-                                <label class="block text-[12px] font-semibold text-zen-t3 uppercase tracking-widest mb-2 ml-1" for="ajudaFamiliar">Valor de ajuda por mês (opcional)</label>
+                                <label class="block text-[12px] font-semibold text-zen-t3 mb-2 ml-1" for="ajudaFamiliar">Valor de ajuda por mês (opcional)</label>
                                 <div class="relative">
                                     <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
                                         <span class="text-zen-t3 font-medium">R$</span>
                                     </div>
                                     <input type="number" id="ajudaFamiliar" name="ajudaFamiliar" step="10" min="0"
-                                        class="w-full bg-zen-surface border border-zen-border rounded-xl pl-10 pr-4 py-3.5 text-zen-t1 font-mono focus:outline-none focus:ring-2 focus:ring-brand/30"
+                                        class="w-full bg-zen-surface border border-zen-border rounded-xl pl-10 pr-4 py-3.5 text-zen-t1 tabular-nums focus:outline-none focus:ring-2 focus:ring-brand/30"
                                         placeholder="0,00">
                                 </div>
                             </div>
@@ -228,7 +228,7 @@
                     ════════════════════════════════════════════ -->
                     <div id="step-3" class="step-transition step-hidden">
                         <div class="text-center mb-10">
-                            <span class="inline-flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.2em] text-brand mb-4">
+                            <span class="inline-flex items-center gap-2 text-[12px] font-bold text-brand mb-4">
                                 <i data-lucide="plug-zap" class="w-3.5 h-3.5"></i> Contas da Casa
                             </span>
                             <h2 class="font-serif text-[32px] md:text-[36px] text-zen-t1 tracking-tight mb-3">Quais contas você paga?</h2>
@@ -279,7 +279,7 @@
                                 </label>
                             </div>
                         </div>
-                        <p class="text-[11px] text-zen-t3 text-center -mt-6 mb-8">Marque todas que se aplicam — inclusive “Não pago contas”.</p>
+                        <p class="text-[12px] text-zen-t3 text-center -mt-6 mb-8">Marque todas que se aplicam — inclusive “Não pago contas”.</p>
 
                         <div class="flex justify-between items-center">
                             <button type="button" onclick="prevStep(2)" class="btn-ghost py-2.5 px-6 rounded-xl text-[14px]">Voltar</button>
@@ -292,7 +292,7 @@
                     ════════════════════════════════════════════ -->
                     <div id="step-4" class="step-transition step-hidden">
                         <div class="text-center mb-10">
-                            <span class="inline-flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.2em] text-brand mb-4">
+                            <span class="inline-flex items-center gap-2 text-[12px] font-bold text-brand mb-4">
                                 <i data-lucide="shopping-cart" class="w-3.5 h-3.5"></i> Alimentação
                             </span>
                             <h2 class="font-serif text-[32px] md:text-[36px] text-zen-t1 tracking-tight mb-3">Quanto você gasta com comida?</h2>
@@ -302,20 +302,20 @@
                         <!-- Quick-select chips -->
                         <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
                             <button type="button" onclick="setAlimentacao(400, this)" class="alim-card border border-zen-border rounded-2xl p-4 text-center hover:border-brand/50 transition">
-                                <span class="block font-mono text-[17px] font-semibold text-zen-t1">R$ 400</span>
-                                <span class="text-[11px] text-zen-t3">Econômico</span>
+                                <span class="block tabular-nums text-[17px] font-semibold text-zen-t1">R$ 400</span>
+                                <span class="text-[12px] text-zen-t3">Econômico</span>
                             </button>
                             <button type="button" onclick="setAlimentacao(800, this)" class="alim-card border border-zen-border rounded-2xl p-4 text-center hover:border-brand/50 transition">
-                                <span class="block font-mono text-[17px] font-semibold text-zen-t1">R$ 800</span>
-                                <span class="text-[11px] text-zen-t3">Moderado</span>
+                                <span class="block tabular-nums text-[17px] font-semibold text-zen-t1">R$ 800</span>
+                                <span class="text-[12px] text-zen-t3">Moderado</span>
                             </button>
                             <button type="button" onclick="setAlimentacao(1400, this)" class="alim-card border border-zen-border rounded-2xl p-4 text-center hover:border-brand/50 transition">
-                                <span class="block font-mono text-[17px] font-semibold text-zen-t1">R$ 1.400</span>
-                                <span class="text-[11px] text-zen-t3">Confortável</span>
+                                <span class="block tabular-nums text-[17px] font-semibold text-zen-t1">R$ 1.400</span>
+                                <span class="text-[12px] text-zen-t3">Confortável</span>
                             </button>
                             <button type="button" onclick="setAlimentacao(2500, this)" class="alim-card border border-zen-border rounded-2xl p-4 text-center hover:border-brand/50 transition">
-                                <span class="block font-mono text-[17px] font-semibold text-zen-t1">R$ 2.500</span>
-                                <span class="text-[11px] text-zen-t3">Premium</span>
+                                <span class="block tabular-nums text-[17px] font-semibold text-zen-t1">R$ 2.500</span>
+                                <span class="text-[12px] text-zen-t3">Premium</span>
                             </button>
                         </div>
                         <div class="flex justify-center mb-5">
@@ -327,17 +327,17 @@
 
                         <!-- Custom value -->
                         <div class="max-w-sm mx-auto mb-3">
-                            <label class="block text-[11px] font-semibold text-zen-t3 uppercase tracking-widest mb-2 ml-1" for="gastoAlimentacao">Ou insira um valor personalizado</label>
+                            <label class="block text-[12px] font-semibold text-zen-t3 mb-2 ml-1" for="gastoAlimentacao">Ou insira um valor personalizado</label>
                             <div class="relative">
                                 <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
                                     <span class="text-zen-t3 font-medium">R$</span>
                                 </div>
                                 <input type="number" id="gastoAlimentacao" name="gastoAlimentacao" step="50" min="0"
-                                    class="w-full bg-zen-surface2/50 border border-zen-border rounded-xl pl-10 pr-4 py-3.5 text-zen-t1 font-mono focus:outline-none focus:ring-2 focus:ring-brand/30"
+                                    class="w-full bg-zen-surface2/50 border border-zen-border rounded-xl pl-10 pr-4 py-3.5 text-zen-t1 tabular-nums focus:outline-none focus:ring-2 focus:ring-brand/30"
                                     placeholder="0,00" oninput="clearAlimCards()">
                             </div>
                         </div>
-                        <p class="text-[11px] text-zen-t3 text-center mb-8">Pode pular se preferir não informar agora.</p>
+                        <p class="text-[12px] text-zen-t3 text-center mb-8">Pode pular se preferir não informar agora.</p>
 
                         <div class="flex justify-between items-center">
                             <button type="button" onclick="goBackFromStep4()" class="btn-ghost py-2.5 px-6 rounded-xl text-[14px]">Voltar</button>
@@ -350,7 +350,7 @@
                     ════════════════════════════════════════════ -->
                     <div id="step-5" class="step-transition step-hidden">
                         <div class="text-center mb-8">
-                            <span class="inline-flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.2em] text-brand mb-4">
+                            <span class="inline-flex items-center gap-2 text-[12px] font-bold text-brand mb-4">
                                 <i data-lucide="route" class="w-3.5 h-3.5"></i> Estilo de vida
                             </span>
                             <h2 class="font-serif text-[32px] md:text-[36px] text-zen-t1 tracking-tight mb-3">Transporte & Assinaturas</h2>
@@ -358,7 +358,7 @@
                         </div>
 
                         <div class="mb-8">
-                            <label class="block text-[12px] font-semibold text-zen-t3 uppercase tracking-widest mb-3">Transporte Principal</label>
+                            <label class="block text-[12px] font-semibold text-zen-t3 mb-3">Transporte Principal</label>
                             <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
                                 <div class="relative">
                                     <input type="radio" name="transportePrincipal" value="CARRO_MOTO" id="transp-carro" class="radio-card-input hidden">
@@ -385,11 +385,11 @@
                                     </label>
                                 </div>
                             </div>
-                            <p class="text-[11px] text-zen-t3 text-center mt-3">Escolha “Sem gasto” se o transporte não pesa no seu orçamento.</p>
+                            <p class="text-[12px] text-zen-t3 text-center mt-3">Escolha “Sem gasto” se o transporte não pesa no seu orçamento.</p>
                         </div>
 
                         <div class="mb-4">
-                            <label class="block text-[12px] font-semibold text-zen-t3 uppercase tracking-widest mb-3">Serviços que você assina</label>
+                            <label class="block text-[12px] font-semibold text-zen-t3 mb-3">Serviços que você assina</label>
                             <div class="flex flex-wrap gap-2">
                                 <label class="relative">
                                     <input type="checkbox" name="assinaturas" value="Netflix" class="checkbox-card-input hidden" data-optional-group="assinaturas">
@@ -431,7 +431,7 @@
                     ════════════════════════════════════════════ -->
                     <div id="step-6" class="step-transition step-hidden">
                         <div class="text-center mb-10">
-                            <span class="inline-flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.2em] text-brand mb-4">
+                            <span class="inline-flex items-center gap-2 text-[12px] font-bold text-brand mb-4">
                                 <i data-lucide="briefcase" class="w-3.5 h-3.5"></i> Perfil Business
                             </span>
                             <h2 class="font-serif text-[32px] md:text-[36px] text-zen-t1 tracking-tight mb-3">Você tem um negócio?</h2>
@@ -454,7 +454,7 @@
 
                             <!-- Nome do negócio (expand se ativado) -->
                             <div id="negocio-fields" class="negocio-fields">
-                                <label class="block text-[12px] font-semibold text-zen-t3 uppercase tracking-widest mb-2 ml-1" for="nomeNegocio">
+                                <label class="block text-[12px] font-semibold text-zen-t3 mb-2 ml-1" for="nomeNegocio">
                                     Nome do negócio / empresa (opcional)
                                 </label>
                                 <input type="text" id="nomeNegocio" name="nomeNegocio" maxlength="100"
@@ -474,7 +474,7 @@
                                 <i data-lucide="sparkles" class="w-4 h-4"></i>
                                 Concluir Setup
                             </button>
-                            <p class="text-[11px] text-zen-t3 text-center mt-3">Você pode atualizar estas informações depois nas configurações.</p>
+                            <p class="text-[12px] text-zen-t3 text-center mt-3">Você pode atualizar estas informações depois nas configurações.</p>
                         </div>
 
                         <div class="flex justify-start items-center mt-4">

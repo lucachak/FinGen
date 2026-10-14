@@ -15,6 +15,7 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
+import static org.hamcrest.Matchers.anyOf;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.not;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -42,9 +43,11 @@ class DashboardExperienceTest {
         mockMvc.perform(get("/app/dashboard"))
                 .andExpect(status().isOk())
                 .andExpect(view().name("dashboard/index"))
-                .andExpect(content().string(containsString("Resumo financeiro para decisão")))
+                .andExpect(content().string(containsString("Sobra este mês")))
                 .andExpect(content().string(containsString("Ocultar valores")))
-                .andExpect(content().string(containsString("Contas que pedem atenção")))
+                .andExpect(content().string(anyOf(
+                        containsString("Seu mês ainda não tem contas"),
+                        containsString("Hoje, dia "))))
                 .andExpect(content().string(not(containsString("+4.2% total"))))
                 .andExpect(content().string(not(containsString("R$ 450"))));
     }
@@ -65,7 +68,8 @@ class DashboardExperienceTest {
 
         mockMvc.perform(get("/app/dashboard"))
                 .andExpect(status().isOk())
-                .andExpect(content().string(containsString("Seus investimentos, com contexto.")))
+                .andExpect(content().string(containsString("id=\"portfolio-title\"")))
+                .andExpect(content().string(containsString("Abrir carteira")))
                 .andExpect(content().string(containsString("ETF Global")))
                 .andExpect(content().string(containsString("Referência para o próximo aporte")))
                 .andExpect(content().string(containsString("Não constitui recomendação de investimento")));

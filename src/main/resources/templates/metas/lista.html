@@ -37,7 +37,7 @@
           <i data-lucide="sparkles" class="w-5 h-5 text-brand group-hover:scale-110 transition-transform"></i>
           IA Sugerir Metas
         </button>
-        <a th:href="@{/app/financeiro/metas/novo}" class="inline-flex items-center justify-center gap-3 px-8 py-4 bg-brand hover:bg-brand-h text-white rounded-2xl font-bold transition-all shadow-lg shadow-brand/20 hover:shadow-brand/30 group">
+        <a th:href="@{/app/financeiro/metas/novo}" class="inline-flex items-center justify-center gap-3 px-8 py-4 bg-brand hover:bg-brand-h text-white rounded-2xl font-bold transition-all shadow-lg group">
           <i data-lucide="plus" class="w-5 h-5 group-hover:rotate-90 transition-transform"></i>
           Nova Meta
         </a>
@@ -47,7 +47,7 @@
     <!-- AI Suggestions Panel -->
     <div id="painel-ia" class="hidden mb-10">
       <!-- Loading skeleton -->
-      <div id="ia-loading" class="hidden bg-zen-surface border border-zen-border rounded-[28px] p-8">
+      <div id="ia-loading" class="hidden bg-zen-surface border border-zen-border rounded-2xl p-8">
         <div class="flex items-center gap-3 mb-6">
           <div class="w-8 h-8 rounded-full bg-brand/10 flex items-center justify-center">
             <i data-lucide="brain-circuit" class="w-4 h-4 text-brand animate-pulse"></i>
@@ -75,7 +75,7 @@
         <div id="ia-cards" class="grid grid-cols-1 md:grid-cols-3 gap-5"></div>
       </div>
       <!-- Error state -->
-      <div id="ia-error" class="hidden bg-red-50 border border-red-100 rounded-[20px] p-6 text-center text-red-600 text-[14px]">
+      <div id="ia-error" class="hidden bg-red-50 border border-red-100 rounded-xl p-6 text-center text-red-600 text-[14px]">
         <i data-lucide="wifi-off" class="w-6 h-6 mx-auto mb-2 opacity-50"></i>
         Não foi possível contactar o Consultor FinGen. Tente novamente.
       </div>
@@ -83,10 +83,10 @@
 
     <!-- Summary Stats Row -->
     <div class="grid grid-cols-1 md:grid-cols-12 gap-6 mb-12">
-        <div class="md:col-span-8 bg-zen-surface border border-zen-border rounded-[32px] p-8 flex items-center justify-between overflow-hidden relative group">
+        <div class="md:col-span-8 bg-zen-surface border border-zen-border rounded-2xl p-8 flex items-center justify-between overflow-hidden relative group">
             <div class="absolute -right-4 -bottom-4 w-32 h-32 bg-brand/5 rounded-full blur-2xl group-hover:bg-brand/10 transition-colors"></div>
             <div class="relative z-10">
-                <div class="text-[13px] font-bold text-brand uppercase tracking-widest mb-2">Visão Geral de Objetivos</div>
+                <div class="text-[13px] font-bold text-brand mb-2">Visão Geral de Objetivos</div>
                 <div class="flex items-baseline gap-2">
                     <span class="text-[32px] font-semibold text-zen-t1" th:text="${metas.size()}">0</span>
                     <span class="text-zen-t3 text-[15px]">metas ativas no momento</span>
@@ -94,17 +94,17 @@
             </div>
             <div class="flex gap-8 relative z-10">
                 <div class="text-right">
-                    <div class="text-[11px] text-zen-t3 uppercase font-bold mb-1">Total Almejado</div>
-                    <div class="text-[18px] font-mono font-bold text-zen-t1" th:text="'R$ ' + ${#numbers.formatDecimal(totalAlmejado, 1, 'POINT', 2, 'COMMA')}">R$ 0,00</div>
+                    <div class="text-[12px] text-zen-t3 font-bold mb-1">Total Almejado</div>
+                    <div class="text-[18px] tabular-nums font-bold text-zen-t1" th:text="'R$ ' + ${#numbers.formatDecimal(totalAlmejado, 1, 'POINT', 2, 'COMMA')}">R$ 0,00</div>
                 </div>
                 <div class="w-px h-10 bg-zen-border opacity-50"></div>
                 <div class="text-right">
-                    <div class="text-[11px] text-zen-t3 uppercase font-bold mb-1">Total Poupado</div>
-                    <div class="text-[18px] font-mono font-bold text-brand" th:text="'R$ ' + ${#numbers.formatDecimal(totalPoupado, 1, 'POINT', 2, 'COMMA')}">R$ 0,00</div>
+                    <div class="text-[12px] text-zen-t3 font-bold mb-1">Total Poupado</div>
+                    <div class="text-[18px] tabular-nums font-bold text-brand" th:text="'R$ ' + ${#numbers.formatDecimal(totalPoupado, 1, 'POINT', 2, 'COMMA')}">R$ 0,00</div>
                 </div>
             </div>
         </div>
-        <div class="md:col-span-4 bg-zen-surface2 border border-zen-border rounded-[32px] p-8 flex items-center gap-5">
+        <div class="md:col-span-4 bg-zen-surface2 border border-zen-border rounded-2xl p-8 flex items-center gap-5">
             <div class="w-14 h-14 rounded-2xl bg-zen-surface border border-zen-border flex items-center justify-center text-brand shadow-sm">
                 <i data-lucide="trending-up" class="w-7 h-7"></i>
             </div>
@@ -117,12 +117,12 @@
     
     <!-- Goals Bento Grid -->
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-      <div th:each="m, iter : ${metas}" class="bento-card bg-zen-surface border border-zen-border rounded-[32px] p-8 flex flex-col relative group overflow-hidden opacity-0" 
+      <div th:each="m, iter : ${metas}" class="bento-card bg-zen-surface border border-zen-border rounded-2xl p-8 flex flex-col relative group overflow-hidden opacity-0" 
            th:id="'goal-' + ${m.id}">
         
         <!-- Status Badge -->
         <div class="absolute top-6 right-8">
-            <span class="text-[10px] font-bold px-3 py-1.5 rounded-full uppercase tracking-widest border shadow-sm"
+            <span class="text-[12px] font-bold px-3 py-1.5 rounded-full border shadow-sm"
                   th:classappend="${m.status=='CONCLUIDO'?'bg-emerald-50 text-emerald-600 border-emerald-100':'bg-zen-surface2 text-zen-t2 border-black/5'}"
                   th:text="${m.status=='CONCLUIDO'?'Meta Atingida':'Em Progresso'}"></span>
         </div>
@@ -134,7 +134,7 @@
           </div>
           <div class="min-w-0 pr-10">
             <h3 class="text-[18px] font-bold text-zen-t1 leading-tight group-hover:text-brand transition-colors mb-1 truncate" th:text="${m.titulo}">Meta</h3>
-            <div class="text-[12px] text-zen-t3 font-medium uppercase tracking-widest" th:text="${m.natureza.descricao}">Natureza</div>
+            <div class="text-[12px] text-zen-t3 font-medium" th:text="${m.natureza.descricao}">Natureza</div>
           </div>
         </div>
 
@@ -152,8 +152,8 @@
                      th:text="${percentuais.get(m.id).intValue() + '%'}">0%</div>
             </div>
             <div>
-                <div class="text-[11px] text-zen-t3 uppercase font-bold mb-1">Aporte Mensal Sugerido</div>
-                <div class="text-[18px] font-mono font-bold text-zen-t1" 
+                <div class="text-[12px] text-zen-t3 font-bold mb-1">Aporte Mensal Sugerido</div>
+                <div class="text-[18px] tabular-nums font-bold text-zen-t1" 
                      th:text="'R$ ' + ${#numbers.formatDecimal(aportesNecessarios.get(m.id), 1, 'POINT', 2, 'COMMA')}">R$ 0,00</div>
             </div>
         </div>
@@ -161,13 +161,13 @@
         <div class="mt-auto space-y-4">
           <div class="grid grid-cols-2 gap-3">
              <div class="bg-zen-surface2/50 rounded-2xl p-4 border border-black/5">
-                 <div class="text-[10px] text-zen-t3 uppercase font-bold mb-1">Já Tenho</div>
-                 <div class="text-[14px] font-mono font-bold text-zen-t1" 
+                 <div class="text-[12px] text-zen-t3 font-bold mb-1">Já Tenho</div>
+                 <div class="text-[14px] tabular-nums font-bold text-zen-t1" 
                       th:text="'R$ ' + ${#numbers.formatDecimal(m.valorAtual, 1, 'POINT', 2, 'COMMA')}">R$ 0,00</div>
              </div>
              <div class="bg-zen-surface2/50 rounded-2xl p-4 border border-black/5">
-                 <div class="text-[10px] text-zen-t3 uppercase font-bold mb-1">Faltam</div>
-                 <div class="text-[14px] font-mono font-bold text-zen-t1" 
+                 <div class="text-[12px] text-zen-t3 font-bold mb-1">Faltam</div>
+                 <div class="text-[14px] tabular-nums font-bold text-zen-t1" 
                       th:text="'R$ ' + ${#numbers.formatDecimal(m.valorAlvo.subtract(m.valorAtual), 1, 'POINT', 2, 'COMMA')}">R$ 0,00</div>
              </div>
           </div>
@@ -189,15 +189,15 @@
       </div>
 
       <!-- Empty State -->
-      <div th:if="${metas==null or #lists.isEmpty(metas)}" class="col-span-full py-24 text-center bg-zen-surface border-2 border-dashed border-zen-border rounded-[40px] flex flex-col items-center justify-center animate-[fade-up_.5s_ease_both]">
+      <div th:if="${metas==null or #lists.isEmpty(metas)}" class="col-span-full py-24 text-center bg-zen-surface border-2 border-dashed border-zen-border rounded-2xl flex flex-col items-center justify-center animate-[fade-up_.5s_ease_both]">
         <div class="w-20 h-20 bg-brand/5 rounded-full flex items-center justify-center text-brand mb-6 shadow-inner">
             <i data-lucide="target" class="w-10 h-10 opacity-30"></i>
         </div>
         <h3 class="font-serif text-[24px] font-medium text-zen-t1 mb-2">Sem metas para o futuro?</h3>
         <p class="text-zen-t3 max-w-xs mx-auto text-[14.5px] font-light mb-8">Defina seu primeiro grande objetivo e veja seu progresso ganhar vida.</p>
         <a th:href="@{/app/financeiro/metas/novo}"
-          class="bg-brand hover:bg-brand-h text-white px-8 py-3.5 rounded-2xl font-bold transition-all shadow-lg shadow-brand/20">
-          Começar minha jornada →
+          class="bg-brand hover:bg-brand-h text-white px-8 py-3.5 rounded-2xl font-bold transition-all shadow-lg">
+          Criar minha primeira meta
         </a>
       </div>
     </div>
@@ -295,10 +295,10 @@
         const aporteFmt = '€ ' + Number(s.aporteMensal).toLocaleString('pt-PT', { minimumFractionDigits: 0 });
         const alvoFmt   = '€ ' + Number(s.valorAlvo).toLocaleString('pt-PT', { minimumFractionDigits: 0 });
         return `
-          <div class="relative rounded-[20px] border p-6 flex flex-col gap-4 bg-zen-surface hover:shadow-md transition-shadow ${colors[idx]}">
+          <div class="relative rounded-xl border p-6 flex flex-col gap-4 bg-zen-surface hover:shadow-md transition-shadow ${colors[idx]}">
             <div class="flex items-start justify-between gap-2">
               <div>
-                <div class="text-[11px] font-bold ${accentText[idx]} uppercase tracking-widest mb-1">${s.natureza.replace('_', ' ')}</div>
+                <div class="text-[12px] font-bold ${accentText[idx]} mb-1">${s.natureza.replace('_', ' ')}</div>
                 <h3 class="text-[16px] font-bold text-zen-t1 leading-tight">${s.titulo}</h3>
               </div>
               <div class="${accentBg[idx]} rounded-xl px-3 py-1 text-[12px] font-bold ${accentText[idx]} shrink-0">${s.prazoMeses} meses</div>
@@ -306,12 +306,12 @@
             <p class="text-[12.5px] text-zen-t3 leading-relaxed">${s.justificativa}</p>
             <div class="grid grid-cols-2 gap-3 mt-auto">
               <div>
-                <div class="text-[10px] text-zen-t3 uppercase font-bold mb-0.5">Meta Alvo</div>
-                <div class="text-[15px] font-mono font-bold text-zen-t1">${alvoFmt}</div>
+                <div class="text-[12px] text-zen-t3 font-bold mb-0.5">Meta Alvo</div>
+                <div class="text-[15px] tabular-nums font-bold text-zen-t1">${alvoFmt}</div>
               </div>
               <div>
-                <div class="text-[10px] text-zen-t3 uppercase font-bold mb-0.5">Aporte Mensal</div>
-                <div class="text-[15px] font-mono font-bold ${accentText[idx]}">${aporteFmt}</div>
+                <div class="text-[12px] text-zen-t3 font-bold mb-0.5">Aporte Mensal</div>
+                <div class="text-[15px] tabular-nums font-bold ${accentText[idx]}">${aporteFmt}</div>
               </div>
             </div>
             <form action="/app/financeiro/metas/ai-criar" method="POST">
@@ -323,7 +323,7 @@
               <input type="hidden" name="natureza"     value="${s.natureza}">
               <input type="hidden" name="justificativa" value="${escapeHtml(s.justificativa)}">
               <button type="submit"
-                class="w-full mt-1 py-3 rounded-xl font-bold text-[13px] text-white bg-brand hover:bg-brand-h transition-colors shadow-sm shadow-brand/20">
+                class="w-full mt-1 py-3 rounded-xl font-bold text-[13px] text-white bg-brand hover:bg-brand-h transition-colors shadow-sm">
                 ✨ Criar esta Meta
               </button>
             </form>

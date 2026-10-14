@@ -1,238 +1,198 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org"
       th:replace="~{layout/layout :: layout(
-          pageTitle='Nova Conta',
+          pageTitle=${conta.id == null ? 'Nova conta' : 'Editar conta'},
           content=~{::main},
           pageStyles=~{::style},
           pageScripts=~{::script}
       )}"
       lang="pt-BR">
 <head>
-    <style th:fragment="pageStyles">
-        .glass-card {
-            background: rgba(255, 255, 255, 0.7);
-            backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.4);
+    <style th:fragment="style">
+        .check-row {
+            display: flex; align-items: center; gap: 12px; min-height: 52px; padding: 8px 12px;
+            border: 1px solid var(--border); border-radius: var(--r-md); cursor: pointer;
+            transition: background-color .15s ease;
         }
-        .form-input {
-            @apply w-full h-[58px] px-6 bg-zen-surface border border-zen-border rounded-[18px] text-zen-t1 text-[15px] focus:outline-none focus:ring-4 focus:ring-brand/5 focus:border-brand transition-all font-medium;
-        }
-        .form-label {
-            @apply block text-[11px] font-bold text-zen-t3 uppercase tracking-[0.1em] mb-2.5 ml-1;
-        }
+        .check-row:hover { background: var(--surface-h); }
+        .check-row input[type=checkbox] { width: 20px; height: 20px; accent-color: var(--brand); flex-shrink: 0; cursor: pointer; }
+        .form-section + .form-section { margin-top: 16px; }
     </style>
 </head>
 
 <body>
     <main th:fragment="content">
-        <div class="max-w-[1000px] mx-auto py-8">
-            
-            <div class="flex items-center justify-between mb-10 animate-[fade-up_.5s_ease_both]">
-                <div>
-                    <a th:href="@{/app/financeiro/contas}" class="inline-flex items-center gap-2 text-[14px] text-zen-t3 hover:text-zen-t1 transition-colors mb-4 group">
-                        <i data-lucide="arrow-left" class="w-4 h-4 group-hover:-translate-x-1 transition-transform"></i>
-                        Voltar ao Hub
-                    </a>
-                    <h1 class="font-serif text-[36px] font-medium text-zen-t1 tracking-tight" th:text="${conta.id == null ? 'Novo Lançamento' : 'Editar Lançamento'}">Novo Lançamento</h1>
-                </div>
-                <div class="hidden md:flex items-center gap-3 p-2 bg-zen-surface2 rounded-2xl border border-zen-border">
-                    <div class="w-10 h-10 rounded-xl bg-zen-surface shadow-sm flex items-center justify-center text-brand">
-                        <i data-lucide="shield-check"></i>
-                    </div>
-                    <div class="pr-4">
-                        <div class="text-[10px] uppercase font-bold text-zen-t3 tracking-wider">Segurança</div>
-                        <div class="text-[12px] font-medium text-zen-t1">Encriptação Avançada</div>
-                    </div>
-                </div>
+        <div class="max-w-[1040px] mx-auto w-full">
+
+            <a th:href="@{/app/financeiro/contas}"
+               class="inline-flex items-center gap-1.5 min-h-[44px] text-[14px] text-zen-t2 hover:text-zen-t1">
+                <i data-lucide="arrow-left" class="w-4 h-4"></i>
+                Voltar para contas
+            </a>
+
+            <div class="page-header !mt-1">
+                <h1 class="page-title" th:text="${conta.id == null ? 'Adicionar conta' : 'Editar conta'}">Adicionar conta</h1>
             </div>
 
-            <div class="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">
-                
-                <!-- ✍️ Form Column -->
-                <div class="lg:col-span-7 space-y-8 animate-[fade-up_.5s_ease_both_150ms]">
-                    <form th:action="@{/app/financeiro/contas/salvar}" th:object="${conta}" method="post" enctype="multipart/form-data" class="space-y-8" aria-label="Formulário de Lançamento">
-                        <input type="hidden" th:field="*{id}" />
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
 
-                        <!-- Error Banner -->
-                        <div th:if="${erroValidacao}" class="flex items-start gap-4 p-5 bg-rose-50 border border-rose-200 rounded-2xl animate-[fade-up_.3s_ease_both]">
-                            <div class="w-8 h-8 rounded-full bg-rose-100 flex items-center justify-center flex-shrink-0 mt-0.5">
-                                <i data-lucide="alert-triangle" class="w-4 h-4 text-rose-600"></i>
+                <form class="lg:col-span-7 min-w-0" th:action="@{/app/financeiro/contas/salvar}" th:object="${conta}"
+                      method="post" enctype="multipart/form-data" aria-label="Dados da conta">
+                    <input type="hidden" th:field="*{id}" />
+
+                    <div th:if="${erroValidacao}" role="alert"
+                         class="mb-4 card !border-[color:var(--red-b)] !bg-[color:var(--red-bg)] p-4 flex items-start gap-3">
+                        <i data-lucide="alert-triangle" class="w-5 h-5 mt-0.5 text-[color:var(--red)] shrink-0"></i>
+                        <div>
+                            <p class="text-[14px] font-medium text-zen-t1">Não foi possível salvar</p>
+                            <p class="text-[14px] text-zen-t2" th:text="${erroValidacao}">Mensagem de erro.</p>
+                        </div>
+                    </div>
+
+                    <section class="card p-5 md:p-6 form-section" aria-labelledby="sec-conta">
+                        <h2 id="sec-conta" class="text-[16px] font-semibold text-zen-t1 mb-4">A conta</h2>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div class="sm:col-span-2">
+                                <label class="field-label" for="inputDesc">Descrição</label>
+                                <input type="text" th:field="*{descricao}" id="inputDesc" class="field-control"
+                                       placeholder="Ex.: Aluguel de outubro" required autocomplete="off">
                             </div>
                             <div>
-                                <div class="text-[13px] font-bold text-rose-700 mb-0.5">Ação necessária</div>
-                                <p class="text-[12px] text-rose-600" th:text="${erroValidacao}"></p>
+                                <label class="field-label" for="inputValor">Valor</label>
+                                <div class="relative">
+                                    <span class="absolute left-3 top-1/2 -translate-y-1/2 text-zen-t3 text-[14px]" aria-hidden="true">R$</span>
+                                    <input type="number" step="0.01" min="0.01" inputmode="decimal" th:field="*{valor}"
+                                           id="inputValor" class="field-control !pl-10" placeholder="0,00" required>
+                                </div>
+                            </div>
+                            <div>
+                                <label class="field-label" for="inputData">Vencimento</label>
+                                <input type="date" th:field="*{dataVencimento}" id="inputData" class="field-control" required>
+                            </div>
+                            <div>
+                                <label class="field-label" for="inputTipo">Tipo</label>
+                                <select th:field="*{tipo}" id="inputTipo" class="field-control">
+                                    <option th:each="t : ${tipos}" th:value="${t}"
+                                            th:text="${t.name() == 'RECEITA' ? 'Receita (entrada)' : 'Despesa (saída)'}">Despesa</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="field-label" for="inputEscopo">Espaço</label>
+                                <select th:field="*{escopo}" id="inputEscopo" class="field-control">
+                                    <option th:each="escopo : ${escopos}" th:value="${escopo}"
+                                            th:text="${escopo.descricao}">Pessoal</option>
+                                </select>
                             </div>
                         </div>
-                        
-                        <!-- Basic Info -->
-                        <div class="bg-zen-surface border border-zen-border p-8 rounded-[32px] shadow-sm space-y-6">
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                <div class="md:col-span-2">
-                                    <label class="form-label" for="inputDesc">Descrição do Lançamento</label>
-                                    <input type="text" th:field="*{descricao}" id="inputDesc" class="form-input" placeholder="O que você está pagando ou recebendo?" required>
-                                </div>
-                                <div>
-                                    <label class="form-label" for="inputValor">Valor (BRL)</label>
-                                    <div class="relative">
-                                        <span class="absolute left-6 top-1/2 -translate-y-1/2 text-zen-t3 font-medium">R$</span>
-                                        <input type="number" step="0.01" th:field="*{valor}" id="inputValor" class="form-input pl-14" placeholder="0,00" required>
-                                    </div>
-                                </div>
-                                <div>
-                                    <label class="form-label" for="inputData">Data de Vencimento</label>
-                                    <input type="date" th:field="*{dataVencimento}" id="inputData" class="form-input" required>
-                                </div>
+                    </section>
+
+                    <section class="card p-5 md:p-6 form-section" aria-labelledby="sec-classif">
+                        <h2 id="sec-classif" class="text-[16px] font-semibold text-zen-t1 mb-4">Classificação</h2>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div>
+                                <label class="field-label" for="inputCat">Categoria</label>
+                                <select th:field="*{categoria}" id="inputCat" class="field-control">
+                                    <option value="">Sem categoria</option>
+                                    <option th:each="cat : ${categorias}" th:value="${cat.id}" th:text="${cat.nome}"
+                                            th:attr="data-escopo=${cat.escopo}"></option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="field-label" for="inputPrioridade">Prioridade</label>
+                                <select th:field="*{prioridade}" id="inputPrioridade" class="field-control">
+                                    <option th:each="p : ${prioridades}" th:value="${p}" th:text="${p.descricao}">Média</option>
+                                </select>
+                            </div>
+                            <div class="sm:col-span-2">
+                                <label class="field-label" for="inputAsset">Conta bancária ou carteira</label>
+                                <select th:field="*{asset}" id="inputAsset" class="field-control" aria-describedby="asset-hint">
+                                    <option value="">Nenhuma</option>
+                                    <option th:each="a : ${assets}" th:value="${a.id}" th:text="${a.name}"></option>
+                                </select>
+                                <p id="asset-hint" class="field-hint">Receitas somam no saldo da conta escolhida e despesas descontam dele.</p>
                             </div>
                         </div>
+                    </section>
 
-                        <!-- Details -->
-                        <div class="bg-zen-surface border border-zen-border p-8 rounded-[32px] shadow-sm space-y-6">
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                <div>
-                                    <label class="form-label" for="inputTipo">Tipo de Movimento</label>
-                                    <select th:field="*{tipo}" id="inputTipo" class="form-input appearance-none">
-                                        <option th:each="t : ${tipos}" th:value="${t}" th:text="${t}"></option>
-                                    </select>
-                                </div>
-                                <div>
-                                    <label class="form-label" for="inputCat">Categoria</label>
-                                    <select th:field="*{categoria}" id="inputCat" class="form-input appearance-none">
-                                        <option value="">Sem Categoria</option>
-                                        <option th:each="cat : ${categorias}" th:value="${cat.id}" th:text="${cat.nome}" th:attr="data-escopo=${cat.escopo}"></option>
-                                    </select>
-                                </div>
-                                <div class="md:col-span-2">
-                                    <label class="form-label" for="inputAsset">Conta Bancária / Carteira (Destino/Origem)</label>
-                                    <select th:field="*{asset}" id="inputAsset" class="form-input appearance-none">
-                                        <option value="">Selecionar conta</option>
-                                        <option th:each="a : ${assets}" th:value="${a.id}" th:text="${a.name}"></option>
-                                    </select>
-                                    <p class="text-[10px] text-zen-t3 mt-2 ml-1 italic">Sua Conta principal já vem selecionada. Entradas somam e despesas descontam do saldo automaticamente.</p>
-                                </div>
-                                <div class="md:col-span-2">
-                                    <label class="form-label">Prioridade & Escopo</label>
-                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                        <select th:field="*{prioridade}" class="form-input" aria-label="Selecionar Prioridade">
-                                            <option th:each="p : ${prioridades}" th:value="${p}" th:text="${p.descricao}"></option>
-                                        </select>
-                                        <select th:field="*{escopo}" id="inputEscopo" class="form-input" aria-label="Selecionar Espaço">
-                                            <option th:each="escopo : ${escopos}" th:value="${escopo}"
-                                                    th:text="${escopo.name() == 'NEGOCIO' ? 'Empresa (CNPJ)' : (escopo.name() == 'CASA' ? 'Casa' : 'Pessoal')}"></option>
-                                        </select>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+                    <section class="card p-5 md:p-6 form-section" aria-labelledby="sec-situacao">
+                        <h2 id="sec-situacao" class="text-[16px] font-semibold text-zen-t1 mb-4">Situação</h2>
+                        <div class="space-y-3">
+                            <label class="check-row" for="inputPaga">
+                                <input type="checkbox" th:field="*{paga}" id="inputPaga">
+                                <span>
+                                    <span class="block text-[14px] font-medium text-zen-t1">Já foi paga ou recebida</span>
+                                    <span class="block text-[13px] text-zen-t3">Marque se o dinheiro já saiu ou entrou.</span>
+                                </span>
+                            </label>
 
-                        <!-- Settings & Attachment -->
-                        <div class="bg-zen-surface border border-zen-border p-8 rounded-[32px] shadow-sm space-y-6">
-                            <div class="space-y-4">
-                                <label class="flex items-center gap-4 p-4 rounded-2xl border border-zen-border hover:bg-zen-surface2 transition-all cursor-pointer group">
-                                    <div class="w-10 h-10 rounded-full bg-zen-surface2 group-hover:bg-brand/10 text-zen-t3 group-hover:text-brand flex items-center justify-center transition-colors">
-                                        <i data-lucide="check"></i>
-                                    </div>
-                                    <div class="flex-1">
-                                        <div class="text-[14px] font-bold text-zen-t1">Já foi processado</div>
-                                        <div class="text-[12px] text-zen-t3">Marcar como pago ou recebido agora</div>
-                                    </div>
-                                    <input type="checkbox" th:field="*{paga}" id="inputPaga" class="w-6 h-6 border-2 border-zen-border rounded-lg text-brand focus:ring-brand transition-all cursor-pointer">
-                                </label>
+                            <label class="check-row" for="checkRecorrente">
+                                <input type="checkbox" id="checkRecorrente" aria-controls="divRecorrencia">
+                                <span>
+                                    <span class="block text-[14px] font-medium text-zen-t1">Repetir nos próximos meses</span>
+                                    <span class="block text-[13px] text-zen-t3">Cria a mesma conta nos meses seguintes.</span>
+                                </span>
+                            </label>
 
-                                <label class="flex items-center gap-4 p-4 rounded-2xl border border-zen-border hover:bg-zen-surface2 transition-all cursor-pointer group" onclick="document.getElementById('divRecorrencia').classList.toggle('hidden')">
-                                    <div class="w-10 h-10 rounded-full bg-zen-surface2 group-hover:bg-brand/10 text-zen-t3 group-hover:text-brand flex items-center justify-center transition-colors">
-                                        <i data-lucide="repeat"></i>
-                                    </div>
-                                    <div class="flex-1">
-                                        <div class="text-[14px] font-bold text-zen-t1">Lançamento Recorrente</div>
-                                        <div class="text-[12px] text-zen-t3">Repetir automaticamente este valor nos próximos meses</div>
-                                    </div>
-                                    <input type="checkbox" id="checkRecorrente" class="w-6 h-6 border-2 border-zen-border rounded-lg text-brand focus:ring-brand transition-all cursor-pointer">
-                                </label>
-
-                                <div id="divRecorrencia" class="hidden animate-[fade-up_.3s_ease_both] p-6 bg-zen-surface2 rounded-2xl border border-zen-border mt-2">
-                                    <label class="form-label text-brand" for="inputMeses">Duração do Ciclo (Meses)</label>
-                                    <input type="number" id="inputMeses" name="mesesRecorrencia" class="form-input" placeholder="Ex: 12 meses">
-                                </div>
-                            </div>
-
-                            <div class="pt-4">
-                                <label class="form-label" for="archivoInput">Comprovante Digital (Opcional)</label>
-                                <label class="w-full flex flex-col items-center justify-center p-10 border-2 border-dashed border-brand/20 rounded-[24px] bg-brand/5 hover:bg-brand/10 transition-all cursor-pointer group">
-                                    <input type="file" id="archivoInput" name="arquivo" class="hidden" onchange="document.getElementById('fileInfo').textContent = this.files[0].name">
-                                    <div class="w-14 h-14 rounded-full bg-brand flex items-center justify-center text-white shadow-xl shadow-brand/20 mb-4 group-hover:scale-110 transition-transform">
-                                        <i data-lucide="upload-cloud"></i>
-                                    </div>
-                                    <div class="text-[15px] font-bold text-zen-t1" id="fileInfo">Escolher arquivo ou arrastar</div>
-                                    <div class="text-[12px] text-zen-t3 mt-1">PDF, PNG ou JPG até 5MB</div>
-                                </label>
+                            <div id="divRecorrencia" class="hidden">
+                                <label class="field-label" for="inputMeses">Por quantos meses?</label>
+                                <input type="number" id="inputMeses" name="mesesRecorrencia" min="1" max="60"
+                                       class="field-control sm:max-w-[200px]" placeholder="Ex.: 12" inputmode="numeric">
                             </div>
                         </div>
 
-                        <div class="flex items-center gap-4 pt-4">
-                            <button type="submit" class="flex-1 h-[64px] bg-brand hover:bg-brand-h text-white rounded-[24px] font-bold text-[16px] shadow-xl shadow-brand/20 transition-all active:scale-95 flex items-center justify-center gap-3 group">
-                                Salvar Transação
-                                <i data-lucide="arrow-right" class="w-5 h-5 group-hover:translate-x-1 transition-transform"></i>
-                            </button>
-                            <a th:href="@{/app/financeiro/contas}" class="px-8 h-[64px] bg-zen-surface border border-zen-border text-zen-t2 rounded-[24px] font-bold text-[16px] hover:bg-zen-surface2 transition-all flex items-center justify-center">Cancelar</a>
+                        <div class="mt-5">
+                            <label class="field-label" for="archivoInput">Comprovante (opcional)</label>
+                            <label for="archivoInput"
+                                   class="flex items-center gap-3 min-h-[52px] px-3 border border-dashed border-zen-border2 rounded-md cursor-pointer hover:bg-zen-surfaceH transition-colors">
+                                <i data-lucide="paperclip" class="w-4 h-4 text-zen-t3 shrink-0"></i>
+                                <span id="fileInfo" class="text-[14px] text-zen-t2 truncate">Escolher arquivo (PDF, PNG ou JPG, até 5 MB)</span>
+                            </label>
+                            <input type="file" id="archivoInput" name="arquivo" class="sr-only" accept=".pdf,.png,.jpg,.jpeg">
                         </div>
-                    </form>
-                </div>
+                    </section>
 
-                <!-- 👁️ Preview Column -->
-                <div class="lg:col-span-5 sticky top-8 animate-[fade-up_.5s_ease_both_300ms]">
-                    <div class="bg-zen-t1 text-white p-10 rounded-[40px] shadow-2xl relative overflow-hidden group">
-                        <div class="relative z-10">
-                            <div class="flex items-center justify-between mb-12">
-                                <div class="w-14 h-14 rounded-2xl bg-zen-surface/10 backdrop-blur-md flex items-center justify-center text-brand">
-                                    <i data-lucide="dollar-sign" class="w-8 h-8"></i>
-                                </div>
-                                <div class="text-right">
-                                    <div class="text-[10px] uppercase font-bold tracking-[.2em] text-white/40 mb-1">Status do Lançamento</div>
-                                    <div id="prevStatus" class="text-[12px] font-bold px-3 py-1 rounded-full bg-zen-surface/10 text-brand inline-block">PENDENTE</div>
-                                </div>
-                            </div>
+                    <div class="flex flex-col-reverse sm:flex-row sm:justify-end gap-3 mt-6">
+                        <a th:href="@{/app/financeiro/contas}" class="btn-secondary">Cancelar</a>
+                        <button type="submit" class="btn-primary"
+                                th:text="${conta.id == null ? 'Salvar conta' : 'Salvar alterações'}">Salvar conta</button>
+                    </div>
+                </form>
 
-                            <div class="space-y-1">
-                                <div id="prevDesc" class="font-serif text-[28px] font-medium leading-tight mb-2">Descrição da Conta</div>
-                                <div class="flex items-center gap-3 text-white/50 text-[14px]">
+                <!-- Como vai aparecer -->
+                <aside class="lg:col-span-5 lg:sticky lg:top-[80px]" aria-labelledby="prev-titulo">
+                    <div class="card p-5 md:p-6">
+                        <h2 id="prev-titulo" class="text-[14px] text-zen-t3">Como vai aparecer</h2>
+                        <div class="mt-4 flex items-start justify-between gap-4">
+                            <div class="min-w-0">
+                                <p id="prevDesc" class="text-[18px] font-medium text-zen-t1 break-words">Descrição da conta</p>
+                                <p class="mt-1 text-[14px] text-zen-t2">
                                     <span id="prevData">Hoje</span>
-                                    <span class="w-1.5 h-1.5 rounded-full bg-zen-surface/20"></span>
-                                    <span id="prevCat" class="text-brand font-bold uppercase tracking-widest text-[11px]">GERAL</span>
-                                </div>
+                                    <span aria-hidden="true">·</span>
+                                    <span id="prevCat">Sem categoria</span>
+                                </p>
                             </div>
-
-                            <div class="mt-12 pt-10 border-t border-white/10 flex items-end justify-between">
-                                <div>
-                                    <div class="text-[11px] uppercase font-bold tracking-widest text-white/40 mb-1">Valor Total</div>
-                                    <div id="prevValor" class="font-serif text-[40px] font-semibold">R$ 0,00</div>
-                                </div>
-                                <div id="prevTipoLabel" class="text-[12px] font-bold text-rose-400 uppercase tracking-widest bg-rose-400/10 px-4 py-2 rounded-xl">SAÍDA</div>
-                            </div>
+                            <span id="prevStatus" class="badge badge-amber shrink-0">Pendente</span>
                         </div>
-                        
-                        <div class="absolute -bottom-20 -right-20 w-60 h-60 bg-brand/20 blur-[100px] rounded-full group-hover:scale-125 transition-transform duration-1000"></div>
-                    </div>
-
-                    <div class="mt-8 p-8 bg-brand/5 border border-brand/10 rounded-[32px]">
-                        <div class="flex items-center gap-4 mb-4">
-                            <div class="w-10 h-10 rounded-full bg-brand text-white flex items-center justify-center">
-                                <i data-lucide="brain-circuit" class="w-5 h-5"></i>
+                        <div class="mt-6 pt-4 border-t border-zen-border flex items-end justify-between gap-4">
+                            <div>
+                                <p class="text-[13px] text-zen-t3">Valor</p>
+                                <p id="prevValor" class="text-[28px] font-semibold text-zen-t1">R$ 0,00</p>
                             </div>
-                            <h4 class="text-[16px] font-serif font-medium text-zen-t1">Oráculo FinGen</h4>
+                            <span id="prevTipoLabel" class="badge badge-gray">Despesa</span>
                         </div>
-                        <p class="text-[14px] text-zen-t2 leading-relaxed">
-                            "Mantenha este registro atualizado para que seu fluxo de caixa preditivo reflita sua realidade financeira com precisão."
-                        </p>
                     </div>
-                </div>
+                </aside>
             </div>
         </div>
     </main>
 
     <script th:fragment="script">
         document.addEventListener('DOMContentLoaded', () => {
-            const scopeSelect = document.getElementById('inputEscopo');
-            const categorySelect = document.getElementById('inputCat');
+            const $ = (id) => document.getElementById(id);
+            const scopeSelect = $('inputEscopo');
+            const categorySelect = $('inputCat');
+
+            // Só mostra categorias do espaço escolhido.
             const syncCategories = () => {
                 const selectedScope = scopeSelect.value;
                 let selectedStillVisible = !categorySelect.value;
@@ -245,47 +205,53 @@
                 });
                 if (!selectedStillVisible) categorySelect.value = '';
             };
-            scopeSelect.addEventListener('change', () => { syncCategories(); up(); });
-            syncCategories();
 
-            const up = () => {
-                const desc = document.getElementById('inputDesc').value || 'Descrição da Conta';
-                const valor = document.getElementById('inputValor').value || '0,00';
-                const data = document.getElementById('inputData').value;
-                const tipo = document.getElementById('inputTipo').value;
-                const paga = document.getElementById('inputPaga').checked;
-                const catElement = document.getElementById('inputCat');
-                const cat = catElement.selectedIndex >= 0 ? catElement.options[catElement.selectedIndex].text : 'Sem Categoria';
+            const BADGE = { pendente: 'badge badge-amber shrink-0', paga: 'badge badge-green shrink-0',
+                            receita: 'badge badge-green', despesa: 'badge badge-gray' };
 
-                document.getElementById('prevDesc').innerText = desc;
-                document.getElementById('prevValor').innerText = 'R$ ' + parseFloat(valor || 0).toLocaleString('pt-BR', {minimumFractionDigits: 2});
-                document.getElementById('prevCat').innerText = cat === 'Sem Categoria' ? 'GERAL' : cat.toUpperCase();
-                
-                if(data) {
-                    const d = new Date(data + 'T12:00:00');
-                    document.getElementById('prevData').innerText = d.toLocaleDateString('pt-BR', {day:'numeric', month:'short'});
-                }
+            const update = () => {
+                const valor = parseFloat($('inputValor').value || 0);
+                $('prevDesc').textContent = $('inputDesc').value || 'Descrição da conta';
+                $('prevValor').textContent = 'R$ ' + valor.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
-                const s = document.getElementById('prevStatus');
-                s.innerText = paga ? 'PROCESSADO' : 'PENDENTE';
-                s.className = paga ? 'text-[12px] font-bold px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-400 inline-block' 
-                                   : 'text-[12px] font-bold px-3 py-1 rounded-full bg-zen-surface/10 text-brand inline-block';
+                const opt = categorySelect.options[categorySelect.selectedIndex];
+                $('prevCat').textContent = opt && opt.value ? opt.text : 'Sem categoria';
 
-                const tl = document.getElementById('prevTipoLabel');
-                tl.innerText = tipo === 'RECEITA' ? 'RECEITA' : 'DESPESA';
-                tl.className = (tipo === 'RECEITA') 
-                    ? 'text-[12px] font-bold text-emerald-400 uppercase tracking-widest bg-emerald-400/10 px-4 py-2 rounded-xl'
-                    : 'text-[12px] font-bold text-rose-400 uppercase tracking-widest bg-rose-400/10 px-4 py-2 rounded-xl';
+                const data = $('inputData').value;
+                $('prevData').textContent = data
+                    ? new Date(data + 'T12:00:00').toLocaleDateString('pt-BR', { day: 'numeric', month: 'short' })
+                    : 'Hoje';
+
+                const paga = $('inputPaga').checked;
+                const receita = $('inputTipo').value === 'RECEITA';
+                const status = $('prevStatus');
+                status.textContent = paga ? (receita ? 'Recebida' : 'Paga') : 'Pendente';
+                status.className = paga ? BADGE.paga : BADGE.pendente;
+
+                const tipo = $('prevTipoLabel');
+                tipo.textContent = receita ? 'Receita' : 'Despesa';
+                tipo.className = receita ? BADGE.receita : BADGE.despesa;
             };
 
-            ['inputDesc', 'inputValor', 'inputData', 'inputTipo', 'inputCat', 'inputPaga', 'inputEscopo'].forEach(id => {
-                const el = document.getElementById(id);
-                if(el) el.addEventListener('input', up);
-                if(el) el.addEventListener('change', up);
+            scopeSelect.addEventListener('change', () => { syncCategories(); update(); });
+            ['inputDesc', 'inputValor', 'inputData', 'inputTipo', 'inputCat', 'inputPaga'].forEach(id => {
+                const el = $(id);
+                if (el) { el.addEventListener('input', update); el.addEventListener('change', update); }
             });
-            up();
 
-            lucide.createIcons();
+            // Recorrência: um único listener no checkbox (o label já repassa o clique).
+            $('checkRecorrente').addEventListener('change', (e) => {
+                $('divRecorrencia').classList.toggle('hidden', !e.target.checked);
+                if (!e.target.checked) $('inputMeses').value = '';
+            });
+
+            $('archivoInput').addEventListener('change', (e) => {
+                $('fileInfo').textContent = e.target.files[0] ? e.target.files[0].name
+                    : 'Escolher arquivo (PDF, PNG ou JPG, até 5 MB)';
+            });
+
+            syncCategories();
+            update();
         });
     </script>
 </body>

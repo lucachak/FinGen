@@ -286,6 +286,9 @@ public class DashboardController {
         model.addAttribute("quantidadeVencendo7Dias", vencendoEmSeteDias.quantidade());
         model.addAttribute("totalVencendo7Dias", vencendoEmSeteDias.total());
         model.addAttribute("temDadosFinanceiros", dashboardQuery.possuiContas(usuarioLogado, EscopoTransacao.PESSOAL));
+        // Posição de "hoje" na faixa do mês (dashboard)
+        model.addAttribute("diaDoMes", hoje.getDayOfMonth());
+        model.addAttribute("diasNoMes", mesAtual.lengthOfMonth());
 
         return "dashboard/index";
     }

@@ -63,7 +63,8 @@ public class AuthController {
             return "redirect:/app/dashboard";
             
         } catch (Exception e) {
-            redirectAttributes.addFlashAttribute("erro", "Credenciais inválidas.");
+            redirectAttributes.addFlashAttribute("erro", "E-mail ou senha incorretos. Confira os dados e tente de novo.");
+            redirectAttributes.addFlashAttribute("emailTentado", email);
             return "redirect:/auth/login";
         }
     }
