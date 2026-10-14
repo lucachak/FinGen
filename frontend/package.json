@@ -1,0 +1,12 @@
+{
+  "name": "fingen-frontend",
+  "private": true,
+  "description": "Compila o CSS do FinGen (Tailwind). O resultado fica em src/main/resources/static/css/app.css e é versionado, então o build Maven não precisa de Node.",
+  "scripts": {
+    "build": "tailwindcss -c tailwind.config.js -i src/app.css -o ../src/main/resources/static/css/app.css --minify",
+    "watch": "tailwindcss -c tailwind.config.js -i src/app.css -o ../src/main/resources/static/css/app.css --watch"
+  },
+  "devDependencies": {
+    "tailwindcss": "3.4.17"
+  }
+}
