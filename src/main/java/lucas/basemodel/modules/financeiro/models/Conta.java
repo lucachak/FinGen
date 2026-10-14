@@ -18,7 +18,11 @@ import java.time.LocalDate;
 @NoArgsConstructor   // Gera o construtor vazio exigido pelo JPA/Hibernate
 @AllArgsConstructor  // Gera o construtor com todos os argumentos exigido pelo @Builder
 @Entity
-@Table(name = "contas")
+@Table(name = "contas", indexes = {
+        @Index(name = "idx_contas_resp_vencimento", columnList = "responsavel_id, data_vencimento"),
+        @Index(name = "idx_contas_resp_paga_pagamento", columnList = "responsavel_id, paga, data_pagamento"),
+        @Index(name = "idx_contas_resp_escopo_tipo", columnList = "responsavel_id, escopo, tipo")
+})
 public class Conta {
 
     @Id
