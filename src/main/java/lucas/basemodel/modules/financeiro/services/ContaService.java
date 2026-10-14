@@ -202,12 +202,6 @@ public class ContaService {
                 .orElse(null);
     }
 
-    public List<Conta> listarTodas(User responsavel) {
-        if ("ROLE_ADMIN".equals(responsavel.getRole())) return contaRepository.findAll();
-        // Fallback for Admin, otherwise empty since we don't have a findByResponsavel global list method yet
-        return new ArrayList<>(); // You might want to create a findByResponsavel in Repo if needed, but we rarely list ALL accounts without filters.
-    }
-
     // Método perfeito para popular o seu dashboard com as contas do mês atual!
     public List<Conta> listarContasDoMesAtual(User responsavel) {
         LocalDate hoje = LocalDate.now();

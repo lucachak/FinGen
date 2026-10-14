@@ -36,6 +36,7 @@ public class OrcamentoService {
     private final UsuarioRepository usuarioRepository;
     private final CategoriaService categoriaService;
     private final EspacoFinanceiroService espacoFinanceiroService;
+    private final DashboardQueryService dashboardQuery;
 
     public List<OrcamentoResponse> listarComConsumo(String email, EscopoTransacao escopo) {
         User user = findUser(email);
@@ -43,13 +44,12 @@ public class OrcamentoService {
         List<Orcamento> orcamentos = orcamentoRepository.findByResponsavel(user).stream()
                 .filter(o -> o.getCategoria() != null && o.getCategoria().getEscopo() == escopo)
                 .toList();
-        java.time.YearMonth mesAtual = java.time.YearMonth.now();
-        LocalDate inicio = mesAtual.atDay(1);
-        LocalDate fimExclusivo = mesAtual.plusMonths(1).atDay(1);
+        // 1 consulta agregada por categoria (antes: 1 consulta por orçamento)
+        Map<Long, BigDecimal> gastos = dashboardQuery.gastosPagosPorCategoria(user,
+                orcamentos.stream().map(o -> o.getCategoria().getId()).toList(), java.time.YearMonth.now());
 
         return orcamentos.stream().map(orc -> {
-            BigDecimal gasto = contaRepository.sumGastosPorCategoriaMesAno(user, orc.getCategoria(), inicio, fimExclusivo);
-            if (gasto == null) gasto = BigDecimal.ZERO;
+            BigDecimal gasto = gastos.getOrDefault(orc.getCategoria().getId(), BigDecimal.ZERO);
             BigDecimal limite = orc.getLimiteMensal() != null ? orc.getLimiteMensal() : BigDecimal.ZERO;
             double percentual = limite.compareTo(BigDecimal.ZERO) > 0
                     ? gasto.multiply(BigDecimal.valueOf(100)).divide(limite, 2, RoundingMode.HALF_UP).doubleValue()

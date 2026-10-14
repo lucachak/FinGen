@@ -28,9 +28,7 @@ public class AiService {
 
     public AiChatResponse chat(String message, String email) {
         User user = usuarioRepository.findByEmail(email).orElseThrow();
-        List<Conta> contas = contaRepository.findAll().stream()
-                .filter(c -> c.getResponsavel() != null && c.getResponsavel().getId().equals(user.getId()))
-                .toList();
+        List<Conta> contas = contaRepository.findAllByResponsavelOrderByDataVencimentoAsc(user);
 
         List<Map<String, String>> history = List.of(Map.of("role", "user", "content", message));
         String reply = openRouterService.chat(history, user, contas);
