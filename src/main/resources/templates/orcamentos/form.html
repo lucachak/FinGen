@@ -145,7 +145,7 @@
     <div class="form-hero opacity-0 translate-y-4">
       <div class="form-section">
         <h2 th:text="${orcamento.id == null ? 'Novo Planejamento' : 'Refinar Orçamento'}">Novo Planejamento</h2>
-        <p>Defina limites saudáveis para suas categorias de gastos. Nossa IA irá monitorar cada transação para garantir que você permaneça no controle.</p>
+        <p>Defina quanto quer gastar em cada categoria por mês. O FinGen mostra quanto já foi usado e destaca quando você chega perto do limite.</p>
         <div class="mb-5 inline-flex px-3 py-2 rounded-lg bg-teal-50 text-teal-800 text-xs font-bold" th:text="'Espaço: ' + ${escopoSelecionado.descricao}"></div>
         
         <form th:action="@{/app/financeiro/orcamentos/salvar}" th:object="${orcamento}" method="post">

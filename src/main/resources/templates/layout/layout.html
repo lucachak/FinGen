@@ -26,17 +26,11 @@
   <meta property="og:description" content="FinGen - Seu patrimônio sob controlo com inteligência artificial.">
   <meta property="og:type" content="website">
   <link rel="dns-prefetch" href="https://unpkg.com">
-  <link rel="dns-prefetch" href="https://fonts.googleapis.com">
 
   <!-- HTMX -->
   <script src="https://unpkg.com/htmx.org@1.9.10"></script>
 
   <!-- Fonts -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link
-    href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600&family=DM+Mono:wght@400;500&display=swap"
-    rel="stylesheet">
 
   <!-- Favicons -->
   <link rel="icon" type="image/png" th:href="@{/favicon-96x96.png}" sizes="96x96" />
@@ -108,6 +102,12 @@
     }
 
     document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeSidebar(); });
+
+    // Confirmação declarativa: <form data-confirm="Excluir a meta X?"> — o texto vem escapado pelo Thymeleaf.
+    document.addEventListener('submit', (e) => {
+      const msg = e.target && e.target.dataset ? e.target.dataset.confirm : null;
+      if (msg && !window.confirm(msg)) e.preventDefault();
+    });
 
     document.addEventListener('htmx:beforeSwap', () => {
       if (window.gsapCtx) window.gsapCtx.revert();

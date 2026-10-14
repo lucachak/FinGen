@@ -87,7 +87,7 @@
               <i data-lucide="pencil" class="w-4 h-4"></i>
             </a>
             <form th:action="@{/app/financeiro/orcamentos/excluir/{id}(id=${orc.id})}" method="post" class="m-0"
-                  th:attr="onsubmit='return confirm(&quot;Remover o limite de ' + ${orc.categoria.nome} + '? As contas não são apagadas.&quot;)'">
+                  th:attr="data-confirm='Remover o limite de ' + ${orc.categoria.nome} + '? As contas não são apagadas.'">
               <button type="submit" class="icon-btn" th:attr="aria-label='Remover limite de ' + ${orc.categoria.nome}">
                 <i data-lucide="trash-2" class="w-4 h-4"></i>
               </button>

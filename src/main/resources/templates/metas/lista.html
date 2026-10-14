@@ -4,336 +4,217 @@
 
 <head>
   <style th:fragment="style">
-    .bento-card {
-      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    .spinner-sm {
+      display: inline-block; width: 16px; height: 16px; margin-right: 8px; vertical-align: text-bottom;
+      border: 2px solid var(--border-2); border-left-color: var(--brand); border-radius: 50%;
+      animation: spin 1s linear infinite;
     }
-    .bento-card:hover {
-      transform: translateY(-8px);
-      box-shadow: 0 20px 40px rgba(20, 184, 166, 0.08);
-    }
-    .progress-star {
-      stroke-dasharray: 100;
-      stroke-dashoffset: 100;
-      transition: stroke-dashoffset 1.5s cubic-bezier(0.4, 0, 0.2, 1);
-    }
-    .card-gradient-1 { background: linear-gradient(135deg, #14b8a6 0%, #0d9488 100%); }
-    .card-gradient-2 { background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%); }
-    .card-gradient-3 { background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); }
+    @keyframes spin { 100% { transform: rotate(360deg); } }
   </style>
 </head>
 
 <body>
-  <main>
-    <!-- Header Hero Section -->
-    <div class="mb-8 flex flex-col md:flex-row md:items-end justify-between gap-6">
-      <div>
-        <h1 class="font-serif text-[40px] md:text-[48px] font-medium text-zen-t1 tracking-tight leading-none mb-3">Seu Mural de <span class="text-brand">Conquistas</span></h1>
-        <p class="text-[16px] text-zen-t3 font-light tracking-wide max-w-md">Transforme sonhos em metas e metas em realidade. Cada passo conta para o seu futuro.</p>
+  <main class="max-w-[1200px] mx-auto w-full">
+
+    <div class="page-header">
+      <div class="min-w-0">
+        <h1 class="page-title">Metas</h1>
+        <p class="page-subtitle">Defina quanto quer juntar e até quando. O FinGen mostra o progresso e o aporte mensal necessário.</p>
       </div>
-      <div class="flex items-center gap-3">
-        <button id="btn-ia-sugerir"
-                onclick="ativarSugestaoIA()"
-                class="inline-flex items-center justify-center gap-2 px-6 py-4 bg-zen-surface border border-zen-border hover:border-brand text-zen-t1 hover:text-brand rounded-2xl font-semibold transition-all group">
-          <i data-lucide="sparkles" class="w-5 h-5 text-brand group-hover:scale-110 transition-transform"></i>
-          IA Sugerir Metas
+      <div class="flex flex-wrap gap-2 justify-end">
+        <button id="btn-ia-sugerir" type="button" onclick="ativarSugestaoIA()" class="btn-secondary">
+          <i data-lucide="sparkles" class="w-4 h-4"></i>
+          Sugerir metas com IA
         </button>
-        <a th:href="@{/app/financeiro/metas/novo}" class="inline-flex items-center justify-center gap-3 px-8 py-4 bg-brand hover:bg-brand-h text-white rounded-2xl font-bold transition-all shadow-lg group">
-          <i data-lucide="plus" class="w-5 h-5 group-hover:rotate-90 transition-transform"></i>
-          Nova Meta
+        <a th:href="@{/app/financeiro/metas/novo}" class="btn-primary">
+          <i data-lucide="plus" class="w-4 h-4"></i>
+          Adicionar meta
         </a>
       </div>
     </div>
 
-    <!-- AI Suggestions Panel -->
-    <div id="painel-ia" class="hidden mb-10">
-      <!-- Loading skeleton -->
-      <div id="ia-loading" class="hidden bg-zen-surface border border-zen-border rounded-2xl p-8">
-        <div class="flex items-center gap-3 mb-6">
-          <div class="w-8 h-8 rounded-full bg-brand/10 flex items-center justify-center">
-            <i data-lucide="brain-circuit" class="w-4 h-4 text-brand animate-pulse"></i>
-          </div>
-          <div>
-            <div class="text-[14px] font-bold text-zen-t1">Consultor FinGen a analisar o seu perfil…</div>
-            <div class="text-[12px] text-zen-t3">Isto pode demorar alguns segundos</div>
-          </div>
-        </div>
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div th:each="i : ${#numbers.sequence(1, 3)}" class="h-44 bg-zen-surface2 rounded-2xl animate-pulse"></div>
-        </div>
+    <!-- Sugestões da IA -->
+    <section id="painel-ia" class="hidden mb-6" aria-live="polite" aria-labelledby="ia-titulo">
+      <div id="ia-loading" class="hidden card p-5" role="status">
+        <p id="ia-titulo" class="text-[15px] font-medium text-zen-t1">
+          <span class="spinner-sm" aria-hidden="true"></span>Analisando seu perfil
+        </p>
+        <p class="mt-1 text-[14px] text-zen-t2">Isso pode levar alguns segundos.</p>
       </div>
-      <!-- Results -->
       <div id="ia-results" class="hidden">
-        <div class="flex items-center gap-3 mb-5">
-          <div class="w-8 h-8 rounded-full bg-brand/10 flex items-center justify-center">
-            <i data-lucide="sparkles" class="w-4 h-4 text-brand"></i>
+        <h2 class="text-[16px] font-semibold text-zen-t1">Sugestões do assistente</h2>
+        <p class="mt-1 mb-3 text-[14px] text-zen-t2">Baseadas na sua renda, nos seus investimentos e no seu perfil. Revise antes de criar.</p>
+        <div id="ia-cards" class="grid grid-cols-1 md:grid-cols-3 gap-4"></div>
+      </div>
+      <div id="ia-error" class="hidden notice notice-err" role="alert">
+        <i data-lucide="alert-circle" class="w-5 h-5 shrink-0 mt-0.5"></i>
+        <span>Não foi possível obter sugestões agora. Verifique a conexão e tente de novo.</span>
+      </div>
+    </section>
+
+    <!-- Resumo -->
+    <section class="card grid grid-cols-1 sm:grid-cols-3 divide-y sm:divide-y-0 sm:divide-x divide-zen-border mb-6" aria-label="Resumo das metas">
+      <div class="p-5">
+        <p class="text-[13px] text-zen-t3">Metas em andamento</p>
+        <p class="mt-1 text-[24px] font-semibold text-zen-t1" th:text="${metas != null ? metas.size() : 0}">0</p>
+      </div>
+      <div class="p-5">
+        <p class="text-[13px] text-zen-t3">Valor das metas</p>
+        <p class="mt-1 text-[24px] font-semibold text-zen-t1"
+           th:text="'R$ ' + ${#numbers.formatDecimal(totalAlmejado != null ? totalAlmejado : 0, 1, 'POINT', 2, 'COMMA')}">R$ 0,00</p>
+      </div>
+      <div class="p-5">
+        <p class="text-[13px] text-zen-t3">Já guardado</p>
+        <p class="mt-1 text-[24px] font-semibold amount-in"
+           th:text="'R$ ' + ${#numbers.formatDecimal(totalPoupado != null ? totalPoupado : 0, 1, 'POINT', 2, 'COMMA')}">R$ 0,00</p>
+        <p class="mt-1 text-[13px] text-zen-t2" th:if="${totalAlmejado != null and totalAlmejado.signum() > 0}"
+           th:text="${#numbers.formatDecimal(totalPoupado.multiply(new java.math.BigDecimal('100')).divide(totalAlmejado, 0, T(java.math.RoundingMode).HALF_UP), 1, 'POINT', 0, 'COMMA')} + '% do total das metas'">0% do total das metas</p>
+      </div>
+    </section>
+
+    <!-- Metas -->
+    <ul class="list-none p-0 m-0 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4" th:unless="${metas == null or #lists.isEmpty(metas)}">
+      <li th:each="m : ${metas}" th:id="'goal-' + ${m.id}" class="card p-5 flex flex-col"
+          th:with="pct=${percentuais.get(m.id).intValue()}">
+        <div class="flex items-start justify-between gap-3">
+          <div class="flex items-center gap-3 min-w-0">
+            <span class="w-10 h-10 rounded-lg bg-zen-surface2 border border-zen-border flex items-center justify-center text-brand shrink-0" aria-hidden="true">
+              <i th:data-lucide="${m.icone}" class="w-5 h-5"></i>
+            </span>
+            <div class="min-w-0">
+              <h2 class="text-[16px] font-semibold text-zen-t1 truncate" th:text="${m.titulo}">Meta</h2>
+              <p class="text-[13px] text-zen-t3" th:text="${m.natureza.descricao}">Natureza</p>
+            </div>
+          </div>
+          <span class="badge shrink-0" th:classappend="${m.status == 'CONCLUIDO'} ? 'badge-green' : 'badge-gray'"
+                th:text="${m.status == 'CONCLUIDO' ? 'Atingida' : 'Em andamento'}">Em andamento</span>
+        </div>
+
+        <div class="mt-5 flex items-baseline justify-between gap-3">
+          <p class="text-[22px] font-semibold text-zen-t1"
+             th:text="'R$ ' + ${#numbers.formatDecimal(m.valorAtual, 1, 'POINT', 2, 'COMMA')}">R$ 0,00</p>
+          <p class="text-[14px] text-zen-t2"
+             th:text="'de R$ ' + ${#numbers.formatDecimal(m.valorAlvo, 1, 'POINT', 2, 'COMMA')}">de R$ 0,00</p>
+        </div>
+        <div class="meter mt-2" role="progressbar" th:attr="aria-valuenow=${pct > 100 ? 100 : pct}, aria-label='Progresso da meta ' + ${m.titulo}"
+             aria-valuemin="0" aria-valuemax="100">
+          <div class="meter-fill" th:style="|width:${pct > 100 ? 100 : pct}%|"></div>
+        </div>
+        <p class="mt-1 text-[13px] text-zen-t3" th:text="${pct} + '% concluída'">0% concluída</p>
+
+        <dl class="mt-4 grid grid-cols-2 gap-3 text-[14px]">
+          <div>
+            <dt class="text-[13px] text-zen-t3">Faltam</dt>
+            <dd class="font-medium text-zen-t1"
+                th:text="'R$ ' + ${#numbers.formatDecimal(m.valorAlvo.subtract(m.valorAtual), 1, 'POINT', 2, 'COMMA')}">R$ 0,00</dd>
           </div>
           <div>
-            <div class="text-[14px] font-bold text-zen-t1">Sugestões Personalizadas pela IA</div>
-            <div class="text-[12px] text-zen-t3">Baseadas no seu rendimento, investimentos e perfil financeiro</div>
+            <dt class="text-[13px] text-zen-t3">Aporte mensal sugerido</dt>
+            <dd class="font-medium text-zen-t1"
+                th:text="'R$ ' + ${#numbers.formatDecimal(aportesNecessarios.get(m.id), 1, 'POINT', 2, 'COMMA')}">R$ 0,00</dd>
           </div>
-        </div>
-        <div id="ia-cards" class="grid grid-cols-1 md:grid-cols-3 gap-5"></div>
-      </div>
-      <!-- Error state -->
-      <div id="ia-error" class="hidden bg-red-50 border border-red-100 rounded-xl p-6 text-center text-red-600 text-[14px]">
-        <i data-lucide="wifi-off" class="w-6 h-6 mx-auto mb-2 opacity-50"></i>
-        Não foi possível contactar o Consultor FinGen. Tente novamente.
-      </div>
-    </div>
+        </dl>
 
-    <!-- Summary Stats Row -->
-    <div class="grid grid-cols-1 md:grid-cols-12 gap-6 mb-12">
-        <div class="md:col-span-8 bg-zen-surface border border-zen-border rounded-2xl p-8 flex items-center justify-between overflow-hidden relative group">
-            <div class="absolute -right-4 -bottom-4 w-32 h-32 bg-brand/5 rounded-full blur-2xl group-hover:bg-brand/10 transition-colors"></div>
-            <div class="relative z-10">
-                <div class="text-[13px] font-bold text-brand mb-2">Visão Geral de Objetivos</div>
-                <div class="flex items-baseline gap-2">
-                    <span class="text-[32px] font-semibold text-zen-t1" th:text="${metas.size()}">0</span>
-                    <span class="text-zen-t3 text-[15px]">metas ativas no momento</span>
-                </div>
-            </div>
-            <div class="flex gap-8 relative z-10">
-                <div class="text-right">
-                    <div class="text-[12px] text-zen-t3 font-bold mb-1">Total Almejado</div>
-                    <div class="text-[18px] tabular-nums font-bold text-zen-t1" th:text="'R$ ' + ${#numbers.formatDecimal(totalAlmejado, 1, 'POINT', 2, 'COMMA')}">R$ 0,00</div>
-                </div>
-                <div class="w-px h-10 bg-zen-border opacity-50"></div>
-                <div class="text-right">
-                    <div class="text-[12px] text-zen-t3 font-bold mb-1">Total Poupado</div>
-                    <div class="text-[18px] tabular-nums font-bold text-brand" th:text="'R$ ' + ${#numbers.formatDecimal(totalPoupado, 1, 'POINT', 2, 'COMMA')}">R$ 0,00</div>
-                </div>
-            </div>
-        </div>
-        <div class="md:col-span-4 bg-zen-surface2 border border-zen-border rounded-2xl p-8 flex items-center gap-5">
-            <div class="w-14 h-14 rounded-2xl bg-zen-surface border border-zen-border flex items-center justify-center text-brand shadow-sm">
-                <i data-lucide="trending-up" class="w-7 h-7"></i>
-            </div>
-            <div>
-                <div class="text-[14px] font-semibold text-zen-t1">Ritmo de Crescimento</div>
-                <p class="text-[12.5px] text-zen-t3 mt-1 leading-relaxed">Você está a 65% da sua meta consolidada de patrimônio.</p>
-            </div>
-        </div>
-    </div>
-    
-    <!-- Goals Bento Grid -->
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-      <div th:each="m, iter : ${metas}" class="bento-card bg-zen-surface border border-zen-border rounded-2xl p-8 flex flex-col relative group overflow-hidden opacity-0" 
-           th:id="'goal-' + ${m.id}">
-        
-        <!-- Status Badge -->
-        <div class="absolute top-6 right-8">
-            <span class="text-[12px] font-bold px-3 py-1.5 rounded-full border shadow-sm"
-                  th:classappend="${m.status=='CONCLUIDO'?'bg-emerald-50 text-emerald-600 border-emerald-100':'bg-zen-surface2 text-zen-t2 border-black/5'}"
-                  th:text="${m.status=='CONCLUIDO'?'Meta Atingida':'Em Progresso'}"></span>
-        </div>
-
-        <div class="flex items-center gap-4 mb-10">
-          <div class="w-14 h-14 rounded-2xl flex items-center justify-center transition-transform group-hover:scale-110 shadow-sm border"
-               th:classappend="${iter.index % 3 == 0 ? 'bg-teal-50 text-teal-600 border-teal-100' : (iter.index % 3 == 1 ? 'bg-slate-50 text-slate-600 border-slate-100' : 'bg-orange-50 text-orange-600 border-orange-100')}">
-            <i th:data-lucide="${m.icone}" class="w-7 h-7"></i>
-          </div>
-          <div class="min-w-0 pr-10">
-            <h3 class="text-[18px] font-bold text-zen-t1 leading-tight group-hover:text-brand transition-colors mb-1 truncate" th:text="${m.titulo}">Meta</h3>
-            <div class="text-[12px] text-zen-t3 font-medium" th:text="${m.natureza.descricao}">Natureza</div>
-          </div>
-        </div>
-
-        <!-- Progress Section -->
-        <div class="mb-10 flex items-center gap-6">
-            <div class="relative w-16 h-16 shrink-0">
-                <svg class="w-16 h-16 transform -rotate-90">
-                    <circle cx="32" cy="32" r="28" stroke="currentColor" stroke-width="4" fill="transparent" class="text-zen-surface2" />
-                    <circle cx="32" cy="32" r="28" stroke="currentColor" stroke-width="4" fill="transparent" 
-                            stroke-linecap="round" class="progress-star"
-                            th:classappend="${m.status=='CONCLUIDO'?'text-emerald-500':'text-brand'}"
-                            th:attr="data-percent=${percentuais.get(m.id)}" />
-                </svg>
-                <div class="absolute inset-0 flex items-center justify-center text-[13px] font-bold text-zen-t1" 
-                     th:text="${percentuais.get(m.id).intValue() + '%'}">0%</div>
-            </div>
-            <div>
-                <div class="text-[12px] text-zen-t3 font-bold mb-1">Aporte Mensal Sugerido</div>
-                <div class="text-[18px] tabular-nums font-bold text-zen-t1" 
-                     th:text="'R$ ' + ${#numbers.formatDecimal(aportesNecessarios.get(m.id), 1, 'POINT', 2, 'COMMA')}">R$ 0,00</div>
-            </div>
-        </div>
-
-        <div class="mt-auto space-y-4">
-          <div class="grid grid-cols-2 gap-3">
-             <div class="bg-zen-surface2/50 rounded-2xl p-4 border border-black/5">
-                 <div class="text-[12px] text-zen-t3 font-bold mb-1">Já Tenho</div>
-                 <div class="text-[14px] tabular-nums font-bold text-zen-t1" 
-                      th:text="'R$ ' + ${#numbers.formatDecimal(m.valorAtual, 1, 'POINT', 2, 'COMMA')}">R$ 0,00</div>
-             </div>
-             <div class="bg-zen-surface2/50 rounded-2xl p-4 border border-black/5">
-                 <div class="text-[12px] text-zen-t3 font-bold mb-1">Faltam</div>
-                 <div class="text-[14px] tabular-nums font-bold text-zen-t1" 
-                      th:text="'R$ ' + ${#numbers.formatDecimal(m.valorAlvo.subtract(m.valorAtual), 1, 'POINT', 2, 'COMMA')}">R$ 0,00</div>
-             </div>
-          </div>
-
-          <div class="flex items-center justify-between pt-6 border-t border-zen-border">
-            <div class="flex items-center gap-1.5 text-[12px] text-zen-t3 font-medium">
-               <i data-lucide="calendar" class="w-3.5 h-3.5 text-brand"></i>
-               <span th:text="${mesesRestantes.get(m.id) + ' meses restantes'}">0 meses</span>
-            </div>
-            <a th:href="@{/app/financeiro/metas/editar/{id}(id=${m.id})}" class="text-[13px] font-bold text-brand hover:text-brand-h transition-colors flex items-center gap-1">
-                Refinar <i data-lucide="chevron-right" class="w-4 h-4"></i>
-            </a>
-            <button type="submit" class="p-1 hover:text-red-500 transition-colors" aria-label="Excluir Meta">
+        <div class="mt-auto pt-4 flex items-center justify-between gap-2 border-t border-zen-border mt-5">
+          <p class="text-[13px] text-zen-t3"
+             th:text="${mesesRestantes.get(m.id) == 1 ? '1 mês restante' : mesesRestantes.get(m.id) + ' meses restantes'}">0 meses restantes</p>
+          <div class="flex items-center">
+            <a th:href="@{/app/financeiro/metas/editar/{id}(id=${m.id})}" class="btn-ghost !min-h-[40px]">Editar</a>
+            <form th:action="@{/app/financeiro/metas/excluir/{id}(id=${m.id})}" method="post" class="m-0"
+                  th:attr="data-confirm='Excluir a meta ' + ${m.titulo} + '? Essa ação não pode ser desfeita.'">
+              <button type="submit" class="icon-btn" th:attr="aria-label='Excluir meta ' + ${m.titulo}">
                 <i data-lucide="trash-2" class="w-4 h-4"></i>
-            </button>
+              </button>
+            </form>
           </div>
         </div>
+      </li>
+    </ul>
 
-      </div>
-
-      <!-- Empty State -->
-      <div th:if="${metas==null or #lists.isEmpty(metas)}" class="col-span-full py-24 text-center bg-zen-surface border-2 border-dashed border-zen-border rounded-2xl flex flex-col items-center justify-center animate-[fade-up_.5s_ease_both]">
-        <div class="w-20 h-20 bg-brand/5 rounded-full flex items-center justify-center text-brand mb-6 shadow-inner">
-            <i data-lucide="target" class="w-10 h-10 opacity-30"></i>
-        </div>
-        <h3 class="font-serif text-[24px] font-medium text-zen-t1 mb-2">Sem metas para o futuro?</h3>
-        <p class="text-zen-t3 max-w-xs mx-auto text-[14.5px] font-light mb-8">Defina seu primeiro grande objetivo e veja seu progresso ganhar vida.</p>
-        <a th:href="@{/app/financeiro/metas/novo}"
-          class="bg-brand hover:bg-brand-h text-white px-8 py-3.5 rounded-2xl font-bold transition-all shadow-lg">
-          Criar minha primeira meta
-        </a>
-      </div>
+    <div th:if="${metas == null or #lists.isEmpty(metas)}" class="card empty-state">
+      <p class="empty-state-title">Você ainda não tem metas</p>
+      <p class="empty-state-text">Crie uma meta com valor e prazo, ou peça sugestões ao assistente com base no seu perfil.</p>
+      <a th:href="@{/app/financeiro/metas/novo}" class="btn-primary">Criar minha primeira meta</a>
     </div>
   </main>
 
   <script th:fragment="script">
-    document.addEventListener('DOMContentLoaded', function() {
-      // Animation entry with GSAP
-      const ctx = gsap.context(() => {
-        gsap.to(".bento-card", {
-          opacity: 1, y: 0, duration: 0.8, stagger: 0.15,
-          ease: "power4.out", delay: 0.2
-        });
-      });
-
-      // Progress ring animation
-      document.querySelectorAll('.progress-star').forEach(ring => {
-        const percent = ring.getAttribute('data-percent');
-        ring.style.strokeDasharray = "176";
-        ring.style.strokeDashoffset = "176";
-        setTimeout(() => {
-          ring.style.strokeDashoffset = 176 - (176 * percent / 100);
-        }, 1000);
-      });
-
-      document.addEventListener('htmx:beforeSwap', () => ctx.revert());
-    });
-
-    // ── AI Goal Suggestion Flow ───────────────────────────────────────────────
     function getCsrfToken() {
       const meta = document.querySelector('meta[name="_csrf"]');
       const header = document.querySelector('meta[name="_csrf_header"]');
       if (meta && header) return { header: header.content, token: meta.content };
-      // fallback: read from hidden input if present
       const inp = document.querySelector('input[name="_csrf"]');
       return inp ? { header: 'X-CSRF-TOKEN', token: inp.value } : { header: 'X-CSRF-TOKEN', token: '' };
     }
+
+    function escapeHtml(str) {
+      return String(str == null ? '' : str).replace(/[&<>"']/g, c =>
+        ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+    }
+
+    const BRL = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL', maximumFractionDigits: 0 });
+    const NATUREZA = (n) => String(n || '').replace(/_/g, ' ').toLowerCase().replace(/^./, c => c.toUpperCase());
 
     function ativarSugestaoIA() {
       const painel = document.getElementById('painel-ia');
       const loading = document.getElementById('ia-loading');
       const results = document.getElementById('ia-results');
-      const error   = document.getElementById('ia-error');
-      const btn     = document.getElementById('btn-ia-sugerir');
+      const error = document.getElementById('ia-error');
+      const btn = document.getElementById('btn-ia-sugerir');
+      const rotulo = btn.innerHTML;
 
       painel.classList.remove('hidden');
       loading.classList.remove('hidden');
       results.classList.add('hidden');
       error.classList.add('hidden');
       btn.disabled = true;
-      btn.innerHTML = '<svg class="animate-spin w-4 h-4 text-brand" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"></path></svg> A analisar…';
 
       const csrf = getCsrfToken();
-
-      fetch('/app/financeiro/metas/ai-suggest', {
-        method: 'POST',
-        headers: { [csrf.header]: csrf.token }
-      })
-      .then(r => {
-        if (!r.ok) throw new Error('HTTP ' + r.status);
-        return r.json();
-      })
-      .then(sugestoes => {
-        loading.classList.add('hidden');
-        if (!sugestoes || sugestoes.length === 0) {
-          error.classList.remove('hidden');
-          error.innerHTML = '<p class="text-[14px]">A IA não devolveu sugestões. Tente novamente.</p>';
-          return;
-        }
-        renderSugestoes(sugestoes);
-        results.classList.remove('hidden');
-        if (window.lucide) lucide.createIcons();
-      })
-      .catch(() => {
-        loading.classList.add('hidden');
-        error.classList.remove('hidden');
-      })
-      .finally(() => {
-        btn.disabled = false;
-        btn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-brand" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l1.88 5.76a1 1 0 00.95.69h6.06l-4.9 3.56a1 1 0 00-.36 1.11L17.51 20 12 16.44 6.49 20l1.88-5.88a1 1 0 00-.36-1.11L3.11 9.45h6.06a1 1 0 00.95-.69L12 3z"/></svg> IA Sugerir Metas';
-      });
+      fetch('/app/financeiro/metas/ai-suggest', { method: 'POST', headers: { [csrf.header]: csrf.token } })
+        .then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
+        .then(sugestoes => {
+          loading.classList.add('hidden');
+          if (!sugestoes || sugestoes.length === 0) {
+            error.classList.remove('hidden');
+            error.querySelector('span').textContent = 'O assistente não trouxe sugestões desta vez. Tente de novo em instantes.';
+            return;
+          }
+          renderSugestoes(sugestoes);
+          results.classList.remove('hidden');
+        })
+        .catch(() => { loading.classList.add('hidden'); error.classList.remove('hidden'); })
+        .finally(() => { btn.disabled = false; btn.innerHTML = rotulo; if (window.lucide) lucide.createIcons(); });
     }
 
     function renderSugestoes(lista) {
       const container = document.getElementById('ia-cards');
       const csrf = getCsrfToken();
-      const colors = [
-        'border-teal-200 bg-teal-50/50', 'border-indigo-200 bg-indigo-50/50', 'border-amber-200 bg-amber-50/50'
-      ];
-      const accentText = ['text-teal-700', 'text-indigo-700', 'text-amber-700'];
-      const accentBg   = ['bg-teal-100', 'bg-indigo-100', 'bg-amber-100'];
-
-      container.innerHTML = lista.map((s, i) => {
-        const idx = i % 3;
-        const aporteFmt = '€ ' + Number(s.aporteMensal).toLocaleString('pt-PT', { minimumFractionDigits: 0 });
-        const alvoFmt   = '€ ' + Number(s.valorAlvo).toLocaleString('pt-PT', { minimumFractionDigits: 0 });
-        return `
-          <div class="relative rounded-xl border p-6 flex flex-col gap-4 bg-zen-surface hover:shadow-md transition-shadow ${colors[idx]}">
-            <div class="flex items-start justify-between gap-2">
-              <div>
-                <div class="text-[12px] font-bold ${accentText[idx]} mb-1">${s.natureza.replace('_', ' ')}</div>
-                <h3 class="text-[16px] font-bold text-zen-t1 leading-tight">${s.titulo}</h3>
-              </div>
-              <div class="${accentBg[idx]} rounded-xl px-3 py-1 text-[12px] font-bold ${accentText[idx]} shrink-0">${s.prazoMeses} meses</div>
+      // Todo texto vindo da IA passa por escapeHtml antes de entrar no DOM.
+      container.innerHTML = lista.map(s => `
+        <article class="card p-5 flex flex-col gap-3">
+          <div class="flex items-start justify-between gap-2">
+            <div class="min-w-0">
+              <p class="text-[13px] text-zen-t3">${escapeHtml(NATUREZA(s.natureza))}</p>
+              <h3 class="text-[16px] font-semibold text-zen-t1">${escapeHtml(s.titulo)}</h3>
             </div>
-            <p class="text-[12.5px] text-zen-t3 leading-relaxed">${s.justificativa}</p>
-            <div class="grid grid-cols-2 gap-3 mt-auto">
-              <div>
-                <div class="text-[12px] text-zen-t3 font-bold mb-0.5">Meta Alvo</div>
-                <div class="text-[15px] tabular-nums font-bold text-zen-t1">${alvoFmt}</div>
-              </div>
-              <div>
-                <div class="text-[12px] text-zen-t3 font-bold mb-0.5">Aporte Mensal</div>
-                <div class="text-[15px] tabular-nums font-bold ${accentText[idx]}">${aporteFmt}</div>
-              </div>
-            </div>
-            <form action="/app/financeiro/metas/ai-criar" method="POST">
-              <input type="hidden" name="${csrf.header === 'X-CSRF-TOKEN' ? '_csrf' : '_csrf'}" value="${csrf.token}">
-              <input type="hidden" name="titulo"       value="${escapeHtml(s.titulo)}">
-              <input type="hidden" name="valorAlvo"    value="${s.valorAlvo}">
-              <input type="hidden" name="aporteMensal" value="${s.aporteMensal}">
-              <input type="hidden" name="prazoMeses"   value="${s.prazoMeses}">
-              <input type="hidden" name="natureza"     value="${s.natureza}">
-              <input type="hidden" name="justificativa" value="${escapeHtml(s.justificativa)}">
-              <button type="submit"
-                class="w-full mt-1 py-3 rounded-xl font-bold text-[13px] text-white bg-brand hover:bg-brand-h transition-colors shadow-sm">
-                ✨ Criar esta Meta
-              </button>
-            </form>
-          </div>`;
-      }).join('');
-    }
-
-    function escapeHtml(str) {
-      return String(str).replace(/[&<>"']/g, c =>
-        ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+            <span class="badge badge-gray shrink-0">${escapeHtml(s.prazoMeses)} meses</span>
+          </div>
+          <p class="text-[14px] text-zen-t2">${escapeHtml(s.justificativa)}</p>
+          <dl class="grid grid-cols-2 gap-3 mt-auto text-[14px]">
+            <div><dt class="text-[13px] text-zen-t3">Valor da meta</dt><dd class="font-medium text-zen-t1">${BRL.format(Number(s.valorAlvo) || 0)}</dd></div>
+            <div><dt class="text-[13px] text-zen-t3">Aporte mensal</dt><dd class="font-medium text-zen-t1">${BRL.format(Number(s.aporteMensal) || 0)}</dd></div>
+          </dl>
+          <form action="/app/financeiro/metas/ai-criar" method="POST" class="m-0">
+            <input type="hidden" name="_csrf" value="${escapeHtml(csrf.token)}">
+            <input type="hidden" name="titulo" value="${escapeHtml(s.titulo)}">
+            <input type="hidden" name="valorAlvo" value="${escapeHtml(s.valorAlvo)}">
+            <input type="hidden" name="aporteMensal" value="${escapeHtml(s.aporteMensal)}">
+            <input type="hidden" name="prazoMeses" value="${escapeHtml(s.prazoMeses)}">
+            <input type="hidden" name="natureza" value="${escapeHtml(s.natureza)}">
+            <input type="hidden" name="justificativa" value="${escapeHtml(s.justificativa)}">
+            <button type="submit" class="btn-secondary w-full">Criar esta meta</button>
+          </form>
+        </article>`).join('');
     }
   </script>
 

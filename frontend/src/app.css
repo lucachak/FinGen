@@ -6,6 +6,18 @@
  * vermelho/âmbar só para atraso e vencimento. Bordas finas em vez de sombras. Números tabulares.
  */
 
+/* Fontes hospedadas localmente (OFL-1.1): sem dependência de CDN em tempo de execução. */
+@font-face {
+  font-family: 'DM Sans';
+  font-style: normal; font-weight: 100 1000; font-display: swap;
+  src: url('../fonts/dm-sans-latin-wght-normal.woff2') format('woff2-variations');
+}
+@font-face {
+  font-family: 'Newsreader';
+  font-style: normal; font-weight: 200 800; font-display: swap;
+  src: url('../fonts/newsreader-latin-wght-normal.woff2') format('woff2-variations');
+}
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;

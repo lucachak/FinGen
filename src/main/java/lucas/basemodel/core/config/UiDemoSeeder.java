@@ -2,13 +2,16 @@ package lucas.basemodel.core.config;
 
 import lombok.RequiredArgsConstructor;
 import lucas.basemodel.modules.financeiro.enums.EscopoTransacao;
+import lucas.basemodel.modules.financeiro.enums.NaturezaMeta;
 import lucas.basemodel.modules.financeiro.enums.StatusTransacao;
 import lucas.basemodel.modules.financeiro.enums.TipoTransacao;
 import lucas.basemodel.modules.financeiro.models.Categoria;
 import lucas.basemodel.modules.financeiro.models.Conta;
+import lucas.basemodel.modules.financeiro.models.MetaFinanceira;
 import lucas.basemodel.modules.financeiro.models.Orcamento;
 import lucas.basemodel.modules.financeiro.repositories.CategoriaRepository;
 import lucas.basemodel.modules.financeiro.repositories.ContaRepository;
+import lucas.basemodel.modules.financeiro.repositories.MetaFinanceiraRepository;
 import lucas.basemodel.modules.financeiro.repositories.OrcamentoRepository;
 import lucas.basemodel.modules.user.User;
 import lucas.basemodel.modules.user.UsuarioRepository;
@@ -34,6 +37,7 @@ public class UiDemoSeeder {
     private final CategoriaRepository categorias;
     private final ContaRepository contas;
     private final OrcamentoRepository orcamentos;
+    private final MetaFinanceiraRepository metas;
     private final PasswordEncoder passwordEncoder;
 
     /** Depois de todos os CommandLineRunner (SetupInicial cria usuário demo e catálogo de categorias). */
@@ -86,6 +90,9 @@ public class UiDemoSeeder {
                     base.plusDays(12), "Transporte");
         }
 
+        meta(demo, "Reserva de emergência (6 meses de despesas)", NaturezaMeta.RESERVA_EMERGENCIA, "30000.00", "11400.00", h.plusMonths(14));
+        meta(demo, "Viagem de fim de ano", NaturezaMeta.VIAGEM, "6500.00", "6500.00", h.plusMonths(2));
+
         orcamento(demo, "Lazer", "100.00");
         orcamento(demo, "Transporte", "160.00");
     }
@@ -126,6 +133,18 @@ public class UiDemoSeeder {
             c.setCategoria(categoria(nomeCategoria, escopo));
         }
         contas.save(c);
+    }
+
+    private void meta(User dono, String titulo, NaturezaMeta natureza, String alvo, String atual, LocalDate prazo) {
+        MetaFinanceira m = new MetaFinanceira();
+        m.setTitulo(titulo);
+        m.setNatureza(natureza);
+        m.setValorAlvo(new BigDecimal(alvo));
+        m.setValorAtual(new BigDecimal(atual));
+        m.setPrazo(prazo);
+        m.setStatus(new BigDecimal(atual).compareTo(new BigDecimal(alvo)) >= 0 ? "CONCLUIDO" : "EM_ANDAMENTO");
+        m.setResponsavel(dono);
+        metas.save(m);
     }
 
     private void orcamento(User dono, String nomeCategoria, String limite) {

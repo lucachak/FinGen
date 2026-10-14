@@ -37,10 +37,10 @@ public class SecurityConfig {
                                                 .csrfTokenRepository(customCsrfTokenRepository()))
                                 .headers(headers -> headers
                                                 .frameOptions(f -> f.sameOrigin())
-                                                .contentSecurityPolicy(csp -> csp.policyDirectives("default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://unpkg.com https://cdn.tailwindcss.com https://cdnjs.cloudflare.com https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self' https:; frame-ancestors 'self';"))
+                                                .contentSecurityPolicy(csp -> csp.policyDirectives("default-src 'self'; script-src 'self' 'unsafe-inline' https://unpkg.com https://cdnjs.cloudflare.com https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline'; font-src 'self' data:; img-src 'self' data: https:; connect-src 'self' https:; frame-ancestors 'self';"))
                                                 .httpStrictTransportSecurity(hsts -> hsts.includeSubDomains(true).maxAgeInSeconds(31536000)))
                                 .authorizeHttpRequests(auth -> auth
-                                                .requestMatchers("/css/**", "/js/**", "/images/**", "/*.glb", 
+                                                .requestMatchers("/css/**", "/js/**", "/fonts/**", "/images/**", "/*.glb", 
                                                                 "/favicon.ico", "/favicon.svg", "/favicon-96x96.png", 
                                                                 "/apple-touch-icon.png", "/site.webmanifest", "/sw.js", 
                                                                 "/web-app-manifest-*.png", "/", "/auth/**",
