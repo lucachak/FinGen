@@ -25,7 +25,7 @@ e **não foi medida**.
 |---|---|
 | Consultas | `DashboardQueryService` (agregação `SUM … GROUP BY`, listas com `LIMIT`, intervalos de data). `DashboardController`, `DashboardService` e `FinancialHealthService` passaram a usá-lo. |
 | Queries | `MONTH()/YEAR()` substituídos por `>= inicio AND < fimExclusivo` em 3 queries. |
-| Índices | 3 índices compostos em `contas`, declarados com `@Index` (criados pelo `ddl-auto=update`). |
+| Índices | 3 índices compostos em `contas`, declarados com `@Index`. O Hibernate 6 os cria em tabela já existente no modo `update` (**confirmado em H2** num experimento isolado da revisão; **não testado em Postgres**). `ContaIndexesTest` só prova a criação em schema novo. |
 | N+1 | `OrcamentoService.listarComConsumo`: 1 consulta agregada em vez de 1 por orçamento. |
 | `findAll()` | `AiService.chat` usa consulta por responsável; `ContaService.listarTodas` removido (sem chamadores). |
 | Relações | `Orcamento.categoria` passou a `LAZY` (+ `EntityGraph` nas consultas), `default_batch_fetch_size=50`. |
@@ -51,6 +51,10 @@ e **não foi medida**.
   renderizam só 5 das 28 páginas; isso não prova que as outras aguentam.
 - **`FinanceAiService` continua usando `findAll()` de usuários**: `nomeCompleto` usa
   `RandomEncryptionConverter` (IV aleatório), então uma consulta de igualdade no banco nunca casaria.
+- **"Transações recentes" da API deixou de listar contas pagas sem `dataPagamento`.** O código antigo as
+  incluía (e em Postgres, `ORDER BY ... DESC` põe NULL no topo); a consulta nova exige `dataPagamento`
+  não nula, que já era a regra do controller MVC. Em H2 (testes) NULL vai para o fim, então o teste de
+  equivalência não distinguiria isso.
 - **JDK:** os comandos rodaram com JDK 17 (`JAVA_HOME`). No JDK 27 padrão do sistema, o Lombok quebra no
   `testCompile` (`EndPosTable`). O `pom.xml` mira Java 17 (o README diz 21, o que está incorreto).
 
