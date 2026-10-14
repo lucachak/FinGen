@@ -109,7 +109,7 @@ public class FinanceAiService {
             }
             return "<i>Análise não disponível no momento.</i>";
         } catch (Exception e) {
-            return "<div style='color: #e11d48;'>🚨 O Córtex Analítico (Python) está offline. Inicie o servidor Python.</div>";
+            return "<p>O serviço de análise está indisponível no momento. Tente novamente em instantes.</p>";
         }
     }
 
@@ -401,7 +401,7 @@ public class FinanceAiService {
             return "<i>Análise não disponível.</i>";
         } catch (Exception e) {
             log.error("Erro no gerarPlanoInvestimentos: ", e);
-            return "<div style='color: #ef4444;'>🚨 O servidor Python está offline ou inacessível.</div>";
+            return "<p>O serviço de análise está indisponível no momento. Tente novamente em instantes.</p>";
         }
     }
 
@@ -475,7 +475,7 @@ public class FinanceAiService {
 
         } catch (Exception e) {
             log.error("Erro no analisarAnomalias: ", e);
-            return "<div style='color: #e11d48; padding: 15px; background: #fee2e2; border-radius: 8px; border: 1px solid #fca5a5;'>🚨 O Detetive IA (Python) está offline ou inacessível.</div>";
+            return "<p>O serviço de análise está indisponível no momento. Tente novamente em instantes.</p>";
         }
     }
 

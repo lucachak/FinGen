@@ -592,7 +592,7 @@
                 <p class="text-[12px] text-[color:var(--green)] tabular-nums">Infraestrutura Business</p>
                 <!-- Nome do negócio se disponível -->
                 <p th:if="${configuracaoFinanceira != null and configuracaoFinanceira.nomeNegocio != null}"
-                   class="mt-4 text-[12px] text-white/70 font-medium border-t border-white/10 pt-4"
+                   class="mt-4 text-[12px] text-white/70 font-medium border-t pt-4"
                    th:text="${configuracaoFinanceira.nomeNegocio}"></p>
             </div>
 
@@ -607,7 +607,7 @@
     </div>
 
     <!-- Micro-dashboard IA -->
-    <div id="ia-dist-panel" class="bg-zen-surface/75 backdrop-blur-2xl border border-white/90 rounded-2xl my-14 shadow-[0_12px_40px_rgba(15,118,110,0.08)] overflow-hidden animate-[fade-up_0.8s_ease-out_0.2s_both]">
+    <div id="ia-dist-panel" class="card my-10 overflow-hidden">
         <div class="flex flex-col sm:flex-row items-center justify-between p-6 md:py-6 md:px-8 border-b border-zen-border bg-zen-surface2">
             <div class="flex items-center gap-3 text-zen-t1 font-serif text-[17px] font-medium tracking-tight mb-4 sm:mb-0">
                 <span class="w-2.5 h-2.5 rounded-full bg-[color:var(--amber)] shadow-[0_0_12px_rgba(245,158,11,0.8)]"></span>
@@ -667,7 +667,7 @@
 
     <!-- MODAL DNA FINANCEIRO -->
     <div id="dnaModal" class="hidden fixed inset-0 z-[9999] bg-[#0F2721]/40 items-center justify-center opacity-0 transition-opacity duration-400 ease-[cubic-bezier(0.16,1,0.3,1)]">
-        <div class="bg-zen-surface/95 w-[90%] max-w-[500px] p-8 md:p-12 relative transform scale-95 translate-y-4 transition-all duration-500 ease-[cubic-bezier(0.34,1.56,0.64,1)] border border-white/90 shadow-[0_32px_72px_rgba(15,118,110,0.15)] rounded-3xl">
+        <div class="bg-zen-surface/95 w-[90%] max-w-[500px] p-8 md:p-12 relative transform scale-95 translate-y-4 transition-all duration-500 ease-[cubic-bezier(0.34,1.56,0.64,1)] border rounded-3xl">
             <button onclick="closeDnaModal()" class="absolute top-6 right-6 w-10 h-10 bg-zen-surface2 hover:bg-zen-border text-zen-t3 hover:text-zen-t1 rounded-full flex items-center justify-center transition-colors">
                 <i data-lucide="x" class="w-6 h-6"></i>
             </button>
@@ -699,7 +699,7 @@
                 </div>
                 
                 <div class="flex justify-center mt-6">
-                    <button type="submit" class="w-full justify-center inline-flex items-center gap-2 px-8 py-4 bg-brand hover:bg-brand-h text-white rounded-xl font-medium text-[15px] shadow-[0_8px_20px_rgba(15,118,110,0.2)] hover:shadow-[0_12px_24px_rgba(15,118,110,0.3)] hover:-translate-y-0.5 transition-all duration-300">
+                    <button type="submit" class="w-full justify-center inline-flex items-center gap-2 px-8 py-4 bg-brand hover:bg-brand-h text-white rounded-xl font-medium text-[15px] hover:shadow-[0_12px_24px_rgba(15,118,110,0.3)] hover:-translate-y-0.5 transition-all duration-300">
                         <i data-lucide="check" class="w-6 h-6"></i>
                         Salvar Configurações
                     </button>

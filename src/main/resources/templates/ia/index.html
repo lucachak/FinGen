@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" th:replace="~{layout/layout :: layout(
-          pageTitle='AI Intelligent Hub',
+          pageTitle='Assistente',
           content=~{::main},
           pageStyles=~{::style},
           pageScripts=~{::script}
@@ -295,81 +295,23 @@
             height: 200px;
         }
 
-        /* ── Status card ── */
+        /* ── Status dos serviços ── */
         .status-card {
-            background: var(--brand);
-            border-radius: var(--r-lg);
-            padding: 18px 20px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--r-xl);
+            padding: 16px 18px;
         }
-
-        .sc-label-title {
-            font-size: 10px;
-            font-weight: 600;
-            color: rgba(255, 255, 255, .35);
-
-            letter-spacing: .08em;
-            margin-bottom: 12px;
-        }
-
+        .sc-label-title { font-size: 14px; font-weight: 500; color: var(--t1); margin-bottom: 8px; }
         .sc-row {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 8px 0;
-            border-bottom: 1px solid rgba(255, 255, 255, .07);
+            display: flex; align-items: center; justify-content: space-between; gap: 12px;
+            padding: 10px 0; border-bottom: 1px solid var(--border);
         }
-
-        .sc-row:last-child {
-            border-bottom: none;
-            padding-bottom: 0;
-        }
-
-        .sc-name {
-            font-size: 12px;
-            color: rgba(255, 255, 255, .55);
-            display: flex;
-            align-items: center;
-            gap: 7px;
-        }
-
-        .sc-name span {
-            width: 5px;
-            height: 5px;
-            border-radius: 50%;
-            display: inline-block;
-        }
-
-        .sc-online {
-            font-size: 11px;
-            font-weight: 500;
-            color: #34d399;
-            display: flex;
-            align-items: center;
-            gap: 4px;
-        }
-
-        .pulse {
-            width: 5px;
-            height: 5px;
-            border-radius: 50%;
-            background: #34d399;
-            display: inline-block;
-            animation: pulse-anim 2s ease infinite;
-        }
-
-        @keyframes pulse-anim {
-
-            0%,
-            100% {
-                opacity: 1;
-                transform: scale(1)
-            }
-
-            50% {
-                opacity: .5;
-                transform: scale(1.3)
-            }
-        }
+        .sc-row:last-child { border-bottom: none; padding-bottom: 0; }
+        .sc-name { font-size: 13px; color: var(--t2); display: flex; align-items: center; gap: 8px; min-width: 0; }
+        .sc-name span.dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; flex-shrink: 0; }
+        .sc-online { font-size: 13px; font-weight: 500; color: var(--green); display: flex; align-items: center; gap: 6px; white-space: nowrap; }
+        .pulse { width: 8px; height: 8px; border-radius: 50%; background: var(--green); display: inline-block; }
 
         /* ── Modal ── */
         .modal-backdrop {
@@ -546,10 +488,7 @@
 
         <div class="page-header mb-8">
             <div>
-                <span class="text-brand tabular-nums text-[12px] mb-2 block">Córtex Financeiro
-                    &bull; AI Powered</span>
-                <h1 class="font-serif text-3xl md:text-4xl text-zen-t1 tracking-tight font-medium">Assistente de
-                    Inteligência</h1>
+                <h1 class="font-serif text-3xl md:text-4xl text-zen-t1 tracking-tight font-medium">Assistente</h1>
                 <p class="page-subtitle">Escolha o modelo de IA que analisa suas contas e seu patrimônio.</p>
             </div>
         </div>
@@ -657,7 +596,7 @@
                                 <div class="font-semibold text-white text-[14px]">Consultor FinGen</div>
                                 <label for="ai-model-select" class="sr-only">Modelo de IA</label>
                                 <select id="ai-model-select" disabled
-                                    class="mt-1 max-w-[230px] truncate text-[12px] font-medium text-white rounded-md px-2 py-1 border border-white/30 focus:outline-none focus:ring-1 focus:ring-white"
+                                    class="mt-1 max-w-[230px] truncate text-[12px] font-medium text-white rounded-md px-2 py-1 border focus:outline-none focus:ring-1 focus:ring-white"
                                     style="background: rgba(255,255,255,0.15);">
                                     <option>Carregando modelos...</option>
                                 </select>
@@ -674,7 +613,7 @@
                     </div>
                     <div class="p-3 border-t border-zen-border bg-zen-surface flex items-center gap-2">
                         <textarea id="chat-input" rows="1"
-                            class="w-full text-[13px] rounded-xl border border-zen-border px-4 py-3 focus:outline-none focus:border-brand focus:ring-1 focus:ring-brand bg-zen-surface2 resize-none"
+                            class="field-control"
                             placeholder="Pergunte-me algo..."></textarea>
                         <button onclick="sendChatMessage()"
                             class="w-[46px] h-[46px] rounded-xl bg-brand text-white flex items-center justify-center hover:bg-brand-h transition-colors shrink-0 shadow-sm">
@@ -686,7 +625,7 @@
                 <div class="chart-card">
                     <div class="chart-head">
                         <div class="chart-title">Gastos por categoria</div>
-                        <div class="chart-sub">Mês actual</div>
+                        <div class="chart-sub">Mês atual</div>
                     </div>
                     <div class="chart-body">
                         <div class="chart-wrap">
@@ -707,33 +646,24 @@
                     </div>
                 </div>
 
-                <div class="status-card">
-                    <div class="sc-label-title">Status dos serviços</div>
+                <div class="status-card" aria-label="Estado dos serviços de IA">
+                    <div class="sc-label-title">Serviços de IA</div>
                     <div class="sc-row">
                         <div class="sc-name">
-                            <span th:style="${aiOnline ? 'background:#34d399;' : 'background:#ef4444;'}"></span>
-                            Python API (Detetive)
+                            <span class="dot" th:style="${aiOnline ? 'background:var(--green);' : 'background:var(--red);'}"></span>
+                            Análise de dados
                         </div>
-                        <div class="sc-online" th:style="${aiOnline ? 'color:#34d399;' : 'color:#ef4444;'}">
-                            <span th:class="${aiOnline ? 'pulse' : ''}"
-                                th:style="${!aiOnline ? 'background:#ef4444;' : ''}"></span>
+                        <div class="sc-online" role="status" th:style="${aiOnline ? 'color:var(--green);' : 'color:var(--red);'}">
+                            <span class="pulse" th:style="${!aiOnline ? 'background:var(--red);' : ''}"></span>
                             <span th:text="${aiOnline ? 'Online' : 'Offline'}">Online</span>
                         </div>
                     </div>
                     <div class="sc-row">
                         <div class="sc-name">
-                            <span th:style="${aiOnline ? 'background:#60a5fa;' : 'background:#94a3b8;'}"></span>
-                            <span id="ai-model-name">Modelo de IA</span>
+                            <span class="dot" style="background:var(--t3);"></span>
+                            <span id="ai-model-name" class="truncate">Modelo de IA</span>
                         </div>
-                        <div class="sc-online" th:style="${aiOnline ? 'color:#60a5fa;' : 'color:#94a3b8;'}">
-                            <span th:class="${aiOnline ? 'pulse' : ''}"
-                                th:style="${aiOnline ? 'background:#60a5fa;' : 'background:#94a3b8;'}"></span>
-                            <span th:text="${aiOnline ? 'Conectado' : 'Aguardando'}">Conectado</span>
-                        </div>
-                    </div>
-                    <div class="sc-row">
-                        <div class="sc-name"><span style="background:#f59e0b;"></span>Parser PDF</div>
-                        <div class="sc-online"><span class="pulse"></span>Ativo</div>
+                        <div class="text-[13px] text-zen-t2" th:text="${aiOnline ? 'Conectado' : 'Aguardando'}">Conectado</div>
                     </div>
                 </div>
 
@@ -1056,18 +986,18 @@
                         if (onlineIndicator) {
                             if (data.online) {
                                 onlineIndicator.innerHTML = '<span class="pulse"></span>' + data.message;
-                                onlineIndicator.style.color = '#34d399';
+                                onlineIndicator.style.color = 'var(--green)';
                             } else {
-                                onlineIndicator.innerHTML = '<span class="pulse" style="background:#ef4444; animation:none;"></span>' + data.message;
-                                onlineIndicator.style.color = '#ef4444';
+                                onlineIndicator.innerHTML = '<span class="pulse" style="background:var(--red);"></span>' + data.message;
+                                onlineIndicator.style.color = 'var(--red)';
                             }
                         }
                     })
                     .catch(() => {
                         const onlineIndicator = document.querySelector('.status-card .sc-online');
                         if (onlineIndicator) {
-                            onlineIndicator.innerHTML = '<span class="pulse" style="background:#ef4444; animation:none;"></span>Offline (Error)';
-                            onlineIndicator.style.color = '#ef4444';
+                            onlineIndicator.innerHTML = '<span class="pulse" style="background:var(--red);"></span>Offline';
+                            onlineIndicator.style.color = 'var(--red)';
                         }
                     });
             }

@@ -6,8 +6,6 @@
 <body>
     <section class="relative min-h-[calc(100vh-80px)] flex items-center justify-center py-10 px-5 overflow-hidden">
         <!-- Background Decorations -->
-        <div class="absolute -top-[10%] -left-[10%] w-[400px] h-[400px] bg-brand-soft rounded-[43%_57%_70%_30%/30%_60%_40%_70%] blur-[80px] opacity-40 pointer-events-none z-0"></div>
-        <div class="absolute -bottom-[5%] -right-[5%] w-[350px] h-[350px] bg-[#EDF2ED] rounded-[53%_47%_40%_60%/60%_40%_60%_40%] blur-[80px] opacity-40 pointer-events-none z-0"></div>
 
         <!-- Error Banner -->
         <div th:if="${errorMessage}" class="absolute top-5 left-1/2 -translate-x-1/2 z-50 flex items-center gap-2 bg-[color:var(--red-bg)] text-[color:var(--red)] border border-[color:var(--red-b)] px-6 py-3 rounded-xl shadow-lg font-medium">
@@ -28,7 +26,7 @@
                      th:classappend="${step == 3 ? 'bg-brand border-brand ring-4 ring-brand/15' : 'bg-zen-surface2 border-zen-border'}"></div>
             </div>
 
-            <div class="bg-zen-surface/80 border border-white/90 rounded-2xl p-10 sm:p-14 shadow-[0_32px_72px_rgba(15,118,110,0.12)] relative overflow-hidden transition-all duration-500">
+            <div class="bg-zen-surface/80 border rounded-2xl p-10 sm:p-14 relative overflow-hidden transition-all duration-500">
                 <!-- Bamboo Texture Noise -->
                 <div class="absolute inset-0 opacity-[0.02] mix-blend-overlay pointer-events-none bg-[url('data:image/svg+xml,%3Csvg viewBox=%220 0 200 200%22 xmlns=%22http://www.w3.org/2000/svg%22%3E%3Cfilter id=%22noiseFilter%22%3E%3CfeTurbulence type=%22fractalNoise%22 baseFrequency=%220.85%22 numOctaves=%223%22 stitchTiles=%22stitch%22/%3E%3C/filter%3E%3Crect width=%22100%25%22 height=%22100%25%22 filter=%22url(%23noiseFilter)%22/%3E%3C/svg%3E')]"></div>
                 
@@ -42,7 +40,7 @@
                             <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
                             <div>
                                 <label class="block text-[12px] font-semibold text-zen-t3 mb-2 ml-1">Nome do Ativo</label>
-                                <input type="text" name="assetName" class="w-full bg-zen-surface2 border border-zen-border rounded-xl px-4 py-3.5 text-zen-t1 text-[15px] focus:outline-none focus:ring-2 focus:ring-brand/30 focus:bg-zen-surface transition-all" placeholder="Ex: Corolla 2022, Apartamento" required>
+                                <input type="text" name="assetName" class="field-control" placeholder="Ex: Corolla 2022, Apartamento" required>
                             </div>
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <div>
@@ -51,12 +49,12 @@
                                         <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
                                             <span class="text-zen-t3 font-medium">R$</span>
                                         </div>
-                                        <input type="number" step="0.01" name="assetValue" class="w-full bg-zen-surface2 border border-zen-border rounded-xl pl-9 pr-4 py-3.5 text-zen-t1 text-[15px] tabular-nums focus:outline-none focus:ring-2 focus:ring-brand/30 focus:bg-zen-surface transition-all" placeholder="0,00" required>
+                                        <input type="number" step="0.01" name="assetValue" class="field-control tabular-nums" placeholder="0,00" required>
                                     </div>
                                 </div>
                                 <div>
                                     <label class="block text-[12px] font-semibold text-zen-t3 mb-2 ml-1">Tipo de Ativo</label>
-                                    <select name="assetType" class="w-full bg-zen-surface2 border border-zen-border rounded-xl px-4 py-3.5 text-zen-t1 text-[15px] focus:outline-none focus:ring-2 focus:ring-brand/30 focus:bg-zen-surface transition-all appearance-none" required>
+                                    <select name="assetType" class="field-control" required>
                                         <option value="" disabled selected>Selecione...</option>
                                         <option value="VEHICLE">Veículo</option>
                                         <option value="REAL_ESTATE">Imóvel</option>
@@ -82,7 +80,7 @@
                             <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
                             <div>
                                 <label class="block text-[12px] font-semibold text-zen-t3 mb-2 ml-1">Fonte de Renda Principal</label>
-                                <input type="text" name="incomeSource" class="w-full bg-zen-surface2 border border-zen-border rounded-xl px-4 py-3.5 text-zen-t1 text-[15px] focus:outline-none focus:ring-2 focus:ring-brand/30 focus:bg-zen-surface transition-all" placeholder="Ex: Salário, Consultoria" required>
+                                <input type="text" name="incomeSource" class="field-control" placeholder="Ex: Salário, Consultoria" required>
                             </div>
                             <div>
                                 <label class="block text-[12px] font-semibold text-zen-t3 mb-2 ml-1">Valor Líquido Mensal (R$)</label>
@@ -90,7 +88,7 @@
                                     <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
                                         <span class="text-zen-t3 font-medium">R$</span>
                                     </div>
-                                    <input type="number" step="0.01" name="incomeAmount" class="w-full bg-zen-surface2 border border-zen-border rounded-xl pl-9 pr-4 py-3.5 text-zen-t1 text-[15px] tabular-nums focus:outline-none focus:ring-2 focus:ring-brand/30 focus:bg-zen-surface transition-all" placeholder="0,00" required>
+                                    <input type="number" step="0.01" name="incomeAmount" class="field-control tabular-nums" placeholder="0,00" required>
                                 </div>
                             </div>
                             

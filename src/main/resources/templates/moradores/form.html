@@ -40,34 +40,34 @@
           <div class="p-8 flex flex-col gap-6">
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
               <div class="flex flex-col gap-2">
-                <label class="text-[12px] font-semibold text-zen-t2 ml-1">Nome Completo</label>
-                <input type="text" th:field="*{nomeCompleto}" class="w-full px-4 py-3 border border-zen-border rounded-xl bg-zen-surface2 text-[14.5px] text-zen-t1 focus:bg-zen-surface focus:border-brand focus:ring-2 focus:ring-brand/20 transition-all outline-none" placeholder="Ex: João da Silva" required>
+                <label class="field-label">Nome Completo</label>
+                <input type="text" th:field="*{nomeCompleto}" class="field-control" placeholder="Ex: João da Silva" required>
               </div>
               <div class="flex flex-col gap-2">
-                <label class="text-[12px] font-semibold text-zen-t2 ml-1">E-mail</label>
-                <input type="email" th:field="*{email}" class="w-full px-4 py-3 border border-zen-border rounded-xl bg-zen-surface2 text-[14.5px] text-zen-t1 focus:bg-zen-surface focus:border-brand focus:ring-2 focus:ring-brand/20 transition-all outline-none" placeholder="joao@email.com" required>
+                <label class="field-label">E-mail</label>
+                <input type="email" th:field="*{email}" class="field-control" placeholder="joao@email.com" required>
               </div>
             </div>
 
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
               <div class="flex flex-col gap-2">
-                <label class="text-[12px] font-semibold text-zen-t2 ml-1">Nome de Usuário</label>
-                <input type="text" th:field="*{username}" class="w-full px-4 py-3 border border-zen-border rounded-xl bg-zen-surface2 text-[14.5px] text-zen-t1 focus:bg-zen-surface focus:border-brand focus:ring-2 focus:ring-brand/20 transition-all outline-none" placeholder="Ex: joao" required>
+                <label class="field-label">Nome de Usuário</label>
+                <input type="text" th:field="*{username}" class="field-control" placeholder="Ex: joao" required>
                 <div class="text-[12px] text-zen-t3 ml-1 mt-0.5">Sem espaços. Usado no login.</div>
               </div>
               <div class="flex flex-col gap-2">
-                <label class="text-[12px] font-semibold text-zen-t2 ml-1">Telefone</label>
-                <input type="text" th:field="*{telefone}" class="w-full px-4 py-3 border border-zen-border rounded-xl bg-zen-surface2 text-[14.5px] text-zen-t1 focus:bg-zen-surface focus:border-brand focus:ring-2 focus:ring-brand/20 transition-all outline-none" placeholder="Ex: 912 345 678">
+                <label class="field-label">Telefone</label>
+                <input type="text" th:field="*{telefone}" class="field-control" placeholder="Ex: 912 345 678">
               </div>
             </div>
 
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
               <div class="flex flex-col gap-2">
-                <label class="text-[12px] font-semibold text-zen-t2 ml-1">Orçamento Mensal (R$)</label>
-                <input type="number" step="0.01" th:field="*{orcamentoMensal}" class="w-full px-4 py-3 border border-zen-border rounded-xl bg-zen-surface2 text-[14.5px] text-zen-t1 focus:bg-zen-surface focus:border-brand focus:ring-2 focus:ring-brand/20 transition-all outline-none" placeholder="3500.00">
+                <label class="field-label">Orçamento Mensal (R$)</label>
+                <input type="number" step="0.01" th:field="*{orcamentoMensal}" class="field-control" placeholder="3500.00">
               </div>
               <div class="flex flex-col justify-center gap-2">
-                <label class="text-[12px] font-semibold text-zen-t2 ml-1">Acesso ao Sistema</label>
+                <label class="field-label">Acesso ao Sistema</label>
                 <label class="flex items-center gap-3 px-1 mt-2 cursor-pointer group">
                   <div class="relative flex items-center justify-center">
                     <input type="checkbox" th:field="*{ativo}" class="peer appearance-none w-5 h-5 border border-zen-border rounded bg-zen-surface2 checked:bg-brand checked:border-brand focus:outline-none focus:ring-2 focus:ring-brand/20 transition-all cursor-pointer">
@@ -79,14 +79,14 @@
             </div>
 
             <div class="flex flex-col gap-2 mt-2 pt-6 border-t border-zen-border">
-              <label class="text-[12px] font-semibold text-zen-t2 ml-1">Foto de Perfil</label>
+              <label class="field-label">Foto de Perfil</label>
               <input type="file" name="fileFoto" accept="image/*" class="w-full px-4 py-3 border border-zen-border border-dashed rounded-xl bg-zen-surface text-[14px] text-zen-t1 file:mr-4 file:py-2.5 file:px-4 file:rounded-lg file:border-0 file:text-[13px] file:font-semibold file:bg-brand/10 file:text-brand hover:file:bg-brand/20 cursor-pointer transition-all">
               <div class="text-[12px] text-zen-t3 ml-1 mt-1">A foto será atualizada ao gravar as alterações.</div>
             </div>
 
             <div class="flex flex-col gap-2 border-t border-zen-border pt-6 mt-2">
-              <label class="text-[12px] font-semibold text-zen-t2 ml-1" th:text="${morador.id == null ? 'Senha Autenticação' : 'Nova Senha'}">Senha</label>
-              <input type="password" th:field="*{password}" class="w-full px-4 py-3 border border-zen-border rounded-xl bg-zen-surface2 text-[14.5px] text-zen-t1 focus:bg-zen-surface focus:border-brand focus:ring-2 focus:ring-brand/20 transition-all outline-none tabular-nums" placeholder="••••••••" th:required="${morador.id == null}">
+              <label class="field-label" th:text="${morador.id == null ? 'Senha Autenticação' : 'Nova Senha'}">Senha</label>
+              <input type="password" th:field="*{password}" class="field-control tabular-nums" placeholder="••••••••" th:required="${morador.id == null}">
               <div class="text-[12px] text-zen-t3 ml-1 mt-0.5" th:if="${morador.id != null}">Deixe em branco para manter a senha atual inalterada.</div>
             </div>
 

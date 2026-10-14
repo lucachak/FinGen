@@ -66,8 +66,6 @@
     <section class="relative min-h-[calc(100vh-80px)] flex items-center justify-center py-10 px-5 overflow-hidden">
 
         <!-- Background Decor -->
-        <div class="absolute -top-[10%] -left-[10%] w-[500px] h-[500px] bg-brand/10 rounded-full blur-[100px] pointer-events-none z-0"></div>
-        <div class="absolute -bottom-[5%] -right-[5%] w-[400px] h-[400px] bg-[color:var(--green)] rounded-full blur-[100px] pointer-events-none z-0"></div>
 
         <div class="w-full max-w-[740px] relative z-10">
             <!-- Progress Bar -->
@@ -82,7 +80,7 @@
             </div>
 
             <!-- Wizard Container -->
-            <div class="bg-zen-surface/80 border border-white/90 rounded-2xl p-8 md:p-12 relative overflow-hidden min-h-[420px]">
+            <div class="bg-zen-surface/80 border rounded-2xl p-8 md:p-12 relative overflow-hidden min-h-[420px]">
 
                 <form id="onboardingForm" onsubmit="return false;">
 
@@ -91,9 +89,6 @@
                     ════════════════════════════════════════════ -->
                     <div id="step-1" class="step-transition step-active">
                         <div class="text-center mb-10">
-                            <span class="inline-flex items-center gap-2 text-[12px] font-bold text-brand mb-4">
-                                <i data-lucide="wallet" class="w-3.5 h-3.5"></i> Sua Base Financeira
-                            </span>
                             <h2 class="font-serif text-[32px] md:text-[36px] text-zen-t1 tracking-tight mb-3">Vamos partir da sua realidade</h2>
                             <p class="text-zen-t3 text-[15px] max-w-md mx-auto">Informe sua renda e o saldo que você tem hoje. Assim, a análise não começa artificialmente em zero.</p>
                         </div>
@@ -105,7 +100,7 @@
                                         <span class="text-zen-t3 font-medium text-lg">R$</span>
                                     </div>
                                     <input type="number" id="rendaLiquida" name="rendaLiquida" step="0.01" min="0"
-                                        class="w-full bg-zen-surface2/50 border border-zen-border rounded-2xl pl-12 pr-5 py-4 text-zen-t1 text-xl tabular-nums focus:outline-none focus:ring-2 focus:ring-brand/30 focus:bg-zen-surface transition-all"
+                                        class="field-control !pl-12 tabular-nums"
                                         placeholder="0,00">
                                 </div>
                             </div>
@@ -116,7 +111,7 @@
                                         <span class="text-zen-t3 font-medium text-lg">R$</span>
                                     </div>
                                     <input type="number" id="saldoDisponivel" name="saldoDisponivel" step="0.01"
-                                        class="w-full bg-zen-surface2/50 border border-zen-border rounded-2xl pl-12 pr-5 py-4 text-zen-t1 text-xl tabular-nums focus:outline-none focus:ring-2 focus:ring-brand/30 focus:bg-zen-surface transition-all"
+                                        class="field-control !pl-12 tabular-nums"
                                         placeholder="Pode ser negativo">
                                 </div>
                                 <p class="text-xs text-zen-t3 mt-2">Criaremos sua Conta principal com esse saldo. Se estiver no vermelho, informe um valor negativo.</p>
@@ -137,9 +132,6 @@
                     ════════════════════════════════════════════ -->
                     <div id="step-2" class="step-transition step-hidden">
                         <div class="text-center mb-10">
-                            <span class="inline-flex items-center gap-2 text-[12px] font-bold text-brand mb-4">
-                                <i data-lucide="home" class="w-3.5 h-3.5"></i> Moradia
-                            </span>
                             <h2 class="font-serif text-[32px] md:text-[36px] text-zen-t1 tracking-tight mb-3">Como você mora hoje?</h2>
                             <p class="text-zen-t3 text-[15px]">Isso define como vamos organizar suas contas.</p>
                         </div>
@@ -187,7 +179,7 @@
                                     <span class="text-zen-t3 font-medium">R$</span>
                                 </div>
                                 <input type="number" id="valorMoradia" name="valorMoradia" step="10" min="0"
-                                    class="w-full bg-zen-surface2/50 border border-zen-border rounded-xl pl-10 pr-4 py-3.5 text-zen-t1 tabular-nums focus:outline-none focus:ring-2 focus:ring-brand/30"
+                                    class="field-control !pl-10 tabular-nums"
                                     placeholder="0,00">
                             </div>
                         </div>
@@ -228,9 +220,6 @@
                     ════════════════════════════════════════════ -->
                     <div id="step-3" class="step-transition step-hidden">
                         <div class="text-center mb-10">
-                            <span class="inline-flex items-center gap-2 text-[12px] font-bold text-brand mb-4">
-                                <i data-lucide="plug-zap" class="w-3.5 h-3.5"></i> Contas da Casa
-                            </span>
                             <h2 class="font-serif text-[32px] md:text-[36px] text-zen-t1 tracking-tight mb-3">Quais contas você paga?</h2>
                             <p class="text-zen-t3 text-[15px]">Selecione as contas fixas que você é responsável.</p>
                         </div>
@@ -292,9 +281,6 @@
                     ════════════════════════════════════════════ -->
                     <div id="step-4" class="step-transition step-hidden">
                         <div class="text-center mb-10">
-                            <span class="inline-flex items-center gap-2 text-[12px] font-bold text-brand mb-4">
-                                <i data-lucide="shopping-cart" class="w-3.5 h-3.5"></i> Alimentação
-                            </span>
                             <h2 class="font-serif text-[32px] md:text-[36px] text-zen-t1 tracking-tight mb-3">Quanto você gasta com comida?</h2>
                             <p class="text-zen-t3 text-[15px] max-w-md mx-auto">Supermercado + restaurantes + delivery. Estimativa tudo bem.</p>
                         </div>
@@ -333,7 +319,7 @@
                                     <span class="text-zen-t3 font-medium">R$</span>
                                 </div>
                                 <input type="number" id="gastoAlimentacao" name="gastoAlimentacao" step="50" min="0"
-                                    class="w-full bg-zen-surface2/50 border border-zen-border rounded-xl pl-10 pr-4 py-3.5 text-zen-t1 tabular-nums focus:outline-none focus:ring-2 focus:ring-brand/30"
+                                    class="field-control !pl-10 tabular-nums"
                                     placeholder="0,00" oninput="clearAlimCards()">
                             </div>
                         </div>
@@ -350,9 +336,6 @@
                     ════════════════════════════════════════════ -->
                     <div id="step-5" class="step-transition step-hidden">
                         <div class="text-center mb-8">
-                            <span class="inline-flex items-center gap-2 text-[12px] font-bold text-brand mb-4">
-                                <i data-lucide="route" class="w-3.5 h-3.5"></i> Estilo de vida
-                            </span>
                             <h2 class="font-serif text-[32px] md:text-[36px] text-zen-t1 tracking-tight mb-3">Transporte & Assinaturas</h2>
                             <p class="text-zen-t3 text-[15px]">Como você se locomove e o que você assina?</p>
                         </div>
@@ -431,9 +414,6 @@
                     ════════════════════════════════════════════ -->
                     <div id="step-6" class="step-transition step-hidden">
                         <div class="text-center mb-10">
-                            <span class="inline-flex items-center gap-2 text-[12px] font-bold text-brand mb-4">
-                                <i data-lucide="briefcase" class="w-3.5 h-3.5"></i> Perfil Business
-                            </span>
                             <h2 class="font-serif text-[32px] md:text-[36px] text-zen-t1 tracking-tight mb-3">Você tem um negócio?</h2>
                             <p class="text-zen-t3 text-[15px] max-w-md mx-auto">MEI, CNPJ, empresa, autônomo... qualquer atividade empresarial que gera receita ou custos separados.</p>
                         </div>
@@ -458,7 +438,7 @@
                                     Nome do negócio / empresa (opcional)
                                 </label>
                                 <input type="text" id="nomeNegocio" name="nomeNegocio" maxlength="100"
-                                    class="w-full bg-zen-surface2/50 border border-zen-border rounded-xl px-4 py-3.5 text-zen-t1 focus:outline-none focus:ring-2 focus:ring-brand/30 mb-4"
+                                    class="field-control"
                                     placeholder="Ex: Padaria do João, FreelanceDev, etc.">
                             </div>
 

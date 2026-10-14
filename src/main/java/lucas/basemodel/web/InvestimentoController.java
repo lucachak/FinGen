@@ -99,9 +99,9 @@ public class InvestimentoController {
     public String syncMarketPrices(RedirectAttributes redirectAttributes) {
         try {
             mercadoService.atualizarCotacoes();
-            redirectAttributes.addFlashAttribute("successMessage", "Cotações do mercado atualizadas com sucesso!");
+            redirectAttributes.addFlashAttribute("successMessage", "Cotações atualizadas.");
         } catch (Exception e) {
-            redirectAttributes.addFlashAttribute("errorMessage", "Erro ao buscar cotações do mercado: " + e.getMessage());
+            redirectAttributes.addFlashAttribute("errorMessage", "Não foi possível atualizar as cotações agora. Tente de novo em instantes.");
         }
         return "redirect:/app/wealth/investimentos";
     }

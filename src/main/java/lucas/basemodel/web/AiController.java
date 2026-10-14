@@ -167,7 +167,7 @@ public class AiController {
         boolean online = financeAi.isServiceAvailable();
         java.util.Map<String, Object> status = new java.util.HashMap<>();
         status.put("online", online);
-        status.put("message", online ? "Córtex Ativo" : "Córtex Offline");
+        status.put("message", online ? "Online" : "Offline");
         return status;
     }
 }

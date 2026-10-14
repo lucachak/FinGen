@@ -91,7 +91,7 @@ public class AuthController {
         }
 
         if (usuarioRepository.findByEmail(email).isPresent()) {
-            redirectAttributes.addFlashAttribute("erro", "Este email já está em uso.");
+            redirectAttributes.addFlashAttribute("erro", "Este e-mail já está cadastrado. Entre com ele ou use outro.");
             return "redirect:/auth/registar";
         }
 
@@ -104,7 +104,7 @@ public class AuthController {
                 .build();
 
         usuarioRepository.save(newUser);
-        redirectAttributes.addFlashAttribute("sucesso", "A sua jornada começa agora. Faça login para continuar.");
+        redirectAttributes.addFlashAttribute("sucesso", "Conta criada. Entre com seu e-mail e senha para começar.");
         return "redirect:/auth/login";
     }
 

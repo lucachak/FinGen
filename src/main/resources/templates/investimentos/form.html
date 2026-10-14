@@ -89,8 +89,8 @@
     <div class="form-shell anim-1">
       <div class="page-header mb-6">
         <div>
-          <h1 class="page-title" th:text="${investimento.id == null ? 'Novo Ativo' : 'Editar Ativo'}">Investimento</h1>
-          <p class="page-subtitle">Configure os detalhes da sua posição no mercado.</p>
+          <h1 class="page-title" th:text="${investimento.id == null ? 'Adicionar investimento' : 'Editar Ativo'}">Investimento</h1>
+          <p class="page-subtitle">Informe o que você aportou e o valor atual da posição.</p>
         </div>
         <a th:href="@{/app/wealth/investimentos}" class="btn-ghost">
           <i data-lucide="arrow-left" class="w-4 h-4"></i>
@@ -105,19 +105,19 @@
 
             <div class="input-group">
               <div class="field-wrapper col-span-2" style="grid-column: span 2;">
-                <label class="field-label">Nome do Ativo</label>
-                <input type="text" th:field="*{nome}" class="zen-input" placeholder="Ex: Tesouro Selic 2029 ou Itaú Unibanco" required>
+                <label class="field-label">Nome</label>
+                <input type="text" th:field="*{nome}" class="field-control" placeholder="Ex: Tesouro Selic 2029 ou Itaú Unibanco" required>
               </div>
             </div>
 
             <div class="input-group">
               <div class="field-wrapper">
-                <label class="field-label">Ticker (Opcional)</label>
-                <input type="text" th:field="*{ticker}" class="zen-input" placeholder="Ex: ITUB4.SA">
+                <label class="field-label">Ticker (opcional)</label>
+                <input type="text" th:field="*{ticker}" class="field-control" placeholder="Ex: ITUB4.SA">
               </div>
               <div class="field-wrapper">
-                <label class="field-label">Tipo de Ativo</label>
-                <select th:field="*{tipo}" class="zen-input zen-select" required>
+                <label class="field-label">Tipo</label>
+                <select th:field="*{tipo}" class="field-control" required>
                   <option value="" disabled selected>Selecione...</option>
                   <option th:each="t : ${tipos}" 
                           th:value="${t}" 
@@ -129,25 +129,25 @@
             <div class="input-group">
               <div class="field-wrapper">
                 <label class="field-label">Quantidade de cotas</label>
-                <input type="number" min="0" step="0.000001" th:field="*{quantidade}" class="zen-input" placeholder="Ex: 12,5">
+                <input type="number" min="0" step="0.000001" th:field="*{quantidade}" class="field-control" placeholder="Ex: 12,5">
                 <span class="field-help">Usada com o ticker para calcular o valor da posição após a sincronização.</span>
               </div>
               <div class="field-wrapper">
-                <label class="field-label">Total Aportado (R$)</label>
-                <input type="number" min="0" step="0.01" th:field="*{valorAportado}" class="zen-input" placeholder="0,00" required>
+                <label class="field-label">Total aportado (R$)</label>
+                <input type="number" min="0" step="0.01" th:field="*{valorAportado}" class="field-control" placeholder="0,00" required>
               </div>
             </div>
 
             <div class="input-group">
               <div class="field-wrapper">
-                <label class="field-label">Valor Atual (R$)</label>
-                <input type="number" min="0" step="0.01" th:field="*{valorAtual}" class="zen-input" placeholder="0,00" required>
+                <label class="field-label">Valor atual (R$)</label>
+                <input type="number" min="0" step="0.01" th:field="*{valorAtual}" class="field-control" placeholder="0,00" required>
                 <span class="field-help">Informe manualmente se o ativo não tiver ticker.</span>
               </div>
               <div class="field-wrapper">
                 <label class="field-label">Último preço por cota</label>
                 <div class="zen-input opacity-70 cursor-not-allowed" aria-live="polite"
-                     th:text="${investimento.precoAtual != null ? 'R$ ' + #numbers.formatDecimal(investimento.precoAtual, 1, 'POINT', 2, 'COMMA') : 'Será preenchido pela sincronização'}">Será preenchido pela sincronização</div>
+                     th:text="${investimento.precoAtual != null ? 'R$ ' + #numbers.formatDecimal(investimento.precoAtual, 1, 'POINT', 2, 'COMMA') : 'Preenchido ao atualizar as cotações'}">Preenchido ao atualizar as cotações</div>
               </div>
             </div>
 
@@ -155,7 +155,7 @@
               <a th:href="@{/app/wealth/investimentos}" class="btn-ghost">Cancelar</a>
               <button type="submit" class="btn-primary">
                 <i data-lucide="save" class="w-4 h-4"></i>
-                Salvar Ativo
+                Salvar investimento
               </button>
             </div>
           </form>

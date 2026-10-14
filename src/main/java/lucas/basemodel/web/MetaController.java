@@ -156,7 +156,7 @@ public class MetaController {
         }
 
         metaRepository.save(alvo);
-        redirectAttributes.addFlashAttribute("successMessage", "Meta salva com sucesso! Continue firme.");
+        redirectAttributes.addFlashAttribute("successMessage", "Meta salva.");
         return "redirect:/app/financeiro/metas";
     }
 
@@ -252,7 +252,7 @@ public class MetaController {
 
         metaRepository.save(nova);
         redirectAttributes.addFlashAttribute("successMessage",
-            "✨ Meta criada pela IA: " + nova.getTitulo());
+            "Meta criada a partir da sugestão do assistente: " + nova.getTitulo());
         return "redirect:/app/financeiro/metas";
     }
 }

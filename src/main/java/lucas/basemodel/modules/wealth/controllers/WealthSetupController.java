@@ -142,7 +142,7 @@ public class WealthSetupController {
     @ExceptionHandler({TypeMismatchException.class, NumberFormatException.class})
     public String handleTypeMismatch(Exception ex, HttpServletRequest request, RedirectAttributes redirectAttributes) {
         log.warn("Invalid input format in setup wizard: {}", ex.getMessage());
-        redirectAttributes.addFlashAttribute("errorMessage", "Formato numérico inválido. Por favor, use ponto (.) para casas decimais.");
+        redirectAttributes.addFlashAttribute("errorMessage", "Valor inválido. Use apenas números e ponto para os centavos, como em 1500.50.");
         
         String requestURI = request.getRequestURI();
         if (requestURI.contains("step2")) {

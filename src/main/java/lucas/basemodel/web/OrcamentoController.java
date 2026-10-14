@@ -186,14 +186,14 @@ public class OrcamentoController {
                     .orElse(null);
             if (existing != null && !existing.getId().equals(alvo.getId())) {
                 redirectAttributes.addFlashAttribute("errorMessage",
-                        "Oops! Você já definiu um limite mensal para a categoria: "
-                                + categoria.getNome());
+                        "Você já definiu um limite mensal para a categoria "
+                                + categoria.getNome() + ". Edite o limite existente.");
                 return "redirect:/app/financeiro/orcamentos/novo";
             }
         }
 
         orcamentoRepository.save(alvo);
-        redirectAttributes.addFlashAttribute("successMessage", "Belo trabalho! Orçamento configurado com sucesso.");
+        redirectAttributes.addFlashAttribute("successMessage", "Limite salvo.");
         EscopoTransacao escopo = categoria.getEscopo();
         return "redirect:/app/financeiro/orcamentos?escopo=" + escopo.name();
     }
@@ -204,7 +204,7 @@ public class OrcamentoController {
         Orcamento orcamento = orcamentoRepository.findByIdAndResponsavelId(id, user.getId())
                 .orElseThrow(() -> new ResourceNotFoundException("Orçamento não encontrado"));
         orcamentoRepository.delete(orcamento);
-        redirectAttributes.addFlashAttribute("successMessage", "Orçamento removido.");
+        redirectAttributes.addFlashAttribute("successMessage", "Limite removido.");
         return "redirect:/app/financeiro/orcamentos";
     }
 
@@ -226,7 +226,7 @@ public class OrcamentoController {
 
         if (contas.isEmpty()) {
             redirectAttributes.addFlashAttribute("errorMessage",
-                    "Sem dados suficientes nos últimos 3 meses para gerar um orçamento automático.");
+                    "Ainda não há gastos suficientes nos últimos 3 meses para sugerir limites. Registre algumas despesas e tente de novo.");
             return "redirect:/app/financeiro/orcamentos?escopo=" + escopo.name();
         }
 
@@ -257,10 +257,10 @@ public class OrcamentoController {
 
         if (gerados > 0) {
             redirectAttributes.addFlashAttribute("successMessage",
-                    "Mágica feita! " + gerados + " novos orçamentos gerados com base no seu padrão de gastos.");
+                    gerados + (gerados == 1 ? " limite criado" : " limites criados") + " a partir dos seus gastos dos últimos 3 meses.");
         } else {
             redirectAttributes.addFlashAttribute("errorMessage",
-                    "Você já possui orçamentos para todas as categorias ativas.");
+                    "Todas as categorias deste espaço já têm limite.");
         }
         return "redirect:/app/financeiro/orcamentos?escopo=" + escopo.name();
     }

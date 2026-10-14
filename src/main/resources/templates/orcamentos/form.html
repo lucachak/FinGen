@@ -152,8 +152,8 @@
           <input type="hidden" th:field="*{id}" />
           
           <div class="form-group">
-            <label class="form-label" for="catSelect">Categoria de Gastos</label>
-            <select class="form-control" th:field="*{categoria.id}" id="catSelect" required>
+            <label class="field-label" for="catSelect">Categoria de Gastos</label>
+            <select class="field-control" th:field="*{categoria.id}" id="catSelect" required>
               <option value="" disabled selected>Selecione uma categoria...</option>
               <option th:each="cat : ${categorias}" 
                       th:value="${cat.id}" 
@@ -163,10 +163,10 @@
           </div>
           
           <div class="form-group">
-            <label class="form-label" for="limiteMensal">Limite Mensal</label>
+            <label class="field-label" for="limiteMensal">Limite Mensal</label>
             <div class="input-wrapper">
               <span class="input-prefix">R$</span>
-              <input type="number" id="limiteMensal" step="0.01" min="0.01" class="form-control input-with-prefix" th:field="*{limiteMensal}" placeholder="0,00" required />
+              <input type="number" id="limiteMensal" step="0.01" min="0.01" class="field-control" th:field="*{limiteMensal}" placeholder="0,00" required />
             </div>
           </div>
           
