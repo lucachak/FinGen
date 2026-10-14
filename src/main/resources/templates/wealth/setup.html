@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" th:replace="~{layout/layout :: layout('Configuração FinGen Zen', ~{::section}, ~{::style}, ~{::script})}">
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{layout/layout :: layout('Configuração FinGen Zen', ~{::main}, ~{::style}, ~{::script})}">
 <head>
     <style></style>
 </head>
 <body>
-    <section class="relative min-h-[calc(100vh-80px)] flex items-center justify-center py-10 px-5 overflow-hidden">
+    <main class="relative min-h-[calc(100vh-80px)] flex items-center justify-center py-10 px-5 overflow-hidden">
         <!-- Background Decorations -->
 
         <!-- Error Banner -->
@@ -175,7 +175,7 @@
                 Você pode mudar isso depois em Distribuição da renda.
             </p>
         </div>
-    </section>
+    </main>
 
     <script th:inline="javascript">
         function selectStrategy(strategy, element) {

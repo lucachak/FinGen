@@ -596,8 +596,8 @@
                                 <div class="font-semibold text-white text-[14px]">Consultor FinGen</div>
                                 <label for="ai-model-select" class="sr-only">Modelo de IA</label>
                                 <select id="ai-model-select" disabled
-                                    class="mt-1 max-w-[230px] truncate text-[12px] font-medium text-white rounded-md px-2 py-1 border focus:outline-none focus:ring-1 focus:ring-white"
-                                    style="background: rgba(255,255,255,0.15);">
+                                    class="mt-1 max-w-[230px] truncate text-[13px] font-medium rounded-md px-2 py-1 border focus:outline-none"
+                                    style="background: var(--surface); color: var(--t1); border-color: var(--border-2);">
                                     <option>Carregando modelos...</option>
                                 </select>
                             </div>
@@ -606,7 +606,7 @@
                     <div class="chart-body flex-1 overflow-y-auto p-5 flex flex-col gap-4 bg-zen-surface2"
                         id="chat-messages">
                         <div
-                            class="text-[12px] text-zen-t3 text-center py-2 flex items-center justify-center flex-col gap-2 opacity-60">
+                            class="text-[12px] text-zen-t3 text-center py-2 flex items-center justify-center flex-col gap-2" data-chat-placeholder>
                             <i data-lucide="message-circle" class="w-5 h-5"></i>
                             Inicie uma conversa.
                         </div>
@@ -615,7 +615,7 @@
                         <textarea id="chat-input" rows="1"
                             class="field-control"
                             placeholder="Pergunte-me algo..."></textarea>
-                        <button onclick="sendChatMessage()"
+                        <button type="button" onclick="sendChatMessage()" aria-label="Enviar mensagem"
                             class="w-[46px] h-[46px] rounded-xl bg-brand text-white flex items-center justify-center hover:bg-brand-h transition-colors shrink-0 shadow-sm">
                             <i data-lucide="send" class="w-4 h-4 ml-0.5"></i>
                         </button>
@@ -830,7 +830,7 @@
                 var id = 'msg-' + Date.now();
                 var container = document.getElementById('chat-messages');
 
-                var placeholder = container.querySelector('.opacity-60');
+                var placeholder = container.querySelector('[data-chat-placeholder]');
                 if (placeholder) placeholder.remove();
 
                 var wrapper = document.createElement('div');

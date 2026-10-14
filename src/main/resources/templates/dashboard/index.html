@@ -160,12 +160,12 @@
                         <dt class="text-[13px] text-zen-t3">Renda comprometida</dt>
                         <dd class="mt-1 text-[22px] font-semibold text-zen-t1"
                             th:text="${#numbers.formatDecimal(comprometimentoRenda, 1, 'POINT', 0, 'COMMA')} + '%'">9%</dd>
-                        <dd class="mt-2 h-1.5 rounded-full bg-zen-surface2 overflow-hidden" role="progressbar"
+                        <dd class="mt-2"><div class="h-1.5 rounded-full bg-zen-surface2 overflow-hidden" role="progressbar"
                             aria-label="Percentual da renda comprometida" th:attr="aria-valuenow=${comprometimentoVisual}" aria-valuemin="0" aria-valuemax="100">
                             <span class="block h-full rounded-full"
                                   th:classappend="${comprometimentoRenda le 70 ? ' bg-brand' : (comprometimentoRenda le 90 ? ' bg-[color:var(--amber)]' : ' bg-[color:var(--red)]')}"
                                   th:style="|width:${comprometimentoVisual}%|"></span>
-                        </dd>
+                        </div></dd>
                         <dd class="mt-1 text-[12.5px] text-zen-t3">Meta: até 70%</dd>
                     </div>
                 </dl>
@@ -353,7 +353,7 @@
                 <!-- WEALTH EVOLUTION (LARGE CARD) -->
                 <div class="bg-zen-surface border border-zen-border rounded-2xl p-8">
                     <div class="flex items-center justify-between mb-8">
-                        <h5 class="text-lg font-serif font-medium text-zen-t1">Evolução do patrimônio</h5>
+                        <h2 class="text-lg font-serif font-medium text-zen-t1">Evolução do patrimônio</h2>
                         <div class="flex items-center gap-2">
                             <span class="w-2 h-2 rounded-full bg-brand"></span>
                             <span class="text-[13px] text-zen-t3">Patrimônio líquido</span>
@@ -372,7 +372,7 @@
                 <!-- GOALS (BENTO MINI CARDS) -->
                 <div>
                     <div class="flex items-center justify-between mb-5 px-2">
-                        <h5 class="text-lg font-serif font-medium text-zen-t1">Metas ativas</h5>
+                        <h2 class="text-lg font-serif font-medium text-zen-t1">Metas ativas</h2>
                         <a th:href="@{/app/financeiro/metas}" class="text-xs font-medium text-brand hover:underline">Ver todas &rarr;</a>
                     </div>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -409,7 +409,7 @@
                 <!-- DISTRIBUTION -->
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div class="bg-zen-surface border border-zen-border rounded-2xl p-8 min-h-[320px]">
-                        <h5 class="text-lg font-serif font-medium text-zen-t1 mb-8">Alocação dos ativos</h5>
+                        <h2 class="text-lg font-serif font-medium text-zen-t1 mb-8">Alocação dos ativos</h2>
                         
                         <!-- Real Chart -->
                         <div th:if="${assetBreakdownLabels != null and !#lists.isEmpty(assetBreakdownLabels)}" class="h-[200px] flex justify-center">
@@ -455,7 +455,7 @@
                 <!-- UPCOMING BILLS -->
                 <div class="bg-zen-surface2 border border-zen-border rounded-2xl p-7">
                     <div class="flex items-center justify-between mb-6">
-                        <h5 class="text-base font-serif font-medium text-zen-t1">Próximos vencimentos</h5>
+                        <h2 class="text-base font-serif font-medium text-zen-t1">Próximos vencimentos</h2>
                         <span class="text-[12px] bg-[color:var(--red-bg)] text-[color:var(--red)] px-2 py-0.5 rounded-full font-bold" th:text="${#lists.size(upcomingBills)}">3</span>
                     </div>
                     <div class="flex flex-col gap-3">
@@ -491,7 +491,7 @@
                 <!-- RECENT TRANSACTIONS -->
                 <div class="bg-zen-surface border border-zen-border rounded-2xl p-7">
                     <div class="flex items-center justify-between mb-6">
-                        <h5 class="text-base font-serif font-medium text-zen-t1">Movimentações recentes</h5>
+                        <h2 class="text-base font-serif font-medium text-zen-t1">Movimentações recentes</h2>
                         <a th:href="@{/app/financeiro/transacoes}" class="text-[12px] text-brand font-medium">Histórico</a>
                     </div>
                     <div class="flex flex-col gap-4">
@@ -566,7 +566,7 @@
 
             <!-- CASA DISTRIBUTION -->
             <div class="lg:col-span-8 bg-zen-surface border border-zen-border rounded-2xl p-8">
-                <h5 class="text-sm font-serif font-medium text-zen-t1 mb-6">Gastos da casa por categoria</h5>
+                <h2 class="text-sm font-serif font-medium text-zen-t1 mb-6">Gastos da casa por categoria</h2>
                 <div class="h-[200px]" th:if="${labelsCategoriaCasa != null and labelsCategoriaCasa.size() > 0}">
                     <canvas id="graficoCasa" aria-label="Gastos da casa por categoria neste mês" role="img"></canvas>
                 </div>
@@ -638,7 +638,7 @@
             
             <!-- Suggestions -->
             <div th:if="${suggestions != null and !#lists.isEmpty(suggestions)}" class="pb-8">
-                <h6 class="text-[13px] font-semibold text-zen-t2 mb-5 flex items-center gap-2 before:w-1 before:h-4 before:bg-brand before:rounded-full">Sugestões para o patrimônio</h6>
+                <h3 class="text-[13px] font-semibold text-zen-t2 mb-5 flex items-center gap-2 before:w-1 before:h-4 before:bg-brand before:rounded-full">Sugestões para o patrimônio</h3>
                 <div class="flex flex-col gap-4">
                     <div th:each="s : ${suggestions}"
                          th:with="isHigh=${s.severity.name() == 'HIGH'}, isMed=${s.severity.name() == 'MEDIUM'}"

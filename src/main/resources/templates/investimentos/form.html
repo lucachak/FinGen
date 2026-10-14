@@ -116,7 +116,7 @@
                 <input type="text" th:field="*{ticker}" class="field-control" placeholder="Ex: ITUB4.SA">
               </div>
               <div class="field-wrapper">
-                <label class="field-label">Tipo</label>
+                <label class="field-label" for="tipo">Tipo</label>
                 <select th:field="*{tipo}" class="field-control" required>
                   <option value="" disabled selected>Selecione...</option>
                   <option th:each="t : ${tipos}" 

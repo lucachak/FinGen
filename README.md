@@ -23,6 +23,12 @@
 
 ---
 
+## Frontend
+
+O CSS é compilado a partir de `frontend/` (Tailwind) e o resultado é versionado em
+`src/main/resources/static/css/app.css`. Para alterar estilos, veja [`frontend/README.md`](frontend/README.md)
+e o sistema de design em [`design-system/fingen/MASTER.md`](design-system/fingen/MASTER.md).
+
 ## 📖 About the Project
 
 **FinGen** is a full-stack web application developed to simplify and centralize family and personal financial management. It combines a robust Spring Boot backend with a reactive frontend via HTMX and Thymeleaf, offering a fluid experience without the complexity of a separate SPA.

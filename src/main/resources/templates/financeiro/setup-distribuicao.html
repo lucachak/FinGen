@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" th:replace="~{layout/layout :: layout('Distribuição da renda', ~{::section}, ~{::style}, ~{::script})}">
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{layout/layout :: layout('Distribuição da renda', ~{::main}, ~{::style}, ~{::script})}">
 <head>
     <style>
         .strategy-option {
@@ -14,7 +14,7 @@
     </style>
 </head>
 <body>
-    <section class="max-w-[960px] mx-auto w-full">
+    <main class="max-w-[960px] mx-auto w-full">
         <div class="page-header">
             <div class="min-w-0">
                 <h1 class="page-title">Distribuição da renda</h1>
@@ -98,7 +98,7 @@
                 </p>
             </aside>
         </div>
-    </section>
+    </main>
 
     <script th:inline="javascript">
         const formatter = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' });

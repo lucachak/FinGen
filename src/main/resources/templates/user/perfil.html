@@ -117,7 +117,7 @@
 </head>
 
 <body>
-    <div th:fragment="content">
+    <main th:fragment="content">
         <div class="zen-shell">
             <div class="page-header anim-1" style="margin-bottom:24px;">
                 <div>
@@ -141,7 +141,7 @@
                 <form th:action="@{/app/settings/perfil/foto}" method="post" enctype="multipart/form-data">
                     <div class="profile-body">
                         <div class="field">
-                            <label class="field-label">Nova foto de perfil</label>
+                            <label class="field-label" for="foto">Nova foto de perfil</label>
                             <input type="file" id="foto" name="foto" accept="image/png,image/jpeg,image/webp"
                                 class="field-input" required>
                         </div>
@@ -160,7 +160,7 @@
                 </form>
             </div>
         </div>
-    </div>
+    </main>
 </body>
 
 </html>

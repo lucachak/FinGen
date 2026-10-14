@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org"
       th:replace="~{layout/layout :: layout(
-          pageTitle='Configurar Orçamento',
+          pageTitle='Limite de orçamento',
           content=~{::main},
           pageStyles=~{::style},
           pageScripts=~{::script}
@@ -144,7 +144,7 @@
 
     <div class="form-hero opacity-0 translate-y-4">
       <div class="form-section">
-        <h2 th:text="${orcamento.id == null ? 'Novo Planejamento' : 'Refinar Orçamento'}">Novo Planejamento</h2>
+        <h1 th:text="${orcamento.id == null ? 'Adicionar limite' : 'Editar limite'}">Adicionar limite</h1>
         <p>Defina quanto quer gastar em cada categoria por mês. O FinGen mostra quanto já foi usado e destaca quando você chega perto do limite.</p>
         <div class="mb-5 inline-flex px-3 py-2 rounded-lg bg-brand-soft text-brand text-xs font-bold" th:text="'Espaço: ' + ${escopoSelecionado.descricao}"></div>
         
@@ -188,7 +188,7 @@
 
         <div class="bg-brand-soft border border-zen-border rounded-xl p-6">
           <i data-lucide="brain-circuit" class="text-brand mb-3"></i>
-          <h4 class="font-bold text-sm text-brand mb-1">Dica</h4>
+          <h2 class="font-bold text-sm text-brand mb-1">Dica</h2>
           <p class="text-xs text-brand leading-relaxed">Escolha categorias que você já usa nas contas: o gasto de cada limite é calculado a partir delas.</p>
         </div>
       </div>

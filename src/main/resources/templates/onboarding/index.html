@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" th:replace="~{layout/layout :: layout('Onboarding FinGen', ~{::section}, ~{::style}, ~{::script})}">
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{layout/layout :: layout('Onboarding FinGen', ~{::main}, ~{::style}, ~{::script})}">
 <head>
     <style>
         /* ─── Step Transitions ─── */
@@ -63,7 +63,7 @@
     </style>
 </head>
 <body>
-    <section class="relative min-h-[calc(100vh-80px)] flex items-center justify-center py-10 px-5 overflow-hidden">
+    <main class="relative min-h-[calc(100vh-80px)] flex items-center justify-center py-10 px-5 overflow-hidden">
 
         <!-- Background Decor -->
 
@@ -474,7 +474,7 @@
                 </form>
             </div>
         </div>
-    </section>
+    </main>
 
     <script>
         // ──────────────────────────────────────────────
