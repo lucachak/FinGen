@@ -98,7 +98,7 @@
                             </td>
                             <td class="px-6 py-4 text-right">
                                 <span class="tabular-nums font-medium text-[14px]" 
-                                      th:classappend="${t.tipo == T(lucas.basemodel.modules.financeiro.enums.TipoTransacao).RECEITA ? 'text-emerald-600' : 'text-zen-t1'}"
+                                      th:classappend="${t.tipo == T(lucas.basemodel.modules.financeiro.enums.TipoTransacao).RECEITA ? 'text-[color:var(--green)]' : 'text-zen-t1'}"
                                       th:text="${(t.tipo == T(lucas.basemodel.modules.financeiro.enums.TipoTransacao).RECEITA ? '+ ' : '- ') + 'R$ ' + #numbers.formatDecimal(t.valor, 1, 'POINT', 2, 'COMMA')}">R$ 0,00</span>
                                 <input type="hidden" th:name="'valor[' + ${iter.index} + ']'" th:value="${t.valor}">
                                 <input type="hidden" th:name="'tipo[' + ${iter.index} + ']'" th:value="${t.tipo}">

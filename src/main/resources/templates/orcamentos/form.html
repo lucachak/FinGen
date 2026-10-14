@@ -146,7 +146,7 @@
       <div class="form-section">
         <h2 th:text="${orcamento.id == null ? 'Novo Planejamento' : 'Refinar Orçamento'}">Novo Planejamento</h2>
         <p>Defina quanto quer gastar em cada categoria por mês. O FinGen mostra quanto já foi usado e destaca quando você chega perto do limite.</p>
-        <div class="mb-5 inline-flex px-3 py-2 rounded-lg bg-teal-50 text-teal-800 text-xs font-bold" th:text="'Espaço: ' + ${escopoSelecionado.descricao}"></div>
+        <div class="mb-5 inline-flex px-3 py-2 rounded-lg bg-brand-soft text-brand text-xs font-bold" th:text="'Espaço: ' + ${escopoSelecionado.descricao}"></div>
         
         <form th:action="@{/app/financeiro/orcamentos/salvar}" th:object="${orcamento}" method="post">
           <input type="hidden" th:field="*{id}" />
@@ -186,10 +186,10 @@
           <span class="cat-natureza">Prévia visual</span>
         </div>
 
-        <div class="bg-teal-50 border border-teal-100 rounded-xl p-6">
+        <div class="bg-brand-soft border border-zen-border rounded-xl p-6">
           <i data-lucide="brain-circuit" class="text-brand mb-3"></i>
-          <h4 class="font-bold text-sm text-teal-900 mb-1">Dica</h4>
-          <p class="text-xs text-teal-700 leading-relaxed">Escolha categorias que você já usa nas contas: o gasto de cada limite é calculado a partir delas.</p>
+          <h4 class="font-bold text-sm text-brand mb-1">Dica</h4>
+          <p class="text-xs text-brand leading-relaxed">Escolha categorias que você já usa nas contas: o gasto de cada limite é calculado a partir delas.</p>
         </div>
       </div>
     </div>

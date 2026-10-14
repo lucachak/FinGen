@@ -10,7 +10,7 @@
         <div class="absolute -bottom-[5%] -right-[5%] w-[350px] h-[350px] bg-[#EDF2ED] rounded-[53%_47%_40%_60%/60%_40%_60%_40%] blur-[80px] opacity-40 pointer-events-none z-0"></div>
 
         <!-- Error Banner -->
-        <div th:if="${errorMessage}" class="absolute top-5 left-1/2 -translate-x-1/2 z-50 flex items-center gap-2 bg-red-50 text-red-600 border border-red-200 px-6 py-3 rounded-xl shadow-lg font-medium">
+        <div th:if="${errorMessage}" class="absolute top-5 left-1/2 -translate-x-1/2 z-50 flex items-center gap-2 bg-[color:var(--red-bg)] text-[color:var(--red)] border border-[color:var(--red-b)] px-6 py-3 rounded-xl shadow-lg font-medium">
             <i data-lucide="alert-triangle" class="w-6 h-6"></i>
             <span th:text="${errorMessage}">Erro genérico</span>
         </div>

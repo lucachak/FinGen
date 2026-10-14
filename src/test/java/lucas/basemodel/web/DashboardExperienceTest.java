@@ -77,8 +77,8 @@ class DashboardExperienceTest {
         mockMvc.perform(get("/app/wealth/investimentos"))
                 .andExpect(status().isOk())
                 .andExpect(view().name("investimentos/lista"))
-                .andExpect(content().string(containsString("Carteira de Investimentos")))
-                .andExpect(content().string(containsString("Resultado Acumulado")))
+                .andExpect(content().string(containsString("Posições, resultado e peso de cada ativo na carteira.")))
+                .andExpect(content().string(containsString("Resultado acumulado")))
                 .andExpect(content().string(containsString("ETF Global")));
     }
 }

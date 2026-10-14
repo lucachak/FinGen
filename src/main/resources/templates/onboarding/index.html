@@ -67,7 +67,7 @@
 
         <!-- Background Decor -->
         <div class="absolute -top-[10%] -left-[10%] w-[500px] h-[500px] bg-brand/10 rounded-full blur-[100px] pointer-events-none z-0"></div>
-        <div class="absolute -bottom-[5%] -right-[5%] w-[400px] h-[400px] bg-emerald-200/20 rounded-full blur-[100px] pointer-events-none z-0"></div>
+        <div class="absolute -bottom-[5%] -right-[5%] w-[400px] h-[400px] bg-[color:var(--green)] rounded-full blur-[100px] pointer-events-none z-0"></div>
 
         <div class="w-full max-w-[740px] relative z-10">
             <!-- Progress Bar -->
@@ -76,7 +76,7 @@
             </div>
 
             <!-- Error Toast -->
-            <div id="validation-error" class="hidden absolute top-4 left-1/2 -translate-x-1/2 z-50 bg-red-50 text-red-600 border border-red-200 px-6 py-3 rounded-xl shadow-lg font-medium flex items-center gap-2">
+            <div id="validation-error" class="hidden absolute top-4 left-1/2 -translate-x-1/2 z-50 bg-[color:var(--red-bg)] text-[color:var(--red)] border border-[color:var(--red-b)] px-6 py-3 rounded-xl shadow-lg font-medium flex items-center gap-2">
                 <i data-lucide="alert-circle" class="w-5 h-5"></i>
                 <span id="error-message">Por favor, preencha o campo.</span>
             </div>
@@ -239,14 +239,14 @@
                             <div class="relative">
                                 <input type="checkbox" name="contasCasa" value="Luz" id="conta-luz" class="checkbox-card-input hidden" data-optional-group="contas-casa">
                                 <label for="conta-luz" class="checkbox-card-label cursor-pointer flex items-center gap-3 p-4 border border-zen-border rounded-xl transition hover:bg-zen-surface2 select-none">
-                                    <i data-lucide="zap" class="w-5 h-5 text-amber-500 shrink-0"></i>
+                                    <i data-lucide="zap" class="w-5 h-5 text-[color:var(--amber)] shrink-0"></i>
                                     <span class="font-medium text-[14px]">Energia</span>
                                 </label>
                             </div>
                             <div class="relative">
                                 <input type="checkbox" name="contasCasa" value="Agua" id="conta-agua" class="checkbox-card-input hidden" data-optional-group="contas-casa">
                                 <label for="conta-agua" class="checkbox-card-label cursor-pointer flex items-center gap-3 p-4 border border-zen-border rounded-xl transition hover:bg-zen-surface2 select-none">
-                                    <i data-lucide="droplet" class="w-5 h-5 text-blue-500 shrink-0"></i>
+                                    <i data-lucide="droplet" class="w-5 h-5 text-brand shrink-0"></i>
                                     <span class="font-medium text-[14px]">Água</span>
                                 </label>
                             </div>
@@ -260,14 +260,14 @@
                             <div class="relative">
                                 <input type="checkbox" name="contasCasa" value="Gas" id="conta-gas" class="checkbox-card-input hidden" data-optional-group="contas-casa">
                                 <label for="conta-gas" class="checkbox-card-label cursor-pointer flex items-center gap-3 p-4 border border-zen-border rounded-xl transition hover:bg-zen-surface2 select-none">
-                                    <i data-lucide="flame" class="w-5 h-5 text-orange-500 shrink-0"></i>
+                                    <i data-lucide="flame" class="w-5 h-5 text-[color:var(--amber)] shrink-0"></i>
                                     <span class="font-medium text-[14px]">Gás</span>
                                 </label>
                             </div>
                             <div class="relative">
                                 <input type="checkbox" name="contasCasa" value="Condominio" id="conta-condo" class="checkbox-card-input hidden" data-optional-group="contas-casa">
                                 <label for="conta-condo" class="checkbox-card-label cursor-pointer flex items-center gap-3 p-4 border border-zen-border rounded-xl transition hover:bg-zen-surface2 select-none">
-                                    <i data-lucide="building" class="w-5 h-5 text-emerald-600 shrink-0"></i>
+                                    <i data-lucide="building" class="w-5 h-5 text-[color:var(--green)] shrink-0"></i>
                                     <span class="font-medium text-[14px]">Condomínio</span>
                                 </label>
                             </div>

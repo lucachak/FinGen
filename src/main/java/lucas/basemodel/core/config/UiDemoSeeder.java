@@ -7,10 +7,13 @@ import lucas.basemodel.modules.financeiro.enums.StatusTransacao;
 import lucas.basemodel.modules.financeiro.enums.TipoTransacao;
 import lucas.basemodel.modules.financeiro.models.Categoria;
 import lucas.basemodel.modules.financeiro.models.Conta;
+import lucas.basemodel.modules.financeiro.enums.TipoAtivo;
+import lucas.basemodel.modules.financeiro.models.Investimento;
 import lucas.basemodel.modules.financeiro.models.MetaFinanceira;
 import lucas.basemodel.modules.financeiro.models.Orcamento;
 import lucas.basemodel.modules.financeiro.repositories.CategoriaRepository;
 import lucas.basemodel.modules.financeiro.repositories.ContaRepository;
+import lucas.basemodel.modules.financeiro.repositories.InvestimentoRepository;
 import lucas.basemodel.modules.financeiro.repositories.MetaFinanceiraRepository;
 import lucas.basemodel.modules.financeiro.repositories.OrcamentoRepository;
 import lucas.basemodel.modules.user.User;
@@ -38,6 +41,7 @@ public class UiDemoSeeder {
     private final ContaRepository contas;
     private final OrcamentoRepository orcamentos;
     private final MetaFinanceiraRepository metas;
+    private final InvestimentoRepository investimentos;
     private final PasswordEncoder passwordEncoder;
 
     /** Depois de todos os CommandLineRunner (SetupInicial cria usuário demo e catálogo de categorias). */
@@ -93,6 +97,9 @@ public class UiDemoSeeder {
         meta(demo, "Reserva de emergência (6 meses de despesas)", NaturezaMeta.RESERVA_EMERGENCIA, "30000.00", "11400.00", h.plusMonths(14));
         meta(demo, "Viagem de fim de ano", NaturezaMeta.VIAGEM, "6500.00", "6500.00", h.plusMonths(2));
 
+        investimento(demo, "Tesouro Selic 2029", null, TipoAtivo.RENDA_FIXA, null, "8000.00", "8412.30");
+        investimento(demo, "ETF IVVB11", "IVVB11.SA", TipoAtivo.ETF, "12", "3600.00", "3948.00");
+
         orcamento(demo, "Lazer", "100.00");
         orcamento(demo, "Transporte", "160.00");
     }
@@ -133,6 +140,19 @@ public class UiDemoSeeder {
             c.setCategoria(categoria(nomeCategoria, escopo));
         }
         contas.save(c);
+    }
+
+    private void investimento(User dono, String nome, String ticker, TipoAtivo tipo, String quantidade,
+                              String aportado, String atual) {
+        Investimento i = new Investimento();
+        i.setNome(nome);
+        i.setTicker(ticker);
+        i.setTipo(tipo);
+        i.setQuantidade(quantidade != null ? new BigDecimal(quantidade) : null);
+        i.setValorAportado(new BigDecimal(aportado));
+        i.setValorAtual(new BigDecimal(atual));
+        i.setResponsavel(dono);
+        investimentos.save(i);
     }
 
     private void meta(User dono, String titulo, NaturezaMeta natureza, String alvo, String atual, LocalDate prazo) {

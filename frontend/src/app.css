@@ -161,6 +161,13 @@ body {
     cursor: pointer; text-decoration: none;
     transition: background-color .15s ease, border-color .15s ease, color .15s ease;
   }
+  .btn-primary,
+  .btn-secondary,
+  .btn-ghost,
+  .btn-danger { white-space: nowrap; }
+  @media (max-width: 640px) {
+    .btn-primary, .btn-secondary, .btn-ghost, .btn-danger { min-height: 44px; }
+  }
   .btn-primary {
     background: var(--brand); color: var(--t-inv); border: 1px solid var(--brand);
   }
@@ -223,6 +230,11 @@ body {
   .page-header {
     display: flex; align-items: flex-end; justify-content: space-between; gap: 16px;
     margin-bottom: 24px;
+  }
+  @media (max-width: 640px) {
+    .page-header { flex-direction: column; align-items: stretch; gap: 12px; margin-bottom: 16px; }
+    .page-header > div:last-child:not(:first-child) { justify-content: flex-start; }
+    .page-title { font-size: 26px; }
   }
   .page-title {
     font-family: var(--font-serif);

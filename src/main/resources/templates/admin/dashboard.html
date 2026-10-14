@@ -63,7 +63,7 @@
                             th:text="${#temporals.format(u.criadoEm, 'dd/MM/yyyy HH:mm')}">01/01/2026</td>
                         <td class="py-4 px-4">
                             <span class="text-[12px] font-bold px-2 py-1 rounded-full"
-                                  th:classappend="${u.ativo} ? 'bg-emerald-50 text-emerald-600 border border-emerald-100' : 'bg-rose-50 text-rose-600 border border-rose-100'"
+                                  th:classappend="${u.ativo} ? 'bg-[color:var(--green-bg)] text-[color:var(--green)] border border-[color:var(--green-b)]' : 'bg-[color:var(--red-bg)] text-[color:var(--red)] border border-[color:var(--red-b)]'"
                                   th:text="${u.ativo ? 'ATIVO' : 'INATIVO'}">ATIVO</span>
                         </td>
                     </tr>

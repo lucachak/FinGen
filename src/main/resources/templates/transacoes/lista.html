@@ -22,7 +22,7 @@
       <div th:each="tx : ${transacoes}" class="flex items-center gap-4 py-3.5 px-6 border-b border-zen-border last:border-b-0 hover:bg-zen-surface2 transition-colors">
         
         <div class="w-11 h-11 rounded-full flex items-center justify-center shrink-0 border" 
-             th:classappend="${tx.tipo.name() == 'RECEITA' ? 'bg-brand/10 text-brand border-brand/20' : 'bg-red-50 text-red-600 border-red-100'}">
+             th:classappend="${tx.tipo.name() == 'RECEITA' ? 'bg-brand/10 text-brand border-brand/20' : 'bg-[color:var(--red-bg)] text-[color:var(--red)] border-[color:var(--red-b)]'}">
           <!-- Lucide Icon for Arrow Up/Down -->
           <svg th:if="${tx.tipo.name() == 'RECEITA'}" xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/></svg>
           <svg th:if="${tx.tipo.name() == 'DESPESA'}" xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><polyline points="19 12 12 19 5 12"/></svg>

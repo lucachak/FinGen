@@ -1,225 +1,157 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org"
-  th:replace="~{layout/layout :: layout('Meu Patrimônio',~{::main},~{::style},~{::script})}" lang="pt-BR">
+  th:replace="~{layout/layout :: layout('Investimentos',~{::main},~{::style},~{::script})}" lang="pt-BR">
 
 <head>
   <style th:fragment="style">
-    .wealth-grid {
-      display: grid;
-      grid-template-columns: repeat(12, 1fr);
-      gap: 20px;
+    .position-row {
+      display: grid; gap: 8px 16px; align-items: center; padding: 14px 4px;
+      border-bottom: 1px solid var(--border);
+      grid-template-columns: minmax(0, 1fr) auto;
     }
-
-    .summary-card {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 24px;
-      padding: 24px;
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-      box-shadow: var(--sh-sm);
+    @media (min-width: 900px) {
+      .position-row { grid-template-columns: minmax(0, 2.2fr) minmax(0, 1.1fr) minmax(0, 1.3fr) minmax(0, 1fr) auto; }
     }
-
-    .asset-card {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 24px;
-      padding: 24px;
-      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-      position: relative;
-      overflow: hidden;
+    .position-head { display: none; }
+    @media (min-width: 900px) {
+      .position-head {
+        display: grid; gap: 16px; padding: 8px 4px; color: var(--t3); font-size: 13px;
+        grid-template-columns: minmax(0, 2.2fr) minmax(0, 1.1fr) minmax(0, 1.3fr) minmax(0, 1fr) auto;
+      }
     }
-
-    .asset-card:hover {
-      transform: translateY(-4px);
-      box-shadow: var(--sh-lg);
-      border-color: var(--brand);
-    }
-
-    .asset-icon-box {
-      width: 44px;
-      height: 44px;
-      border-radius: 14px;
-      background: var(--brand-soft);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: var(--brand);
-      margin-bottom: 16px;
-    }
-
-    .roi-badge {
-      font-family: var(--mono);
-      font-size: 11px;
-      font-weight: 600;
-      padding: 3px 10px;
-      border-radius: 99px;
-      display: inline-flex;
-      align-items: center;
-      gap: 4px;
-    }
-
-    .roi-pos { background: rgba(21, 128, 61, 0.1); color: #15803d; border: 1px solid rgba(21, 128, 61, 0.2); }
-    .roi-neg { background: rgba(185, 28, 28, 0.1); color: #b91c1c; border: 1px solid rgba(185, 28, 28, 0.2); }
-    .roi-neu { background: var(--surface-2); color: var(--t3); border: 1px solid var(--border); }
-
-    .sync-loader {
-      animation: spin 2s linear infinite;
-    }
-
-    .position-track { height: 5px; overflow: hidden; border-radius: 999px; background: var(--surface-2); }
-    .position-track > span { display: block; height: 100%; border-radius: inherit; background: var(--brand); }
-
-    @keyframes spin {
-      from { transform: rotate(0deg); }
-      to { transform: rotate(360deg); }
-    }
+    .spin { animation: spin 1.2s linear infinite; }
+    @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
   </style>
 </head>
 
 <body>
-  <main>
-    <!-- Header -->
-    <div class="page-header mb-8 anim-1">
-      <div>
-        <h1 class="page-title">Carteira de Investimentos</h1>
-        <p class="page-subtitle">Posições, rendimentos e composição em um só lugar.</p>
+  <main class="max-w-[1200px] mx-auto w-full">
+
+    <div class="page-header">
+      <div class="min-w-0">
+        <h1 class="page-title">Investimentos</h1>
+        <p class="page-subtitle">Posições, resultado e peso de cada ativo na carteira.</p>
       </div>
-      <div class="flex gap-3">
-        <form th:action="@{/app/wealth/investimentos/sync}" method="post">
-          <button id="btnSync" type="submit" class="p-2 border border-zen-border rounded-xl text-brand hover:bg-emerald-50 transition-all shadow-sm" aria-label="Sincronizar cotações">
+      <div class="flex flex-wrap gap-2 justify-end">
+        <form th:action="@{/app/wealth/investimentos/sync}" method="post" class="m-0">
+          <button id="btnSync" type="submit" class="btn-secondary">
             <i data-lucide="refresh-cw" class="w-4 h-4" id="syncIcon"></i>
+            <span id="syncLabel">Atualizar cotações</span>
           </button>
         </form>
         <a th:href="@{/app/wealth/investimentos/novo}" class="btn-primary">
           <i data-lucide="plus" class="w-4 h-4"></i>
-          Novo Ativo
+          Adicionar investimento
         </a>
       </div>
     </div>
 
-    <div th:if="${successMessage}" class="mb-6 rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-800" th:text="${successMessage}">Atualizado.</div>
-    <div th:if="${errorMessage}" class="mb-6 rounded-2xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-800" th:text="${errorMessage}">Erro.</div>
-
-    <!-- Summary Metrics -->
-    <div class="wealth-grid mb-8 anim-2">
-      <div class="summary-card col-span-12 sm:col-span-6 lg:col-span-3">
-        <span class="text-[12px] font-bold text-zen-t3">Patrimônio Atual</span>
-        <div class="flex items-baseline gap-2">
-          <span class="text-2xl font-serif font-bold text-zen-t1" th:text="'R$ ' + ${#numbers.formatDecimal(totalAtual, 1, 'POINT', 2, 'COMMA')}">R$ 0,00</span>
-        </div>
-        <p class="text-[12px] text-zen-t3">Valor de mercado em tempo real</p>
-      </div>
-
-      <div class="summary-card col-span-12 sm:col-span-6 lg:col-span-3">
-        <span class="text-[12px] font-bold text-zen-t3">Total Aportado</span>
-        <div class="text-2xl font-serif font-bold text-zen-t1" th:text="'R$ ' + ${#numbers.formatDecimal(totalAportado, 1, 'POINT', 2, 'COMMA')}">R$ 0,00</div>
-        <p class="text-[12px] text-zen-t3">Soma histórica de aportes</p>
-      </div>
-
-      <div class="summary-card col-span-12 sm:col-span-6 lg:col-span-3">
-        <span class="text-[12px] font-bold text-zen-t3">Retorno da Carteira</span>
-        <div class="flex items-center gap-3">
-          <div class="text-2xl font-serif font-bold" 
-               th:classappend="${roiTotal > 0 ? 'text-emerald-600' : (roiTotal < 0 ? 'text-red-600' : 'text-zen-t1')}"
-               th:text="${(roiTotal > 0 ? '+' : '') + #numbers.formatDecimal(roiTotal, 1, 'POINT', 2, 'COMMA') + '%'}">0%</div>
-          <span class="roi-badge" th:classappend="${roiTotal >= 0 ? 'roi-pos' : 'roi-neg'}">
-            <i th:data-lucide="${roiTotal >= 0 ? 'trending-up' : 'trending-down'}" class="w-3 h-3"></i>
-            Consolidado
-          </span>
-        </div>
-        <p class="text-[12px] text-zen-t3">Considerando variações de mercado</p>
-      </div>
-
-      <div class="summary-card col-span-12 sm:col-span-6 lg:col-span-3">
-        <span class="text-[12px] font-bold text-zen-t3">Resultado Acumulado</span>
-        <div class="text-2xl font-serif font-bold" th:classappend="${portfolio.totalGain >= 0 ? ' text-emerald-600' : ' text-red-600'}"
-             th:text="${(portfolio.totalGain >= 0 ? '+ R$ ' : '- R$ ') + #numbers.formatDecimal(portfolio.totalGain.abs(), 1, 'POINT', 2, 'COMMA')}">R$ 0,00</div>
-        <p class="text-[12px] text-zen-t3">Valor atual menos aportes</p>
-      </div>
+    <div th:if="${successMessage}" role="status" class="notice notice-ok mb-4">
+      <i data-lucide="check-circle" class="w-5 h-5 shrink-0 mt-0.5"></i>
+      <span th:text="${successMessage}">Atualizado.</span>
+    </div>
+    <div th:if="${errorMessage}" role="alert" class="notice notice-err mb-4">
+      <i data-lucide="alert-circle" class="w-5 h-5 shrink-0 mt-0.5"></i>
+      <span th:text="${errorMessage}">Erro.</span>
     </div>
 
-    <!-- Assets List -->
-    <div class="wealth-grid anim-3">
-      <div th:each="inv, iter : ${investimentos}" class="asset-card col-span-12 md:col-span-4 lg:col-span-3">
-        <!-- Asset Icon based on Type -->
-        <div class="asset-icon-box">
-          <i th:data-lucide="${inv.tipo != null ? inv.tipo.icon : 'help-circle'}" class="w-5 h-5"></i>
-        </div>
-        
-        <div class="mb-4">
-          <h3 class="text-[15px] font-bold text-zen-t1 truncate" th:text="${inv.nome}">Nome</h3>
-          <div class="flex items-center gap-2">
-            <span class="text-[12px] tabular-nums text-zen-t3" th:text="${inv.ticker ?: '—'}">TICKER</span>
-            <span class="w-1 h-1 bg-zen-border rounded-full"></span>
-            <span class="text-[12px] font-semibold text-zen-t2" th:text="${inv.tipo != null ? inv.tipo.descricao : 'Indefinido'}">Tipo</span>
-          </div>
-        </div>
-
-        <div class="space-y-3 mb-6">
-          <div class="flex justify-between items-center">
-            <span class="text-[12px] text-zen-t3">Valor Atual</span>
-            <span class="text-[13.5px] tabular-nums font-bold text-zen-t1" th:text="${'R$ ' + #numbers.formatDecimal(inv.valorAtual, 1, 'POINT', 2, 'COMMA')}">0,00</span>
-          </div>
-          <div class="flex justify-between items-center" th:if="${inv.quantidade != null}">
-            <span class="text-[12px] text-zen-t3">Quantidade</span>
-            <span class="text-[12px] tabular-nums text-zen-t2" th:text="${#numbers.formatDecimal(inv.quantidade, 1, 'POINT', 4, 'COMMA')}">0</span>
-          </div>
-          <div class="flex justify-between items-center" th:if="${inv.precoAtual != null}">
-            <span class="text-[12px] text-zen-t3">Preço por cota</span>
-            <span class="text-[12px] tabular-nums text-zen-t2" th:text="${'R$ ' + #numbers.formatDecimal(inv.precoAtual, 1, 'POINT', 2, 'COMMA')}">R$ 0,00</span>
-          </div>
-          <div class="flex justify-between items-center">
-            <span class="text-[12px] text-zen-t3">Variação do dia</span>
-            <span class="roi-badge" th:if="${inv.rentabilidade != null}"
-                  th:classappend="${inv.rentabilidade > 0 ? 'roi-pos' : (inv.rentabilidade < 0 ? 'roi-neg' : 'roi-neu')}"
-                  th:text="${(inv.rentabilidade > 0 ? '+' : '') + #numbers.formatDecimal(inv.rentabilidade, 1, 'POINT', 2, 'COMMA') + '%'}">
-              0%
-            </span>
-            <span th:unless="${inv.rentabilidade != null}" class="text-zen-t3 text-[12px]">Aguardando...</span>
-          </div>
-          <div th:if="${totalAtual > 0}" class="pt-1">
-            <div class="flex justify-between text-[12px] text-zen-t3 mb-1.5"><span>Peso na carteira</span><span th:text="${#numbers.formatDecimal(inv.valorAtual * 100 / totalAtual, 1, 'POINT', 1, 'COMMA') + '%'}">0%</span></div>
-            <div class="position-track"><span th:style="|width:${inv.valorAtual * 100 / totalAtual}%|"></span></div>
-          </div>
-        </div>
-
-        <div class="flex gap-2">
-          <a th:href="@{/app/wealth/investimentos/editar/{id}(id=${inv.id})}" class="flex-1 btn-ghost py-1.5 text-[12px] flex items-center justify-center gap-2">
-            <i data-lucide="edit-3" class="w-3.5 h-3.5"></i>
-            Gerir
-          </a>
-        </div>
+    <!-- Resumo -->
+    <section class="card grid grid-cols-2 lg:grid-cols-4 mb-6" aria-label="Resumo da carteira">
+      <div class="p-5 border-b lg:border-b-0 border-r border-zen-border">
+        <p class="text-[13px] text-zen-t3">Valor atual</p>
+        <p class="mt-1 text-[22px] font-semibold text-zen-t1"
+           th:text="'R$ ' + ${#numbers.formatDecimal(totalAtual, 1, 'POINT', 2, 'COMMA')}">R$ 0,00</p>
       </div>
-
-      <!-- Empty State -->
-      <div th:if="${#lists.isEmpty(investimentos)}" class="col-span-12 py-20 text-center bg-zen-surface border border-zen-border rounded-2xl">
-        <div class="w-16 h-16 bg-zen-surface2 rounded-full flex items-center justify-center mx-auto mb-4">
-          <i data-lucide="layers" class="w-8 h-8 text-zen-t3"></i>
-        </div>
-        <h3 class="text-lg font-serif font-medium text-zen-t1">Nenhum ativo registrado</h3>
-        <p class="text-sm text-zen-t3 mt-2">Adicione a primeira posição para acompanhar alocação e rendimento.</p>
-        <a th:href="@{/app/wealth/investimentos/novo}" class="mt-6 inline-block btn-primary">Adicionar Ativo</a>
+      <div class="p-5 border-b lg:border-b-0 lg:border-r border-zen-border">
+        <p class="text-[13px] text-zen-t3">Total aportado</p>
+        <p class="mt-1 text-[22px] font-semibold text-zen-t1"
+           th:text="'R$ ' + ${#numbers.formatDecimal(totalAportado, 1, 'POINT', 2, 'COMMA')}">R$ 0,00</p>
       </div>
+      <div class="p-5 border-r border-zen-border">
+        <p class="text-[13px] text-zen-t3">Retorno</p>
+        <p class="mt-1 text-[22px] font-semibold"
+           th:classappend="${roiTotal > 0 ? ' amount-in' : (roiTotal < 0 ? ' amount-late' : ' text-zen-t1')}"
+           th:text="${(roiTotal > 0 ? '+' : '') + #numbers.formatDecimal(roiTotal, 1, 'POINT', 2, 'COMMA') + '%'}">0,00%</p>
+      </div>
+      <div class="p-5">
+        <p class="text-[13px] text-zen-t3">Resultado acumulado</p>
+        <p class="mt-1 text-[22px] font-semibold"
+           th:classappend="${portfolio.totalGain.signum() > 0 ? ' amount-in' : (portfolio.totalGain.signum() < 0 ? ' amount-late' : ' text-zen-t1')}"
+           th:text="${(portfolio.totalGain.signum() >= 0 ? '+ R$ ' : '− R$ ') + #numbers.formatDecimal(portfolio.totalGain.abs(), 1, 'POINT', 2, 'COMMA')}">R$ 0,00</p>
+        <p class="mt-1 text-[13px] text-zen-t3">Valor atual menos aportes</p>
+      </div>
+    </section>
+
+    <!-- Posições -->
+    <section th:unless="${#lists.isEmpty(investimentos)}" aria-labelledby="pos-titulo">
+      <h2 id="pos-titulo" class="sr-only">Posições</h2>
+      <div class="position-head" aria-hidden="true">
+        <span>Ativo</span><span>Valor atual</span><span>Peso na carteira</span><span>Variação do dia</span><span class="w-[72px]"></span>
+      </div>
+      <ul class="list-none p-0 m-0 border-t border-zen-border">
+        <li th:each="inv : ${investimentos}" class="position-row">
+          <div class="min-w-0">
+            <p class="ledger-title" th:text="${inv.nome}">Nome</p>
+            <p class="ledger-meta">
+              <span th:text="${inv.ticker != null and !#strings.isEmpty(inv.ticker) ? inv.ticker : 'Sem ticker'}">TICKER</span>
+              <span aria-hidden="true">·</span>
+              <span th:text="${inv.tipo != null ? inv.tipo.descricao : 'Tipo não informado'}">Tipo</span>
+              <span th:if="${inv.dataAtualizacao != null}"
+                    th:text="'· cotação de ' + ${#temporals.format(inv.dataAtualizacao, 'dd/MM')}">· cotação de 01/01</span>
+            </p>
+          </div>
+
+          <div class="text-right md:text-left">
+            <p class="ledger-amount md:text-left" th:text="${'R$ ' + #numbers.formatDecimal(inv.valorAtual, 1, 'POINT', 2, 'COMMA')}">R$ 0,00</p>
+            <p class="text-[13px] text-zen-t3" th:if="${inv.quantidade != null}"
+               th:text="${#numbers.formatDecimal(inv.quantidade, 1, 'POINT', 4, 'COMMA')} + ' cotas'">0 cotas</p>
+          </div>
+
+          <div class="col-span-2 md:col-span-1" th:if="${totalAtual != null and totalAtual.signum() > 0}">
+            <div class="flex items-center gap-3">
+              <div class="meter flex-1" aria-hidden="true">
+                <div class="meter-fill" th:style="|width:${inv.valorAtual * 100 / totalAtual}%|"></div>
+              </div>
+              <span class="text-[13px] text-zen-t2 w-[48px] text-right"
+                    th:text="${#numbers.formatDecimal(inv.valorAtual * 100 / totalAtual, 1, 'POINT', 1, 'COMMA') + '%'}">0%</span>
+            </div>
+          </div>
+          <div th:unless="${totalAtual != null and totalAtual.signum() > 0}" class="hidden md:block"></div>
+
+          <div class="text-[14px]">
+            <span class="md:hidden text-zen-t3">Variação do dia: </span>
+            <span th:if="${inv.rentabilidade != null}"
+                  th:classappend="${inv.rentabilidade > 0 ? 'amount-in' : (inv.rentabilidade < 0 ? 'amount-late' : 'text-zen-t2')}"
+                  th:text="${(inv.rentabilidade > 0 ? '+' : '') + #numbers.formatDecimal(inv.rentabilidade, 1, 'POINT', 2, 'COMMA') + '%'}">0%</span>
+            <span th:unless="${inv.rentabilidade != null}" class="text-zen-t3">Sem cotação</span>
+          </div>
+
+          <div class="flex justify-end">
+            <a th:href="@{/app/wealth/investimentos/editar/{id}(id=${inv.id})}" class="btn-ghost !min-h-[40px]"
+               th:attr="aria-label='Gerenciar ' + ${inv.nome}">Gerenciar</a>
+          </div>
+        </li>
+      </ul>
+    </section>
+
+    <div th:if="${#lists.isEmpty(investimentos)}" class="card empty-state">
+      <p class="empty-state-title">Nenhum investimento cadastrado</p>
+      <p class="empty-state-text">Informe o valor aportado e o valor atual. Se tiver ticker e quantidade, o FinGen atualiza as cotações.</p>
+      <a th:href="@{/app/wealth/investimentos/novo}" class="btn-primary">Adicionar investimento</a>
     </div>
   </main>
 
   <script th:fragment="script">
-    document.addEventListener('DOMContentLoaded', function() {
-      lucide.createIcons();
-
-      const btnSync = document.getElementById('btnSync');
-      const syncIcon = document.getElementById('syncIcon');
-      
-      if (btnSync) {
-        btnSync.addEventListener('click', function() {
-          syncIcon.classList.add('sync-loader');
-          btnSync.classList.add('opacity-70');
-          btnSync.innerHTML = '<i data-lucide="refresh-cw" class="w-4 h-4 sync-loader"></i> Sincronizando...';
-          lucide.createIcons();
-        });
-      }
+    document.addEventListener('DOMContentLoaded', function () {
+      const form = document.getElementById('btnSync') && document.getElementById('btnSync').form;
+      if (!form) return;
+      form.addEventListener('submit', function () {
+        const btn = document.getElementById('btnSync');
+        document.getElementById('syncLabel').textContent = 'Atualizando…';
+        document.getElementById('syncIcon').classList.add('spin');
+        // desabilita depois do envio para não perder o clique
+        setTimeout(function () { btn.disabled = true; }, 0);
+      });
     });
   </script>
 </body>

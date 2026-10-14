@@ -273,7 +273,7 @@
                             <p class="money-value text-3xl tabular-nums text-zen-t1 mt-2" th:text="'R$ ' + ${#numbers.formatDecimal(portfolio.currentValue, 1, 'POINT', 2, 'COMMA')}">R$ 0,00</p>
                         </div>
                         <span class="inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-[12px] tabular-nums font-bold"
-                              th:classappend="${portfolio.returnPercentage >= 0 ? ' bg-emerald-50 text-emerald-700' : ' bg-rose-50 text-rose-700'}">
+                              th:classappend="${portfolio.returnPercentage >= 0 ? ' bg-[color:var(--green-bg)] text-[color:var(--green)]' : ' bg-[color:var(--red-bg)] text-[color:var(--red)]'}">
                             <i th:data-lucide="${portfolio.returnPercentage >= 0 ? 'trending-up' : 'trending-down'}" class="w-3 h-3"></i>
                             <span th:text="${(portfolio.returnPercentage >= 0 ? '+' : '') + #numbers.formatDecimal(portfolio.returnPercentage, 1, 'POINT', 2, 'COMMA') + '%'}">0%</span>
                         </span>
@@ -285,7 +285,7 @@
                         </div>
                         <div>
                             <span class="text-[12px] text-zen-t3 block">Resultado acumulado</span>
-                            <strong class="money-value text-sm tabular-nums" th:classappend="${portfolio.totalGain >= 0 ? ' text-emerald-600' : ' text-rose-600'}"
+                            <strong class="money-value text-sm tabular-nums" th:classappend="${portfolio.totalGain >= 0 ? ' text-[color:var(--green)]' : ' text-[color:var(--red)]'}"
                                     th:text="${(portfolio.totalGain >= 0 ? '+ R$ ' : '- R$ ') + #numbers.formatDecimal(portfolio.totalGain.abs(), 1, 'POINT', 2, 'COMMA')}">R$ 0,00</strong>
                         </div>
                     </div>
@@ -308,14 +308,14 @@
                 </article>
 
                 <article class="xl:col-span-4 bg-[color:var(--amber-bg)] border border-[color:var(--amber-b)] rounded-2xl p-6 md:p-7">
-                    <div class="w-10 h-10 rounded-xl bg-amber-100 text-amber-700 flex items-center justify-center mb-5"><i data-lucide="compass" class="w-5 h-5"></i></div>
-                    <p class="text-[12px] text-amber-700 font-bold">Referência para o próximo aporte</p>
+                    <div class="w-10 h-10 rounded-xl bg-[color:var(--amber-bg)] text-[color:var(--amber)] flex items-center justify-center mb-5"><i data-lucide="compass" class="w-5 h-5"></i></div>
+                    <p class="text-[12px] text-[color:var(--amber)] font-bold">Referência para o próximo aporte</p>
                     <h3 class="text-xl font-serif text-zen-t1 mt-2" th:text="${portfolio.opportunity.label}">Classe de ativo</h3>
                     <div class="flex items-end justify-between gap-3 mt-5 mb-2">
                         <span class="text-[12px] text-zen-t3" th:text="${#numbers.formatDecimal(portfolio.opportunity.currentPercentage, 1, 'POINT', 1, 'COMMA') + '% atual'}">0% atual</span>
-                        <span class="text-[12px] font-semibold text-amber-800" th:text="${'alvo ' + #numbers.formatDecimal(portfolio.opportunity.targetPercentage, 1, 'POINT', 0, 'COMMA') + '%'}">alvo 0%</span>
+                        <span class="text-[12px] font-semibold text-[color:var(--amber)]" th:text="${'alvo ' + #numbers.formatDecimal(portfolio.opportunity.targetPercentage, 1, 'POINT', 0, 'COMMA') + '%'}">alvo 0%</span>
                     </div>
-                    <div class="allocation-track"><div class="h-full rounded-full bg-amber-500" th:style="|width:${portfolio.opportunity.progressPercentage}%|"></div></div>
+                    <div class="allocation-track"><div class="h-full rounded-full bg-[color:var(--amber)]" th:style="|width:${portfolio.opportunity.progressPercentage}%|"></div></div>
                     <p class="money-value text-sm text-zen-t2 mt-4" th:if="${portfolio.opportunity.suggestedAmount > 0}">Do caixa livre deste mês, uma referência proporcional seria <strong class="tabular-nums text-zen-t1" th:text="'R$ ' + ${#numbers.formatDecimal(portfolio.opportunity.suggestedAmount, 1, 'POINT', 2, 'COMMA')}">R$ 0,00</strong>.</p>
                     <p class="text-[12px] leading-relaxed text-zen-t3 mt-3">Baseado no perfil cadastrado e na distribuição atual. Não constitui recomendação de investimento.</p>
                 </article>
@@ -332,7 +332,7 @@
                                 <div class="min-w-0"><p class="text-[13px] font-semibold text-zen-t1 truncate group-hover:text-brand" th:text="${position.investment.nome}">Ativo</p><p class="text-[12px] tabular-nums text-zen-t3" th:text="${position.investment.ticker ?: (position.investment.tipo != null ? position.investment.tipo.descricao : 'Sem classe')}">TICKER</p></div>
                             </div>
                             <div class="text-right sm:text-left"><p class="money-value text-[12px] tabular-nums font-semibold text-zen-t1" th:text="'R$ ' + ${#numbers.formatDecimal(position.investment.valorAtual, 1, 'POINT', 2, 'COMMA')}">R$ 0,00</p><p class="portfolio-weight text-[12px] text-zen-t3" th:text="${#numbers.formatDecimal(position.portfolioPercentage, 1, 'POINT', 1, 'COMMA') + '% da carteira'}">0%</p></div>
-                            <span class="portfolio-weight justify-self-end text-[12px] tabular-nums font-bold" th:classappend="${position.returnPercentage >= 0 ? ' text-emerald-600' : ' text-rose-600'}" th:text="${(position.returnPercentage >= 0 ? '+' : '') + #numbers.formatDecimal(position.returnPercentage, 1, 'POINT', 2, 'COMMA') + '%'}">0%</span>
+                            <span class="portfolio-weight justify-self-end text-[12px] tabular-nums font-bold" th:classappend="${position.returnPercentage >= 0 ? ' text-[color:var(--green)]' : ' text-[color:var(--red)]'}" th:text="${(position.returnPercentage >= 0 ? '+' : '') + #numbers.formatDecimal(position.returnPercentage, 1, 'POINT', 2, 'COMMA') + '%'}">0%</span>
                         </a>
                     </div>
                 </article>
@@ -356,13 +356,13 @@
                         <h5 class="text-lg font-serif font-medium text-zen-t1">Evolução do patrimônio</h5>
                         <div class="flex items-center gap-2">
                             <span class="w-2 h-2 rounded-full bg-brand"></span>
-                            <span class="text-[12px] font-medium text-zen-t3">Histórico Real</span>
+                            <span class="text-[13px] text-zen-t3">Patrimônio líquido</span>
                         </div>
                     </div>
-                    <div th:if="${labelsHistoricoPatrimonio != null and !#lists.isEmpty(labelsHistoricoPatrimonio)}" class="h-[300px] w-full">
+                    <div th:if="${labelsHistoricoPatrimonio != null and #lists.size(labelsHistoricoPatrimonio) >= 2}" class="h-[300px] w-full">
                         <canvas id="graficoHistorico"></canvas>
                     </div>
-                    <div th:if="${labelsHistoricoPatrimonio == null or #lists.isEmpty(labelsHistoricoPatrimonio)}" class="h-[300px] flex flex-col items-center justify-center text-center gap-4">
+                    <div th:if="${labelsHistoricoPatrimonio == null or #lists.size(labelsHistoricoPatrimonio) < 2}" class="h-[220px] flex flex-col items-center justify-center text-center gap-4">
                         <div class="w-12 h-12 rounded-2xl bg-zen-surface2 flex items-center justify-center"><i data-lucide="line-chart" class="w-5 h-5 text-zen-t3"></i></div>
                         <div><p class="text-sm font-medium text-zen-t2">Histórico ainda não disponível</p><p class="text-xs text-zen-t3 mt-1">Registre ativos para acompanhar a evolução ao longo do tempo.</p></div>
                         <a th:href="@{/app/wealth/setup/step1}" class="dashboard-action text-xs font-semibold text-brand hover:underline">Adicionar primeiro ativo</a>
@@ -428,13 +428,13 @@
                                     <span class="text-[12px] text-zen-t3 font-bold tracking-tighter text-center leading-none">Sem<br>Ativos</span>
                                 </div>
                             </div>
-                            <p class="text-[12px] text-zen-t3 text-center leading-relaxed">Adicione a sua primeira conta bancária<br>ou imóvel para visualizar a divisão.</p>
+                            <p class="text-[12px] text-zen-t3 text-center leading-relaxed">Cadastre uma conta bancária ou um bem<br>para ver a divisão do patrimônio.</p>
                         </div>
                     </div>
                     <div class="bg-zen-surface2 rounded-2xl p-8 border border-zen-border flex flex-col justify-center">
                         <div class="flex items-center gap-3 text-brand mb-4">
                             <i data-lucide="sparkles" class="w-5 h-5"></i>
-                            <span class="text-xs font-bold">IA Advisor</span>
+                            <span class="text-[14px] font-medium">Orientação para o seu perfil</span>
                         </div>
                         <p class="text-sm text-zen-t2 leading-relaxed italic" th:if="${suggestions != null and !#lists.isEmpty(suggestions)}" th:text="${suggestions[0].message}">
                             Sugestão baseada no seu patrimônio.
@@ -443,7 +443,7 @@
                             O portfólio está registrado. Gere uma nova análise para receber uma recomendação baseada nos dados atuais.
                         </p>
                         <p class="text-sm text-zen-t3 leading-relaxed italic" th:if="${assetBreakdownLabels == null or #lists.isEmpty(assetBreakdownLabels)}">
-                            "Assim que adicionar os seus primeiros ativos, a IA analisará o seu portfólio para sugerir alocações mais eficientes."
+                            Quando você cadastrar os primeiros ativos, o assistente pode sugerir ajustes na alocação.
                         </p>
                     </div>
                 </div>
@@ -456,7 +456,7 @@
                 <div class="bg-zen-surface2 border border-zen-border rounded-2xl p-7">
                     <div class="flex items-center justify-between mb-6">
                         <h5 class="text-base font-serif font-medium text-zen-t1">Próximos vencimentos</h5>
-                        <span class="text-[12px] bg-rose-100 text-rose-700 px-2 py-0.5 rounded-full font-bold" th:text="${#lists.size(upcomingBills)}">3</span>
+                        <span class="text-[12px] bg-[color:var(--red-bg)] text-[color:var(--red)] px-2 py-0.5 rounded-full font-bold" th:text="${#lists.size(upcomingBills)}">3</span>
                     </div>
                     <div class="flex flex-col gap-3">
                         <a th:each="bill : ${upcomingBills}"
@@ -476,12 +476,12 @@
                                 </div>
                             </div>
                             <div class="flex items-center gap-2">
-                                <div class="money-value tabular-nums text-[14px] font-medium text-rose-600" th:text="'R$ ' + ${#numbers.formatDecimal(bill.valor, 1, 'POINT', 2, 'COMMA')}">R$ 1.500</div>
+                                <div class="money-value tabular-nums text-[14px] font-medium text-[color:var(--red)]" th:text="'R$ ' + ${#numbers.formatDecimal(bill.valor, 1, 'POINT', 2, 'COMMA')}">R$ 1.500</div>
                                 <i data-lucide="chevron-right" class="w-3.5 h-3.5 text-zen-t3 opacity-0 group-hover:opacity-100 transition-opacity"></i>
                             </div>
                         </a>
                         <div th:if="${#lists.isEmpty(upcomingBills)}" class="py-8 flex flex-col items-center text-center gap-2">
-                            <i data-lucide="calendar-check" class="w-6 h-6 text-emerald-600"></i>
+                            <i data-lucide="calendar-check" class="w-6 h-6 text-[color:var(--green)]"></i>
                             <p class="text-xs font-medium text-zen-t2">Nenhum vencimento futuro</p>
                             <p class="text-[12px] text-zen-t3">As contas atrasadas aparecem no resumo acima.</p>
                         </div>
@@ -500,7 +500,7 @@
                              class="flex items-center justify-between">
                             <div class="flex items-center gap-3">
                                 <div class="w-9 h-9 rounded-full flex items-center justify-center"
-                                     th:class="${isReceita ? 'w-9 h-9 rounded-full flex items-center justify-center bg-emerald-50 text-emerald-600' : 'w-9 h-9 rounded-full flex items-center justify-center bg-zen-surface2 text-zen-t3'}">
+                                     th:class="${isReceita ? 'w-9 h-9 rounded-full flex items-center justify-center bg-[color:var(--green-bg)] text-[color:var(--green)]' : 'w-9 h-9 rounded-full flex items-center justify-center bg-zen-surface2 text-zen-t3'}">
                                     <i th:data-lucide="${isReceita ? 'arrow-up-right' : 'arrow-down-left'}" class="w-4 h-4"></i>
                                 </div>
                                 <div>
@@ -508,7 +508,7 @@
                                     <div class="text-[12px] text-zen-t3" th:text="${#temporals.format(t.dataPagamento, 'dd MMM')}">05 Mar</div>
                                 </div>
                             </div>
-                            <div th:class="${isReceita ? 'money-value tabular-nums text-[13px] font-semibold text-emerald-600' : 'money-value tabular-nums text-[13px] font-semibold text-zen-t1'}"
+                            <div th:class="${isReceita ? 'money-value tabular-nums text-[13px] font-semibold text-[color:var(--green)]' : 'money-value tabular-nums text-[13px] font-semibold text-zen-t1'}"
                                  th:text="${(isReceita ? '+ ' : '- ') + 'R$ ' + #numbers.formatDecimal(t.valor, 1, 'POINT', 2, 'COMMA')}">R$ 25,00</div>
                         </div>
                         <div th:if="${#lists.isEmpty(recentTransactions)}" class="py-6 text-center">
@@ -519,27 +519,26 @@
                 </div>
 
                 <!-- AI INTELLIGENCE -->
-                <div class="bg-brand rounded-2xl p-7 text-white relative overflow-hidden group">
-                    <div class="absolute -right-4 -bottom-4 w-24 h-24 bg-zen-surface/10 rounded-full blur-2xl group-hover:scale-150 transition-transform duration-700"></div>
+                <div class="card p-5">
                     <div class="relative z-10">
-                        <div class="flex items-center gap-2 text-emerald-200 mb-4">
-                            <i data-lucide="zap" class="w-5 h-5 fill-current"></i>
-                            <span class="text-[12px] font-bold">Resumo Inteligente</span>
+                        <div class="flex items-center gap-2 text-zen-t1 mb-3">
+                            <i data-lucide="sparkles" class="w-[18px] h-[18px] text-brand"></i>
+                            <span class="text-[14px] font-medium">Leitura do mês</span>
                         </div>
-                        <p th:if="${!temDadosFinanceiros}" class="text-[13px] leading-relaxed text-emerald-50 mb-6">
+                        <p th:if="${!temDadosFinanceiros}" class="text-[14px] leading-relaxed text-zen-t2 mb-4">
                             Registre sua primeira receita ou despesa para receber uma leitura financeira baseada em dados reais.
                         </p>
-                        <p th:if="${temDadosFinanceiros and quantidadeAtrasadas > 0}" class="text-[13px] leading-relaxed text-emerald-50 mb-6">
+                        <p th:if="${temDadosFinanceiros and quantidadeAtrasadas > 0}" class="text-[14px] leading-relaxed text-zen-t2 mb-4">
                             Existem <strong th:text="${quantidadeAtrasadas}">0</strong> contas atrasadas. Priorize as de maior impacto para recuperar o fluxo do mês.
                         </p>
-                        <p th:if="${temDadosFinanceiros and quantidadeAtrasadas == 0 and !#lists.isEmpty(orcamentosAlerta)}" class="text-[13px] leading-relaxed text-emerald-50 mb-6">
+                        <p th:if="${temDadosFinanceiros and quantidadeAtrasadas == 0 and !#lists.isEmpty(orcamentosAlerta)}" class="text-[14px] leading-relaxed text-zen-t2 mb-4">
                             <strong th:text="${#lists.size(orcamentosAlerta)}">0</strong> orçamento(s) já atingiram pelo menos 80% do limite mensal.
                         </p>
-                        <p th:if="${temDadosFinanceiros and quantidadeAtrasadas == 0 and #lists.isEmpty(orcamentosAlerta)}" class="text-[13px] leading-relaxed text-emerald-50 mb-6"
+                        <p th:if="${temDadosFinanceiros and quantidadeAtrasadas == 0 and #lists.isEmpty(orcamentosAlerta)}" class="text-[14px] leading-relaxed text-zen-t2 mb-4"
                            th:text="${freeCashFlow >= 0 ? 'Seu fluxo projetado permanece positivo após os compromissos registrados.' : 'Seus compromissos superam as receitas registradas neste mês.'}">
                             Seu fluxo projetado permanece positivo.
                         </p>
-                        <button hx-get="/api/ia/analisar-anomalias?escopo=PESSOAL" hx-target="#ia-dist-body" class="w-full py-3 bg-zen-surface/10 hover:bg-zen-surface/20 border border-white/20 rounded-2xl text-[12px] font-bold transition-all">Ver Relatório IA</button>
+                        <button hx-get="/api/ia/analisar-anomalias?escopo=PESSOAL" hx-target="#ia-dist-body" class="btn-secondary w-full">Ver Relatório IA</button>
                     </div>
                 </div>
 
@@ -555,7 +554,7 @@
             <div class="lg:col-span-4 bg-zen-surface border border-zen-border rounded-2xl p-8">
                 <div class="flex items-center justify-between mb-8">
                     <span class="text-[12px] font-bold text-zen-t3">Custo da casa</span>
-                    <div class="w-8 h-8 rounded-full bg-emerald-50 flex items-center justify-center text-emerald-600">
+                    <div class="w-8 h-8 rounded-full bg-[color:var(--green-bg)] flex items-center justify-center text-[color:var(--green)]">
                         <i data-lucide="home" class="w-4 h-4"></i>
                     </div>
                 </div>
@@ -568,9 +567,12 @@
             <!-- CASA DISTRIBUTION -->
             <div class="lg:col-span-8 bg-zen-surface border border-zen-border rounded-2xl p-8">
                 <h5 class="text-sm font-serif font-medium text-zen-t1 mb-6">Gastos da casa por categoria</h5>
-                <div class="h-[200px]">
-                    <canvas id="graficoCasa"></canvas>
+                <div class="h-[200px]" th:if="${labelsCategoriaCasa != null and labelsCategoriaCasa.size() > 0}">
+                    <canvas id="graficoCasa" aria-label="Gastos da casa por categoria neste mês" role="img"></canvas>
                 </div>
+                <p class="text-[14px] text-zen-t2" th:unless="${labelsCategoriaCasa != null and labelsCategoriaCasa.size() > 0}">
+                    Nenhuma despesa da casa registrada neste mês.
+                </p>
             </div>
         </div>
     </div>
@@ -581,13 +583,13 @@
             <!-- HERO METRIC BUSINESS -->
             <div class="lg:col-span-4 bg-brand rounded-2xl p-8 text-white">
                 <div class="flex items-center justify-between mb-8">
-                    <span class="text-[12px] font-bold text-emerald-200">Custos Operacionais</span>
+                    <span class="text-[12px] font-bold text-[color:var(--green)]">Custos Operacionais</span>
                     <i data-lucide="briefcase" class="w-5 h-5 opacity-60"></i>
                 </div>
                 <div class="money-value text-3xl tabular-nums font-medium mb-2">
                     <span class="text-lg opacity-40 font-sans mr-1">R$</span><span th:text="${#numbers.formatDecimal(gastoNegocioMes, 1, 'POINT', 2, 'COMMA')}">0,00</span>
                 </div>
-                <p class="text-[12px] text-emerald-100/60 tabular-nums">Infraestrutura Business</p>
+                <p class="text-[12px] text-[color:var(--green)] tabular-nums">Infraestrutura Business</p>
                 <!-- Nome do negócio se disponível -->
                 <p th:if="${configuracaoFinanceira != null and configuracaoFinanceira.nomeNegocio != null}"
                    class="mt-4 text-[12px] text-white/70 font-medium border-t border-white/10 pt-4"
@@ -608,8 +610,8 @@
     <div id="ia-dist-panel" class="bg-zen-surface/75 backdrop-blur-2xl border border-white/90 rounded-2xl my-14 shadow-[0_12px_40px_rgba(15,118,110,0.08)] overflow-hidden animate-[fade-up_0.8s_ease-out_0.2s_both]">
         <div class="flex flex-col sm:flex-row items-center justify-between p-6 md:py-6 md:px-8 border-b border-zen-border bg-zen-surface2">
             <div class="flex items-center gap-3 text-zen-t1 font-serif text-[17px] font-medium tracking-tight mb-4 sm:mb-0">
-                <span class="w-2.5 h-2.5 rounded-full bg-amber-500 shadow-[0_0_12px_rgba(245,158,11,0.8)]"></span>
-                Cérebro Financeiro (Análise ML)
+                <span class="w-2.5 h-2.5 rounded-full bg-[color:var(--amber)] shadow-[0_0_12px_rgba(245,158,11,0.8)]"></span>
+                Análise do assistente
             </div>
 
             <button hx-get="/api/ia/analisar-anomalias?escopo=PESSOAL"
@@ -618,8 +620,8 @@
                     hx-indicator="#ia-dist-loading"
                     onclick="this.style.display='none'"
                     class="inline-flex items-center justify-center gap-2 px-6 py-2.5 text-brand bg-zen-surface border border-zen-border rounded-xl font-medium text-[13.5px] shadow-sm hover:shadow-md hover:-translate-y-0.5 hover:bg-brand-soft hover:border-brand/30 transition-all duration-300 w-full sm:w-auto">
-                <i data-lucide="sparkles" class="w-6 h-6 text-amber-500"></i>
-                Gerar Relatório de Crescimento
+                <i data-lucide="sparkles" class="w-6 h-6 text-[color:var(--amber)]"></i>
+                Gerar análise
             </button>
         </div>
 
@@ -628,7 +630,7 @@
                 <div class="flex justify-center mb-4">
                     <i data-lucide="loader-2" class="w-8 h-8 text-brand animate-spin"></i>
                 </div>
-                <span class="text-zen-t2 font-medium text-[15px] font-serif tracking-tight">Decodificando DNA Financeiro...</span>
+                <span class="text-zen-t2 font-medium text-[15px] font-serif tracking-tight">Analisando seus dados…</span>
             </div>
             
             <!-- Analysis Text -->
@@ -636,14 +638,14 @@
             
             <!-- Suggestions -->
             <div th:if="${suggestions != null and !#lists.isEmpty(suggestions)}" class="pb-8">
-                <h6 class="text-[13px] font-semibold text-zen-t2 mb-5 flex items-center gap-2 before:w-1 before:h-4 before:bg-brand before:rounded-full">Sugestões de Patrimônio</h6>
+                <h6 class="text-[13px] font-semibold text-zen-t2 mb-5 flex items-center gap-2 before:w-1 before:h-4 before:bg-brand before:rounded-full">Sugestões para o patrimônio</h6>
                 <div class="flex flex-col gap-4">
                     <div th:each="s : ${suggestions}"
                          th:with="isHigh=${s.severity.name() == 'HIGH'}, isMed=${s.severity.name() == 'MEDIUM'}"
-                         th:class="${isHigh ? 'rounded-xl p-5 border shadow-sm transition-all hover:shadow-md bg-red-50 border-red-200 dark:bg-red-900/20 dark:border-red-800/40' : (isMed ? 'rounded-xl p-5 border shadow-sm transition-all hover:shadow-md bg-amber-50 border-amber-200 dark:bg-amber-900/20 dark:border-amber-800/40' : 'rounded-xl p-5 border shadow-sm transition-all hover:shadow-md bg-sky-50 border-sky-200 dark:bg-sky-900/20 dark:border-sky-800/40')}">
+                         th:class="${isHigh ? 'rounded-xl p-5 border shadow-sm transition-all hover:shadow-md bg-[color:var(--red-bg)] border-[color:var(--red-b)]' : (isMed ? 'rounded-xl p-5 border shadow-sm transition-all hover:shadow-md bg-[color:var(--amber-bg)] border-[color:var(--amber-b)]' : 'rounded-xl p-5 border shadow-sm transition-all hover:shadow-md bg-brand-soft border-zen-border')}">
                         <div class="flex justify-between items-start mb-2">
-                            <span th:class="${isHigh ? 'text-[12px] font-bold px-2 py-0.5 rounded border bg-zen-surface text-red-700 border-red-200 dark:bg-red-950 dark:text-red-400 dark:border-red-800/50' : (isMed ? 'text-[12px] font-bold px-2 py-0.5 rounded border bg-zen-surface text-amber-700 border-amber-200 dark:bg-amber-950 dark:text-amber-400 dark:border-amber-800/50' : 'text-[12px] font-bold px-2 py-0.5 rounded border bg-zen-surface text-sky-700 border-sky-200 dark:bg-sky-950 dark:text-sky-400 dark:border-sky-800/50')}"
-                                  th:text="${s.type}">TIPO</span>
+                            <span th:class="${isHigh ? 'text-[12px] font-bold px-2 py-0.5 rounded border bg-zen-surface text-[color:var(--red)] border-[color:var(--red-b)]' : (isMed ? 'text-[12px] font-bold px-2 py-0.5 rounded border bg-zen-surface text-[color:var(--amber)] border-[color:var(--amber-b)]' : 'text-[12px] font-bold px-2 py-0.5 rounded border bg-zen-surface text-brand border-zen-border')}"
+                                  th:text="${s.type.name() == 'REBALANCING' ? 'Rebalanceamento' : (s.type.name() == 'DIVERSIFICATION' ? 'Diversificação' : (s.type.name() == 'DEPRECIATION_ALERT' ? 'Alerta de desvalorização' : (s.type.name() == 'MARKET_OPPORTUNITY' ? 'Oportunidade' : 'Sugestão')))}">Sugestão</span>
                         </div>
                         <p class="text-[15px] text-zen-t1 leading-relaxed m-0 font-medium" th:text="${s.message}">Mensagem da sugestão...</p>
                     </div>
@@ -656,8 +658,8 @@
                     <i data-lucide="brain-circuit" class="w-7 h-7 text-zen-t3 opacity-40"></i>
                 </div>
                 <div>
-                  <p class="text-base font-serif font-medium text-zen-t1">Cérebro ainda em repouso</p>
-                  <p class="text-[13px] text-zen-t3 max-w-xs mx-auto mt-1">Gere um relatório de crescimento para que o motor ML analise os seus dados.</p>
+                  <p class="text-base font-serif font-medium text-zen-t1">Nenhuma análise ainda</p>
+                  <p class="text-[13px] text-zen-t3 max-w-xs mx-auto mt-1">Gere uma análise para o assistente avaliar suas contas e seu patrimônio.</p>
                 </div>
             </div>
         </div>
@@ -785,6 +787,7 @@
             const activateTab = () => {
                 document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
                 document.getElementById('tab-' + name)?.classList.add('active');
+                if (name === 'casa' && window.renderCasaChart) requestAnimationFrame(window.renderCasaChart);
             };
             if (ctx && !reduceMotion) {
                 ctx.add(() => {
@@ -847,11 +850,14 @@
         // ==========================================
         // CHART ENGINE (ZEN THEME)
         // ==========================================
-        const ccBrand = '#0F766E';
-        const ccBorder = 'rgba(15,118,110,0.08)';
-        
-        Chart.defaults.font.family = "'DM Sans', sans-serif";
-        Chart.defaults.color = '#2D4A3E';
+        // Cores lidas do tema ativo (claro/escuro); os gráficos refletem a troca de tema ao recarregar.
+        const cssVar = (name) => getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+        const ccBrand = cssVar('--brand');
+        const ccBorder = cssVar('--border');
+        const ccSurface = cssVar('--surface');
+
+        Chart.defaults.font.family = "'DM Sans', system-ui, sans-serif";
+        Chart.defaults.color = cssVar('--t2');
         Chart.defaults.scale.grid.color = ccBorder;
 
         // 1. Wealth History
@@ -867,7 +873,7 @@
                         label: 'Patrimônio',
                         data: valuesH,
                         borderColor: ccBrand,
-                        backgroundColor: 'rgba(15,118,110,0.05)',
+                        backgroundColor: cssVar('--brand-soft'),
                         fill: true,
                         tension: 0.4,
                         pointRadius: 0,
@@ -898,7 +904,7 @@
                         data: /*[[${assetBreakdownValues}]]*/ [],
                         backgroundColor: ['#0F766E', '#14B8A6', '#5EEAD4', '#99F6E4', '#CCFBF1'],
                         borderWidth: 4,
-                        borderColor: '#ffffff'
+                        borderColor: ccSurface
                     }]
                 },
                 options: {
@@ -910,6 +916,32 @@
             });
         }
 
+        const casaLabels = /*[[${labelsCategoriaCasa}]]*/ [];
+        const casaValues = /*[[${valoresCategoriaCasa}]]*/ [];
+        window.renderCasaChart = function () {
+            const el = document.getElementById('graficoCasa');
+            if (!el || el.dataset.ready || !casaValues || !casaValues.length) return;
+            el.dataset.ready = '1';
+            new Chart(el, {
+                type: 'doughnut',
+                data: {
+                    labels: casaLabels,
+                    datasets: [{
+                        data: casaValues,
+                        backgroundColor: ['#0F766E', '#B45309', '#4F46E5', '#BE123C', '#0369A1', '#4D7C0F'],
+                        borderWidth: 2,
+                        borderColor: ccSurface
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    cutout: '62%',
+                    plugins: { legend: { position: 'right', labels: { boxWidth: 10, boxHeight: 10 } } }
+                }
+            });
+        };
+
         const ctxPortfolio = document.getElementById('portfolioAllocationChart');
         if (ctxPortfolio) {
             new Chart(ctxPortfolio, {
@@ -920,7 +952,7 @@
                         data: /*[[${portfolioAllocationValues}]]*/ [],
                         backgroundColor: /*[[${portfolioAllocationColors}]]*/ [],
                         borderWidth: 3,
-                        borderColor: '#ffffff'
+                        borderColor: ccSurface
                     }]
                 },
                 options: {

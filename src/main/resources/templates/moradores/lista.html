@@ -24,11 +24,11 @@
     </div>
 
     <!-- Mensagens de Feedback -->
-    <div th:if="${success}" class="bg-emerald-50 text-emerald-600 px-5 py-3.5 rounded-xl border border-emerald-100 mb-6 text-[13.5px] font-medium flex items-center gap-3">
+    <div th:if="${success}" class="bg-[color:var(--green-bg)] text-[color:var(--green)] px-5 py-3.5 rounded-xl border border-[color:var(--green-b)] mb-6 text-[13.5px] font-medium flex items-center gap-3">
         <svg class="w-5 h-5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
         <span th:text="${success}">Sucesso</span>
     </div>
-    <div th:if="${error}" class="bg-rose-50 text-rose-600 px-5 py-3.5 rounded-xl border border-rose-100 mb-6 text-[13.5px] font-medium flex items-center gap-3">
+    <div th:if="${error}" class="bg-[color:var(--red-bg)] text-[color:var(--red)] px-5 py-3.5 rounded-xl border border-[color:var(--red-b)] mb-6 text-[13.5px] font-medium flex items-center gap-3">
         <svg class="w-5 h-5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
         <span th:text="${error}">Erro</span>
     </div>
@@ -53,7 +53,7 @@
         </div>
         <div class="flex items-center justify-between pt-5 border-t border-zen-border mt-auto">
           <span class="text-[12px] font-semibold px-3 py-1 rounded-full" 
-                th:classappend="${m.role=='ROLE_ADMIN' ? 'bg-brand/10 text-brand border-brand/20 border' : 'bg-slate-50 text-slate-500 border border-slate-200'}"
+                th:classappend="${m.role=='ROLE_ADMIN' ? 'bg-brand/10 text-brand border-brand/20 border' : 'bg-zen-surface2 text-zen-t3 border border-zen-border'}"
                 th:text="${m.role=='ROLE_ADMIN'?'Admin':'Morador'}"></span>
           <div class="flex items-center gap-2">
             <a th:href="@{/app/settings/moradores/editar/{id}(id=${m.id})}" class="inline-flex items-center gap-1.5 px-3 py-1.5 border border-zen-border rounded-lg text-[12px] font-medium text-zen-t2 hover:bg-zen-surface2 transition-colors">
@@ -67,7 +67,7 @@
                   onsubmit="return confirm('Deseja realmente remover este morador da casa?')"
                   aria-label="Remover Morador"
                   class="inline m-0">
-                <button type="submit" class="inline-flex items-center gap-1.5 px-3 py-1.5 border border-rose-200 bg-rose-50 text-rose-600 rounded-lg text-[12px] font-medium hover:bg-rose-100 transition-colors" aria-label="Remover Morador">
+                <button type="submit" class="inline-flex items-center gap-1.5 px-3 py-1.5 border border-[color:var(--red-b)] bg-[color:var(--red-bg)] text-[color:var(--red)] rounded-lg text-[12px] font-medium hover:bg-[color:var(--red-bg)] transition-colors" aria-label="Remover Morador">
                     <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <polyline points="3 6 5 6 21 6"></polyline>
                         <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>

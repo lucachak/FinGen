@@ -60,7 +60,7 @@ public class WealthSuggestionService {
                                 .user(user)
                                 .type(SuggestionType.DIVERSIFICATION)
                                 .severity(SuggestionSeverity.MEDIUM)
-                                .message("O seu patrimônio está altamente concentrado em " + entry.getKey() + " (" + percentage.setScale(1, RoundingMode.HALF_UP) + "%). Considere diversificar para reduzir riscos.")
+                                .message("Seu patrimônio está altamente concentrado em " + entry.getKey() + " (" + percentage.setScale(1, RoundingMode.HALF_UP) + "%). Considere diversificar para reduzir riscos.")
                                 .build());
                     }
                 }
@@ -76,7 +76,7 @@ public class WealthSuggestionService {
                         .user(user)
                         .type(SuggestionType.REBALANCING)
                         .severity(SuggestionSeverity.HIGH)
-                        .message("Reserva de Emergência baixa. A sua liquidez atual cobre menos de 3 meses do seu orçamento mensal (" + monthlyBudget + "). Foque em acumular ativos de baixo risco.")
+                        .message("Reserva de emergência baixa. Sua liquidez atual cobre menos de 3 meses do seu orçamento mensal (" + String.format(new java.util.Locale("pt", "BR"), "R$ %,.2f", monthlyBudget) + "). Foque em acumular ativos de baixo risco.")
                                 .build());
                     }
 
@@ -89,7 +89,7 @@ public class WealthSuggestionService {
                             .user(user)
                             .type(SuggestionType.DEPRECIATION_ALERT)
                             .severity(SuggestionSeverity.LOW)
-                            .message("Ativos depreciáveis (Veículos) representam " + vehiclePercent.setScale(1, RoundingMode.HALF_UP) + "% do seu patrimônio. Lembre-se que veículos perdem valor ao longo do tempo.")
+                            .message("Ativos depreciáveis (Veículos) representam " + vehiclePercent.setScale(1, RoundingMode.HALF_UP) + "% do seu patrimônio. Veículos perdem valor ao longo do tempo.")
                             .build());
                 }
             }
