@@ -7,134 +7,72 @@
 
 <body>
 
-    <aside th:fragment="sidebar" id="sidebar"
-        class="fixed inset-y-0 left-0 w-[248px] bg-zen-surface border-r border-zen-border flex flex-col z-50 transition-transform duration-300 -translate-x-full md:translate-x-0">
+    <!-- Item de navegação. `key` casa com o `activeMenu` que cada controller define. -->
+    <a th:fragment="item(href, key, icon, label, menu)" th:href="@{${href}}"
+        class="group flex items-center gap-3 min-h-[40px] px-3 rounded-md text-[14px] transition-colors"
+        th:classappend="${menu == key} ? 'bg-zen-surfaceH text-zen-t1 font-medium' : 'text-zen-t2 hover:bg-zen-surfaceH hover:text-zen-t1'"
+        th:attr="aria-current=${menu == key} ? 'page' : null">
+        <i th:attr="data-lucide=${icon}" class="w-[18px] h-[18px] shrink-0"
+            th:classappend="${menu == key} ? 'text-brand' : 'text-zen-t3 group-hover:text-zen-t2'"></i>
+        <span th:text="${label}">Item</span>
+    </a>
 
-        <!-- Brand -->
-        <div class="flex items-center gap-3 px-5 h-[64px] border-b border-zen-border shrink-0">
-            <div
-                class="w-8 h-8 bg-brand rounded-lg flex items-center justify-center shrink-0 shadow-[0_4px_12px_rgba(15,118,110,0.3)]">
+    <aside th:fragment="sidebar" id="sidebar" aria-label="Menu principal"
+        class="fixed inset-y-0 left-0 w-[232px] bg-zen-surface border-r border-zen-border flex flex-col z-50 transition-transform duration-200 -translate-x-full md:translate-x-0">
+
+        <!-- Marca -->
+        <a th:href="@{/app/dashboard}" class="flex items-center gap-2.5 px-5 h-[56px] border-b border-zen-border shrink-0 no-underline">
+            <span class="w-7 h-7 bg-brand rounded-md flex items-center justify-center shrink-0" aria-hidden="true">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
-                    <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" stroke="white" stroke-width="2.5"
-                        stroke-linecap="round" stroke-linejoin="round" />
+                    <path d="M4 18V9m6 9V5m6 13v-7m4 7H2" stroke="white" stroke-width="2.5" stroke-linecap="round"
+                        stroke-linejoin="round" />
                 </svg>
-            </div>
-            <span class="text-[15px] font-semibold text-zen-t1 tracking-tight">FinGen</span>
-        </div>
+            </span>
+            <span class="text-[16px] font-semibold text-zen-t1 tracking-tight">FinGen</span>
+        </a>
 
-        <!-- Navigation -->
-        <!-- FIX #13: activeMenu null-safe via ?: '' — evita NPE se controller não setar a variável -->
-        <nav th:with="menu=${activeMenu ?: ''}" class="flex-1 overflow-y-auto px-3 py-4 flex flex-col gap-1"
-            style="scrollbar-width:none;">
+        <nav th:with="menu=${activeMenu ?: ''}" class="flex-1 overflow-y-auto px-3 py-4 flex flex-col gap-0.5">
 
-            <span class="text-[10px] font-semibold tracking-widest uppercase text-zen-t3 px-2.5 pt-3.5 pb-1.5">Visão
-                Geral</span>
+            <th:block th:replace="~{:: item('/app/dashboard', 'dashboard', 'layout-dashboard', 'Início', ${menu})}"></th:block>
+            <th:block th:replace="~{:: item('/app/financeiro/contas', 'contas', 'receipt', 'Contas', ${menu})}"></th:block>
+            <th:block th:replace="~{:: item('/app/financeiro/recorrentes', 'automacao', 'repeat', 'Contas recorrentes', ${menu})}"></th:block>
+            <th:block th:replace="~{:: item('/app/financeiro/orcamentos', 'orcamentos', 'wallet', 'Orçamentos', ${menu})}"></th:block>
+            <th:block th:replace="~{:: item('/app/financeiro/setup', 'setup', 'sliders-horizontal', 'Distribuição da renda', ${menu})}"></th:block>
 
-            <a th:href="@{/app/dashboard}"
-                class="group flex items-center gap-2.5 px-3 py-2 rounded-md text-[13.5px] transition-colors border border-transparent"
-                th:classappend="${menu == 'dashboard'} ? 'bg-brand-soft text-brand font-medium border-brand/15' : 'text-zen-t2 hover:bg-zen-surfaceH hover:text-zen-t1'">
-                <i data-lucide="layout-dashboard" class="w-4 h-4 shrink-0 transition-colors"
-                    th:classappend="${menu == 'dashboard'} ? 'text-brand' : 'text-zen-t3 group-hover:text-brand'"></i>
-                Dashboard
-            </a>
+            <p class="px-3 pt-5 pb-1.5 text-[12px] font-medium text-zen-t3">Patrimônio</p>
+            <th:block th:replace="~{:: item('/app/wealth/investimentos', 'investimentos', 'trending-up', 'Investimentos', ${menu})}"></th:block>
+            <th:block th:replace="~{:: item('/app/financeiro/metas', 'metas', 'target', 'Metas', ${menu})}"></th:block>
 
-            <a th:href="@{/app/financeiro/contas}"
-                class="group flex items-center gap-2.5 px-3 py-2 rounded-md text-[13.5px] transition-colors border border-transparent"
-                th:classappend="${menu == 'contas'} ? 'bg-brand-soft text-brand font-medium border-brand/15' : 'text-zen-t2 hover:bg-zen-surfaceH hover:text-zen-t1'">
-                <i data-lucide="receipt" class="w-4 h-4 shrink-0 transition-colors"
-                    th:classappend="${menu == 'contas'} ? 'text-brand' : 'text-zen-t3 group-hover:text-brand'"></i>
-                Gestão de Contas
-            </a>
+            <p class="px-3 pt-5 pb-1.5 text-[12px] font-medium text-zen-t3">Ajuda</p>
+            <th:block th:replace="~{:: item('/app/ia', 'ia', 'sparkles', 'Assistente', ${menu})}"></th:block>
 
-            <a th:href="@{/app/financeiro/recorrentes}"
-                class="group flex items-center gap-2.5 px-3 py-2 rounded-md text-[13.5px] transition-colors border border-transparent"
-                th:classappend="${menu == 'automacao'} ? 'bg-brand-soft text-brand font-medium border-brand/15' : 'text-zen-t2 hover:bg-zen-surfaceH hover:text-zen-t1'">
-                <i data-lucide="zap" class="w-4 h-4 shrink-0 transition-colors"
-                    th:classappend="${menu == 'automacao'} ? 'text-brand' : 'text-zen-t3 group-hover:text-brand'"></i>
-                Automação de Contas
-            </a>
-
-            <a th:href="@{/app/financeiro/orcamentos}"
-                class="group flex items-center gap-2.5 px-3 py-2 rounded-md text-[13.5px] transition-colors border border-transparent"
-                th:classappend="${menu == 'orcamentos'} ? 'bg-brand-soft text-brand font-medium border-brand/15' : 'text-zen-t2 hover:bg-zen-surfaceH hover:text-zen-t1'">
-                <i data-lucide="wallet" class="w-4 h-4 shrink-0 transition-colors"
-                    th:classappend="${menu == 'orcamentos'} ? 'text-brand' : 'text-zen-t3 group-hover:text-brand'"></i>
-                Orçamentos
-            </a>
-
-            <a th:href="@{/app/financeiro/setup}"
-                class="group flex items-center gap-2.5 px-3 py-2 rounded-md text-[13.5px] transition-colors border border-transparent"
-                th:classappend="${menu == 'setup'} ? 'bg-brand-soft text-brand font-medium border-brand/15' : 'text-zen-t2 hover:bg-zen-surfaceH hover:text-zen-t1'">
-                <i data-lucide="sliders" class="w-4 h-4 shrink-0 transition-colors"
-                    th:classappend="${menu == 'setup'} ? 'text-brand' : 'text-zen-t3 group-hover:text-brand'"></i>
-                Estratégia de Renda
-            </a>
-
-            <a th:href="@{/app/ia}"
-                class="group flex items-center gap-2.5 px-3 py-2 rounded-md text-[13.5px] transition-colors border border-transparent"
-                th:classappend="${menu == 'ia'} ? 'bg-brand-soft text-brand font-medium border-brand/15' : 'text-zen-t2 hover:bg-zen-surfaceH hover:text-zen-t1'">
-                <i data-lucide="bot" class="w-4 h-4 shrink-0 transition-colors"
-                    th:classappend="${menu == 'ia'} ? 'text-brand' : 'text-zen-t3 group-hover:text-brand'"></i>
-                Assistente IA
-                <span
-                    class="ml-auto text-[9.5px] font-semibold bg-brand text-white rounded-full px-2 py-0.5 tracking-wide">IA</span>
-            </a>
-
-            <span th:if="${user != null and user.role == 'ROLE_ADMIN'}" class="text-[10px] font-semibold tracking-widest uppercase text-zen-t3 px-2.5 pt-3.5 pb-1.5">Minha
-                Casa</span>
-
-            <a th:if="${user != null and user.role == 'ROLE_ADMIN'}" th:href="@{/app/settings/moradores}"
-                class="group flex items-center gap-2.5 px-3 py-2 rounded-md text-[13.5px] transition-colors border border-transparent"
-                th:classappend="${menu == 'moradores'} ? 'bg-brand-soft text-brand font-medium border-brand/15' : 'text-zen-t2 hover:bg-zen-surfaceH hover:text-zen-t1'">
-                <i data-lucide="users" class="w-4 h-4 shrink-0 transition-colors"
-                    th:classappend="${menu == 'moradores'} ? 'text-brand' : 'text-zen-t3 group-hover:text-brand'"></i>
-                Moradores (Família)
-            </a>
-
-            <span
-                class="text-[10px] font-semibold tracking-widest uppercase text-zen-t3 px-2.5 pt-3.5 pb-1.5">Crescimento</span>
-
-            <a th:href="@{/app/wealth/investimentos}"
-                class="group flex items-center gap-2.5 px-3 py-2 rounded-md text-[13.5px] transition-colors border border-transparent"
-                th:classappend="${menu == 'investimentos'} ? 'bg-brand-soft text-brand font-medium border-brand/15' : 'text-zen-t2 hover:bg-zen-surfaceH hover:text-zen-t1'">
-                <i data-lucide="trending-up" class="w-4 h-4 shrink-0 transition-colors"
-                    th:classappend="${menu == 'investimentos'} ? 'text-brand' : 'text-zen-t3 group-hover:text-brand'"></i>
-                Investimentos
-            </a>
-
-            <a th:href="@{/app/financeiro/metas}"
-                class="group flex items-center gap-2.5 px-3 py-2 rounded-md text-[13.5px] transition-colors border border-transparent"
-                th:classappend="${menu == 'metas'} ? 'bg-brand-soft text-brand font-medium border-brand/15' : 'text-zen-t2 hover:bg-zen-surfaceH hover:text-zen-t1'">
-                <i data-lucide="target" class="w-4 h-4 shrink-0 transition-colors"
-                    th:classappend="${menu == 'metas'} ? 'text-brand' : 'text-zen-t3 group-hover:text-brand'"></i>
-                Metas Financeiras
-            </a>
-
+            <th:block th:if="${user != null and user.role == 'ROLE_ADMIN'}">
+                <p class="px-3 pt-5 pb-1.5 text-[12px] font-medium text-zen-t3">Casa</p>
+                <th:block th:replace="~{:: item('/app/settings/moradores', 'moradores', 'users', 'Moradores', ${menu})}"></th:block>
+            </th:block>
         </nav>
 
-        <!-- Sidebar Footer -->
+        <!-- Conta -->
         <div class="shrink-0 p-3 border-t border-zen-border">
-            <div class="flex items-center gap-2.5 p-2 rounded-md bg-zen-surface2 border border-zen-border mb-2">
+            <a th:href="@{/app/settings/perfil}"
+                class="flex items-center gap-2.5 p-2 rounded-md hover:bg-zen-surfaceH no-underline transition-colors">
                 <img th:if="${user != null and user.fotoPerfil != null}" th:src="@{${user.fotoPerfil}}"
-                    class="w-8 h-8 rounded-full object-cover" alt="Avatar">
-                <div th:unless="${user != null and user.fotoPerfil != null}"
-                    class="w-8 h-8 rounded-full bg-brand text-white flex items-center justify-center shrink-0 text-xs font-semibold">
-                    <a th:href="@{/app/settings/perfil}" class="no-underline text-inherit">
-                        <span th:text="${user != null ? #strings.substring(user.email,0,1).toUpperCase() : 'U'}"></span>
-                    </a>
-                </div>
-                <div class="overflow-hidden">
-                    <div class="text-[12.5px] font-medium text-zen-t1 truncate"
-                        th:text="${user != null ? user.username : 'Utilizador'}">Utilizador</div>
-                    <div class="text-[11px] text-zen-t3 truncate" th:text="${user != null ? user.email : ''}">email
-                    </div>
-                </div>
-            </div>
-            <form th:action="@{/logout}" method="post" class="m-0">
+                    class="w-8 h-8 rounded-full object-cover" alt="">
+                <span th:unless="${user != null and user.fotoPerfil != null}"
+                    class="w-8 h-8 rounded-full bg-brand text-zen-inv flex items-center justify-center shrink-0 text-[13px] font-semibold"
+                    aria-hidden="true"
+                    th:text="${user != null ? #strings.toUpperCase(#strings.substring(user.nomeCompleto != null ? user.nomeCompleto : user.username, 0, 1)) : 'U'}">M</span>
+                <span class="min-w-0">
+                    <span class="block text-[13px] font-medium text-zen-t1 truncate"
+                        th:text="${user != null ? (user.nomeCompleto != null ? user.nomeCompleto : user.username) : 'Conta'}">Conta</span>
+                    <span class="block text-[12px] text-zen-t3 truncate" th:text="${user != null ? user.email : ''}">email</span>
+                </span>
+            </a>
+            <form th:action="@{/logout}" method="post" class="m-0 mt-1">
                 <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
                 <button type="submit"
-                    class="w-full flex items-center gap-2 px-3 py-2 rounded-md text-[13px] text-zen-t3 hover:bg-red-50 hover:text-red-600 transition-colors text-left bg-transparent border-none cursor-pointer">
-                    <i data-lucide="log-out" class="w-4 h-4"></i>
+                    class="w-full flex items-center gap-3 min-h-[40px] px-3 rounded-md text-[14px] text-zen-t2 hover:bg-zen-surfaceH hover:text-zen-t1 transition-colors text-left bg-transparent border-none cursor-pointer">
+                    <i data-lucide="log-out" class="w-[18px] h-[18px] text-zen-t3"></i>
                     Sair
                 </button>
             </form>
