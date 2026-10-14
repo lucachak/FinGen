@@ -50,3 +50,6 @@ data/*.trace.db
 
 ### Mobile ###
 mobile/.env
+
+### Artefatos locais ###
+teste.pdf
