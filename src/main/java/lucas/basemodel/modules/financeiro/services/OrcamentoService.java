@@ -43,11 +43,12 @@ public class OrcamentoService {
         List<Orcamento> orcamentos = orcamentoRepository.findByResponsavel(user).stream()
                 .filter(o -> o.getCategoria() != null && o.getCategoria().getEscopo() == escopo)
                 .toList();
-        int mes = LocalDate.now().getMonthValue();
-        int ano = LocalDate.now().getYear();
+        java.time.YearMonth mesAtual = java.time.YearMonth.now();
+        LocalDate inicio = mesAtual.atDay(1);
+        LocalDate fimExclusivo = mesAtual.plusMonths(1).atDay(1);
 
         return orcamentos.stream().map(orc -> {
-            BigDecimal gasto = contaRepository.sumGastosPorCategoriaMesAno(user, orc.getCategoria(), mes, ano);
+            BigDecimal gasto = contaRepository.sumGastosPorCategoriaMesAno(user, orc.getCategoria(), inicio, fimExclusivo);
             if (gasto == null) gasto = BigDecimal.ZERO;
             BigDecimal limite = orc.getLimiteMensal() != null ? orc.getLimiteMensal() : BigDecimal.ZERO;
             double percentual = limite.compareTo(BigDecimal.ZERO) > 0

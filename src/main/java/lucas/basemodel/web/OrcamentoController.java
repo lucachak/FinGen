@@ -65,8 +65,7 @@ public class OrcamentoController {
             Map<UUID, BigDecimal> percentuais = new HashMap<>();
             Map<UUID, String> statusRisco = new HashMap<>();
 
-            int mesAtual = LocalDate.now().getMonthValue();
-            int anoAtual = LocalDate.now().getYear();
+            java.time.YearMonth mesAtual = java.time.YearMonth.now();
 
             // OPTIMIZED: 1 batch query GROUP BY categoria (antes: 1 query por orçamento —
             // N+1)
@@ -77,8 +76,8 @@ public class OrcamentoController {
 
             Map<Long, BigDecimal> gastosBatch = new HashMap<>();
             if (!categoriaIds.isEmpty()) {
-                List<Object[]> rows = contaRepository.sumGastosPorCategoriasBatch(user, categoriaIds, mesAtual,
-                        anoAtual);
+                List<Object[]> rows = contaRepository.sumGastosPorCategoriasBatch(user, categoriaIds,
+                        mesAtual.atDay(1), mesAtual.plusMonths(1).atDay(1));
                 for (Object[] row : rows) {
                     Long catId = (Long) row[0]; // Mude de UUID para Long
                     BigDecimal soma = row[1] instanceof BigDecimal bd ? bd : new BigDecimal(row[1].toString());

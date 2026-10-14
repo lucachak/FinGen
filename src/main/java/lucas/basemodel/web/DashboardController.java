@@ -214,9 +214,8 @@ public class DashboardController {
 
         Map<Long, BigDecimal> gastosBatch = new HashMap<>();
         if (!catIds.isEmpty()) {
-            int mes = java.time.LocalDate.now().getMonthValue();
-            int ano = java.time.LocalDate.now().getYear();
-            List<Object[]> rows = contaRepository.sumGastosPorCategoriasBatch(usuarioLogado, catIds, mes, ano);
+            List<Object[]> rows = contaRepository.sumGastosPorCategoriasBatch(usuarioLogado, catIds,
+                    mesAtual.atDay(1), mesAtual.plusMonths(1).atDay(1));
             for (Object[] row : rows) {
                 Long catId = (Long) row[0];
                 BigDecimal soma = row[1] instanceof BigDecimal bd ? bd : new BigDecimal(row[1].toString());

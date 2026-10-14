@@ -211,7 +211,9 @@ public class ContaService {
     // Método perfeito para popular o seu dashboard com as contas do mês atual!
     public List<Conta> listarContasDoMesAtual(User responsavel) {
         LocalDate hoje = LocalDate.now();
-        return contaRepository.findByResponsavelAndMesEAno(responsavel, hoje.getMonthValue(), hoje.getYear());
+        java.time.YearMonth mes = java.time.YearMonth.from(hoje);
+        return contaRepository.findByResponsavelAndVencimentoNoIntervalo(responsavel, mes.atDay(1),
+                mes.plusMonths(1).atDay(1));
     }
 
     // Calcula o total de saídas (despesas) pendentes
